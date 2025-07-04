@@ -20,7 +20,15 @@ class UnknownNodeTypeError(Exception):
 
 
 def parse_behavior_tree(file_path: str) -> BaseNode:
-    """Parse a behavior tree XML file and return a list of nodes."""
+    """
+    Parse a behavior tree XML file and return a list of nodes.
+
+    Args:
+        file_path: Path to the XML file to parse
+
+    Returns:
+        BaseNode: The parsed behavior tree root node
+    """
     tree = ET.parse(file_path)
     root = tree.getroot()
     return parse_node(root)
@@ -33,10 +41,10 @@ def parse_behavior_tree_with_metadata(
     Parse the XML file containing the behavior tree and metadata.
 
     Args:
-        file_path (str): Path to the XML file.
+        file_path: Path to the XML file
 
     Returns:
-        Tuple[Optional[BaseNode], Dict[str, str]]: The parsed behavior tree and a dictionary containing metadata.
+        Tuple[Optional[BaseNode], Dict[str, str]]: The parsed behavior tree and a dictionary containing metadata
     """
     with open(file_path, "r") as file:
         content = file.read()
@@ -71,7 +79,19 @@ def parse_behavior_tree_with_metadata(
 
 
 def parse_node(node: ET.Element) -> BaseNode:
-    """Parse an individual XML node and return its data structure."""
+    """
+    Parse an individual XML node and return its data structure.
+
+    Args:
+        node: The XML element to parse
+
+    Returns:
+        BaseNode: The parsed node structure
+
+    Raises:
+        UnknownNodeTypeError: If an unknown node type is encountered
+        ValueError: If BehaviorTree node structure is invalid
+    """
     node_type = node.tag.lower()
 
     if node_type == "condition":
@@ -102,7 +122,16 @@ def parse_node(node: ET.Element) -> BaseNode:
 
 
 def print_nodes(node: BaseNode, indent: int = 0) -> None:
-    """Print the parsed nodes in a readable format."""
+    """
+    Print the parsed nodes in a readable format.
+
+    Args:
+        node: The node to print
+        indent: Indentation level for formatting
+
+    Raises:
+        ValueError: If unknown node type is encountered
+    """
     indent_str = "  " * indent
 
     if isinstance(node, SequenceNode):
@@ -124,7 +153,13 @@ def print_nodes(node: BaseNode, indent: int = 0) -> None:
 
 
 def save_behavior_tree_xml(data: str, file_path: str) -> None:
-    """Save parsed nodes back to an XML file."""
+    """
+    Save parsed nodes back to an XML file.
+
+    Args:
+        data: The XML data string to save
+        file_path: Path where to save the XML file
+    """
     if not data:
         print("No valid XML content to save.")
         return
@@ -148,7 +183,20 @@ def save_behavior_tree_with_metadata(
     style_name: str,
     file_path: str,
 ) -> None:
-    """Save behavior tree data with metadata to an XML file."""
+    """
+    Save behavior tree data with metadata to an XML file.
+
+    Args:
+        data: The XML data string to save
+        behaviors: Dictionary of behavior names
+        agent_class_name: Name of the agent class
+        env_name: Name of the environment
+        task_name: Name of the task
+        model_name: Name of the model
+        technique: Prompt technique used
+        style_name: Style name used
+        file_path: Path where to save the XML file
+    """
     if not data:
         print("No valid XML content to save.")
         return

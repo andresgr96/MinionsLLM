@@ -16,7 +16,20 @@ def _validate_node_recursive(
     feedback: List[str],
     path: str,
 ) -> bool:
-    """Recursively validate a node and its children against lists of valid primitives."""
+    """
+    Recursively validate a node and its children against lists of valid primitives.
+
+    Args:
+        node: The XML element node to validate
+        conditions: List of valid condition primitives
+        actuator_actions: List of valid actuator action primitives
+        state_actions: List of valid state action primitives
+        feedback: List to collect validation feedback messages
+        path: Current path in the XML tree for error reporting
+
+    Returns:
+        bool: True if validation passes, False otherwise
+    """
     current_path = f"{path}/{node.tag}" if path else node.tag
 
     if node.text and node.text.strip():
@@ -57,9 +70,7 @@ def validate_primitives(tree_xml: str, agent_class: Type[Agent]) -> tuple[bool, 
         agent_class: The agent class to validate against.
 
     Returns:
-        A tuple containing:
-        - bool: True if the tree is valid, False otherwise.
-        - str: A feedback message. Empty if valid, or an error message if invalid.
+        tuple[bool, str]: A tuple containing validation result and feedback message
     """
     feedback: List[str] = []
     try:

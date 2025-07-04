@@ -6,4 +6,4 @@ packages=$(../read_project_parts.sh)
 
 cd ../..
 
-darglint -s sphinx $packages
+darglint -s google $packages

@@ -279,7 +279,15 @@ class BehaviorTreeGrammarValidator:
     # --- Public Validation Method ---
 
     def validate_tree(self, tree_xml: str) -> Tuple[bool, str]:
-        """Validate a behavior tree against the grammar rules."""
+        """
+        Validate a behavior tree against the grammar rules.
+
+        Args:
+            tree_xml: The behavior tree XML string to validate
+
+        Returns:
+            Tuple[bool, str]: A tuple containing validation result and feedback message
+        """
         # --- Start of new validation logic ---
         try:
             # We parse the tree here first to check its basic structure.
@@ -320,7 +328,12 @@ class BehaviorTreeGrammarValidator:
         return True, "Tree is syntactically valid according to the grammar."
 
     def get_grammar_info(self) -> Dict[str, Any]:
-        """Get information about the current grammar configuration."""
+        """
+        Get information about the current grammar configuration.
+
+        Returns:
+            Dict[str, Any]: Dictionary containing parsed rules and flattened shapes
+        """
         return {
             "parsed_rules": self.parsed_rules,
             "flattened_shapes": self.flattened_grammar_shapes,
