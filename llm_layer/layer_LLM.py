@@ -4,8 +4,8 @@ import os
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import List, Optional, Type, Union
-import requests
+from typing import List, Optional, Type, Union, Dict, Any, Tuple
+import requests  # type: ignore
 import json
 
 # Optional imports - graceful failure if not available
@@ -23,7 +23,7 @@ except ImportError:
 
 from vi import Agent
 from lancedb.pydantic import LanceModel, Vector
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # type: ignore
 from openai import OpenAI
 from lancedb import table
 
@@ -31,8 +31,8 @@ class BehaviorTreeGenerator:
     def __init__(self,
                  agent_class: Type[Agent],
                  backend: str = "llamacpp",
-                 model_path_or_url: str = None,
-                 ollama_model_name: str = None,
+                 model_path_or_url: Optional[str] = None,
+                 ollama_model_name: Optional[str] = None,
                  chat_format: str = "llama-3",
                  context_length: int = 4096,
                  gpu_layers: int = -1,
@@ -46,7 +46,7 @@ class BehaviorTreeGenerator:
                  vector_tb: Optional[table.Table] = None,
                  schema: Optional[Type[LanceModel]] = None,
                  max_retries: int = 0,
-                 **kwargs):
+                 **kwargs: Any) -> None:
         """
         Initialize the BehaviorTreeGenerator with support for multiple backends.
         
@@ -116,7 +116,7 @@ class BehaviorTreeGenerator:
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Model file not found: {model_path}")
 
-    def _validate_ollama_requirements(self, model_path_or_url: str, ollama_model_name: str) -> None:
+    def _validate_ollama_requirements(self, model_path_or_url: Optional[str], ollama_model_name: Optional[str]) -> None:
         """Validate requirements for ollama backend."""
         if not OLLAMA_AVAILABLE:
             raise ImportError("ollama is required for ollama backend. Install with: pip install ollama (also needs to be downloaded and installed from https://ollama.com)")
@@ -130,8 +130,10 @@ class BehaviorTreeGenerator:
         except Exception as e:
             raise RuntimeError(f"Ollama service is not running or accessible. Error: {e}")
 
-    def _init_llamacpp(self, model_path_or_url: str, gpu_layers: int, n_threads: Optional[int], **kwargs) -> None:
+    def _init_llamacpp(self, model_path_or_url: Optional[str], gpu_layers: int, n_threads: Optional[int], **kwargs: Any) -> None:
         """Initialize llamacpp backend."""
+        if model_path_or_url is None:
+            raise ValueError("model_path_or_url is required for llamacpp backend")
         self._validate_llamacpp_requirements(model_path_or_url)
         
         self.model_path = model_path_or_url
@@ -158,7 +160,7 @@ class BehaviorTreeGenerator:
             **llamacpp_kwargs
         )
 
-    def _init_ollama(self, model_path_or_url: str, ollama_model_name: str, **kwargs) -> None:
+    def _init_ollama(self, model_path_or_url: Optional[str], ollama_model_name: Optional[str], **kwargs: Any) -> None:
         """Initialize ollama backend."""
         self._validate_ollama_requirements(model_path_or_url, ollama_model_name)
         
@@ -368,10 +370,10 @@ class BehaviorTreeGenerator:
             else:
                 raise RuntimeError(f"Failed to verify Ollama model: {e}")
 
-    def _generate_completion(self, messages: List[dict]) -> dict:
+    def _generate_completion(self, messages: List[Dict[str, str]]) -> Dict[str, Any]:
         """Generate completion using the configured backend."""
         if self.backend == "llamacpp":
-            return self.llm.create_chat_completion(messages=messages)
+            return self.llm.create_chat_completion(messages=messages)  # type: ignore
         
         elif self.backend == "ollama":
             # Extract system and user messages for generate API
@@ -408,8 +410,11 @@ class BehaviorTreeGenerator:
                     }
                 }]
             }
+        
+        # This should never be reached, but added for type safety
+        raise ValueError(f"Unknown backend: {self.backend}")
 
-    def query_vector_db(self, query: str) -> List:
+    def query_vector_db(self, query: str) -> List[Any]:
         """
         Query the vector database for similar examples.
         
@@ -424,6 +429,11 @@ class BehaviorTreeGenerator:
         """
         if not self.rag_enabled:
             raise RuntimeError("RAG is not enabled. Please provide client, vector_tb, and schema.")
+        
+        # Type assertions for mypy since we know these are not None due to rag_enabled check
+        assert self.client is not None, "Client should not be None when RAG is enabled"
+        assert self.vector_tb is not None, "Vector table should not be None when RAG is enabled"
+        assert self.schema is not None, "Schema should not be None when RAG is enabled"
             
         try:
             response = self.client.embeddings.create(
@@ -437,7 +447,7 @@ class BehaviorTreeGenerator:
             if not results:
                 raise ValueError("No examples retrieved from vector database")
             
-            return results
+            return results  # type: ignore
         except Exception as e:
             raise RuntimeError(f"Error querying vector database: {e}")
 
@@ -456,7 +466,7 @@ class BehaviorTreeGenerator:
         with open(file_path, 'r') as file:
             return file.read()
 
-    def generate_behavior_tree(self, prompt: str, fix_mistake: str = "", which_prompt: int = 2, log_prompt: bool = False) -> tuple[int, str]:
+    def generate_behavior_tree(self, prompt: str, fix_mistake: str = "", which_prompt: int = 2, log_prompt: bool = False) -> Tuple[int, str]:
         """
         Generate a behavior tree from a natural language prompt.
         
@@ -568,7 +578,7 @@ class BehaviorTreeGenerator:
         else:
             return self.error_count, behavior_tree
 
-    def call_behaviors(self) -> dict:
+    def call_behaviors(self) -> Dict[str, str]:
         """
         Get all the behaviors from the agent class, extracting only Node Type and Description.
         

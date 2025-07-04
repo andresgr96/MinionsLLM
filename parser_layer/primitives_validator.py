@@ -51,7 +51,7 @@ def validate_primitives(tree_xml: str, agent_class: Type[Agent]) -> tuple[bool, 
         - bool: True if the tree is valid, False otherwise.
         - str: A feedback message. Empty if valid, or an error message if invalid.
     """
-    feedback = []
+    feedback: List[str] = []
     try:
         parser = AgentDocstringParser(agent_class)
         config = parser.extract_docstring_config()
