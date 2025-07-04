@@ -69,6 +69,9 @@ class DatasetGenerator:
             node_connectors: Dictionary with the connectors for the nodes (optional)
             output_dir: Directory to save generated trees and datasets
             seed: Random seed for reproducibility
+
+        Raises:
+            ValueError: If grammar_parameters is not a dict or list of tuples
         """
         # If no agent_class provided, use RobotAgent as default
         if agent_class is None:
@@ -217,7 +220,24 @@ class DatasetGenerator:
         grammar_params: Optional[Dict[str, Dict[str, Any]]] = None,
         start_index: int = 0,
     ) -> List[str]:
-        """Generate trees with filtering based on simulation metrics."""
+        """
+        Generate trees with filtering based on simulation metrics.
+
+        Args:
+            target_trees: Number of valid trees to generate
+            size: Size of the integer list used for generation
+            filter_env: Environment to use for filtering trees
+            output_dir: Directory to save the generated trees
+            filter_metrics: List of metrics that must be > 0 for tree to be valid
+            grammar_params: Specific grammar parameters to use
+            start_index: Starting index for file naming
+
+        Returns:
+            List[str]: List of paths to the generated tree files
+
+        Raises:
+            ValueError: If filter_metrics is not specified
+        """
         if filter_metrics is None:
             raise ValueError(
                 "filter_metrics must be specified when using filtering. No default metrics are provided."
@@ -291,6 +311,9 @@ class DatasetGenerator:
         Returns:
             If filter_env is None: List of paths to all generated tree files
             If filter_env is not None: List of tuples (structure_folder_path, target_count, structure_metrics)
+
+        Raises:
+            ValueError: If structure config does not have 2 or 3 elements
         """
         if output_dir is None:
             output_dir = self.unpopulated_dir if placeholders else self.populated_dir
@@ -389,7 +412,17 @@ class DatasetGenerator:
         filter_env: SimEnvironment,
         filter_metrics: Union[List[str], Dict[str, Any]],
     ) -> bool:
-        """Test a tree in the simulation environment and check if it achieves any target metrics."""
+        """
+        Test a tree in the simulation environment and check if it achieves any target metrics.
+
+        Args:
+            xml_tree: XML tree to test in simulation
+            filter_env: Environment to use for testing
+            filter_metrics: Metrics to check against
+
+        Returns:
+            bool: True if tree meets metric targets, False otherwise
+        """
         # Create temporary file for the tree
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".xml", delete=False
@@ -442,6 +475,9 @@ class DatasetGenerator:
 
         Returns:
             True if metrics meet targets, False otherwise
+
+        Raises:
+            ValueError: If target_metrics format is invalid
         """
         if target_metrics is None:
             return True

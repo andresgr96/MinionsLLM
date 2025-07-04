@@ -15,7 +15,14 @@ class SimEnvironment(ABC):
     """
 
     def __init__(self, config: Config, bt_path: str, headless: bool = False):
-        """Initialize the simulation environment."""
+        """
+        Initialize the simulation environment.
+
+        Args:
+            config: Configuration object for the simulation
+            bt_path: Path to the behavior tree XML file
+            headless: Whether to run without GUI display
+        """
         self.config = config
         self.simulation: Union[Simulation, HeadlessSimulation] = (
             Simulation(config) if not headless else HeadlessSimulation(config)
@@ -46,7 +53,15 @@ class SimEnvironment(ABC):
         pass
 
     def load_images(self, image_paths: List[str]) -> List[pg.Surface]:
-        """Load images for the environment, handling headless mode."""
+        """
+        Load images for the simulation.
+
+        Args:
+            image_paths: List of paths to image files to load
+
+        Returns:
+            List[pg.Surface]: List of loaded image surfaces
+        """
         if self.headless:
             return [pg.image.load(path) for path in image_paths]
         else:

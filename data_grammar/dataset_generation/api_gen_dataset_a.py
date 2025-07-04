@@ -15,7 +15,15 @@ client = OpenAI(
 
 
 def get_tree_content(file_path: str) -> str:
-    """Read the content of an XML file."""
+    """
+    Read the content of an XML file.
+
+    Args:
+        file_path: Path to the XML file to read
+
+    Returns:
+        str: Content of the XML file
+    """
     with open(file_path, "r") as f:
         return f.read().strip()
 
@@ -26,7 +34,18 @@ def process_tree_with_api(
     node_connectors: Dict[str, str],
     spoon_node_translations: Dict[str, str],
 ) -> Tuple[str, str, str]:
-    """Send the tree and technical prompt to the API and retrieve the layman task."""
+    """
+    Send the tree and technical prompt to the API and retrieve the layman task.
+
+    Args:
+        tree_content: XML content of the behavior tree
+        node_translations: Dictionary mapping node names to technical translations
+        node_connectors: Dictionary with connectors for nodes
+        spoon_node_translations: Dictionary mapping node names to spoon translations
+
+    Returns:
+        Tuple[str, str, str]: Layman prompt, technical prompt, and spoon prompt
+    """
     tech_prompt = generate_tech_prompt(tree_content, node_translations, node_connectors)
     spoon_prompt = generate_spoon_prompt(
         tree_content, spoon_node_translations, node_connectors
@@ -61,7 +80,17 @@ def process_trees_in_folder(
     node_connectors: Optional[Dict[str, str]] = None,
     spoon_node_translations: Optional[Dict[str, str]] = None,
 ) -> None:
-    """Process trees in a folder and save results to a JSON file."""
+    """
+    Process trees in a folder and save results to a JSON file.
+
+    Args:
+        folder_path: Path to the folder containing XML tree files
+        output_json_path: Path where the JSON dataset will be saved
+        max_trees: Maximum number of trees to process
+        node_translations: Dictionary mapping node names to technical translations
+        node_connectors: Dictionary with connectors for nodes
+        spoon_node_translations: Dictionary mapping node names to spoon translations
+    """
     dataset = []
     processed_count = 0
 

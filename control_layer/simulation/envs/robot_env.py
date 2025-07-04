@@ -23,7 +23,17 @@ class RobotEnvironment(SimEnvironment):
         task: str,
         headless: bool,
     ):
-        """Initialize robot environment with configuration and metrics."""
+        """
+        Initialize robot environment with configuration and metrics.
+
+        Args:
+            config: Configuration object for the simulation
+            bt_path: Path to the behavior tree XML file
+            n_agents: Number of agents to spawn
+            n_parts: Number of parts to place
+            task: Task description for the simulation
+            headless: Whether to run without GUI
+        """
         super().__init__(config, bt_path, headless)
         self.n_agents = n_agents
         self.n_parts = n_parts
@@ -107,7 +117,13 @@ class RobotEnvironment(SimEnvironment):
         )
 
     def spawn_part(self, type: str, pos: Vector2) -> None:
-        """Spawn a part of specified type at given position."""
+        """
+        Spawn a part of specified type at given position.
+
+        Args:
+            type: Type of part to spawn ('good' or 'bad')
+            pos: Position vector where to spawn the part
+        """
         part = Part(
             images=self.loaded_parts_imgs,
             simulation=self.simulation,
@@ -119,11 +135,21 @@ class RobotEnvironment(SimEnvironment):
         self.simulation._all.add(part)
 
     def remove_part(self, part: Part) -> None:
-        """Remove a part from the simulation."""
+        """
+        Remove a part from the simulation.
+
+        Args:
+            part: Part object to remove from simulation
+        """
         part.kill()
 
     def place_parts(self, num_parts: int) -> None:
-        """Place specified number of good and bad parts in the environment."""
+        """
+        Place specified number of good and bad parts in the environment.
+
+        Args:
+            num_parts: Number of parts to place in the environment
+        """
         for _ in range(num_parts):
             # Place the good parts
             rand_good_pos = Vector2(
@@ -179,7 +205,12 @@ class RobotEnvironment(SimEnvironment):
             self.simulation._all.add(agent)
 
     def run(self) -> Dict[str, Any]:
-        """Run the simulation and return metrics."""
+        """
+        Run the simulation and return metrics.
+
+        Returns:
+            Dict[str, Any]: Dictionary containing simulation metrics
+        """
         # Reset metrics at the start of each run for env reusability
         self.good_parts_picked_up = 0
         self.bad_parts_picked_up = 0

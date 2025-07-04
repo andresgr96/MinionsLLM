@@ -27,7 +27,16 @@ class RobotAgent(Agent):  # type: ignore
         env: "SimEnvironment",
         xml_path: str,
     ):
-        """Initialize robot agent with behavior tree and environment."""
+        """
+        Initialize robot agent with behavior tree and environment.
+
+        Args:
+            images: List of image surfaces for the agent
+            simulation: Simulation object this agent belongs to
+            pos: Initial position of the agent
+            env: Environment reference for agent operations
+            xml_path: Path to the behavior tree XML file
+        """
         super().__init__(images=images, simulation=simulation, pos=pos)
         self.simulation = simulation
         self.env = env
@@ -68,6 +77,9 @@ class RobotAgent(Agent):  # type: ignore
         Description: Checks whether the agent is in the base area. Returns True if the agent is within the base, and False otherwise.
         Translation: you are in the base
         Spoon Translation: you are in the base area
+
+        Returns:
+            bool: True if agent is in base area, False otherwise
         """
         if self.is_agent_in_base_flag:
             return True
@@ -82,6 +94,9 @@ class RobotAgent(Agent):  # type: ignore
         Description: Checks whether the agent is in the construction zone within the base area. Returns True if the agent is within the construction, and False otherwise.
         Translation: you are in the construction
         Spoon Translation: you are in the construction area
+
+        Returns:
+            bool: True if agent is in construction area, False otherwise
         """
         if self.is_agent_in_construction_flag:
             return True
@@ -96,6 +111,9 @@ class RobotAgent(Agent):  # type: ignore
         Description: Checks whether the agent is in the storage zone within the base area. Returns True if the agent is within the storage, and False otherwise.
         Translation: you are in the storage
         Spoon Translation: you are in the storage area
+
+        Returns:
+            bool: True if agent is in storage area, False otherwise
         """
         if self.is_agent_in_storage_flag:
             return True
@@ -110,6 +128,9 @@ class RobotAgent(Agent):  # type: ignore
         Description: Checks whether the agent is in the source area. Returns True if the agent is within the source, and False otherwise.
         Translation: you are in the source
         Spoon Translation: you are in the source area
+
+        Returns:
+            bool: True if agent is in source area, False otherwise
         """
         if self.is_agent_in_source_flag:
             return True
@@ -124,6 +145,9 @@ class RobotAgent(Agent):  # type: ignore
         Description: Checks whether the agent is in the waste area. Returns True if the agent is within the waste, and False otherwise.
         Translation: you are in the waste
         Spoon Translation: you are in the waste area
+
+        Returns:
+            bool: True if agent is in waste area, False otherwise
         """
         if self.is_agent_in_waste_flag:
             return True
@@ -138,6 +162,9 @@ class RobotAgent(Agent):  # type: ignore
         Description: Checks whether the agent is holding a good part. Returns True if the agent is holding a good part, and False otherwise.
         Translation: you are holding a good part
         Spoon Translation: you are holding a good part
+
+        Returns:
+            bool: True if agent is holding a good part, False otherwise
         """
         if self.is_agent_holding_good_part_flag:
             return True
@@ -152,6 +179,9 @@ class RobotAgent(Agent):  # type: ignore
         Description: Checks whether the agent is holding a scrap part. Returns True if the agent is holding a scrap part, and False otherwise.
         Translation: you are holding a scrap part
         Spoon Translation: you are holding a scrap part
+
+        Returns:
+            bool: True if agent is holding a scrap part, False otherwise
         """
         if self.is_agent_holding_bad_part_flag:
             return True
@@ -166,6 +196,9 @@ class RobotAgent(Agent):  # type: ignore
         Description: Checks whether the agent detects a good part within range to pick it up. Returns True if the agent is within range of a good part, and False otherwise.
         Translation: you detect a good part
         Spoon Translation: you detect a good part
+
+        Returns:
+            bool: True if good part is detected, False otherwise
         """
         nearby_parts = self.in_proximity_performance().filter_kind(Part)
         for part in nearby_parts:
@@ -181,6 +214,9 @@ class RobotAgent(Agent):  # type: ignore
         Description: Checks whether the agent detects a scrap part within range to pick it up. Returns True if the agent is within range of a scrap part, and False otherwise.
         Translation: you detect a scrap part
         Spoon Translation: you detect a scrap part
+
+        Returns:
+            bool: True if scrap part is detected, False otherwise
         """
         nearby_parts = self.in_proximity_performance().filter_kind(Part)
         for part in nearby_parts:
@@ -198,6 +234,9 @@ class RobotAgent(Agent):  # type: ignore
         Description: Makes the agent pick up a part if its within range and not already holding a part. Returns True if the agent picks up a part, and False otherwise.
         Translation: pick up the part
         Spoon Translation: pick up the part
+
+        Returns:
+            bool: True if part was successfully picked up, False otherwise
         """
         if (
             self.is_good_part_detected() or self.is_scrap_part_detected()
@@ -230,6 +269,9 @@ class RobotAgent(Agent):  # type: ignore
         Description: Makes the agent drop a part only if its holding one. Returns True if the agent drops a part, and False otherwise.
         Translation: drop the part
         Spoon Translation: drop the part
+
+        Returns:
+            bool: True if part was successfully dropped, False otherwise
         """
         if not self.holding_any_part or self.holding_part is None:
             return False
@@ -262,6 +304,9 @@ class RobotAgent(Agent):  # type: ignore
         Description: Makes the agent move in the direction of the base. Returns True, indicating the action was executed.
         Translation: go to the base
         Spoon Translation: seek the base area
+
+        Returns:
+            bool: True if successfully moving towards base area
         """
         self.state = "searching_nest"
 
@@ -275,6 +320,9 @@ class RobotAgent(Agent):  # type: ignore
         Description: Makes the agent move in the direction of the storage zone within the base. Returns True, indicating the action was executed.
         Translation: go to the storage
         Spoon Translation: seek the storage area
+
+        Returns:
+            bool: True if successfully moving towards storage area
         """
         self.state = "searching_storage"
 
@@ -288,6 +336,9 @@ class RobotAgent(Agent):  # type: ignore
         Description: Makes the agent move in the direction of the construction zone within the base. Returns True, indicating the action was executed.
         Translation: go to the construction
         Spoon Translation: seek the construction area
+
+        Returns:
+            bool: True if successfully moving towards construction area
         """
         self.state = "searching_repair"
 
@@ -301,6 +352,9 @@ class RobotAgent(Agent):  # type: ignore
         Description: Makes the agent move in the opposite direction of light where the waste area is found. Returns True, indicating the action was executed.
         Translation: go to the waste
         Spoon Translation: seek the waste area
+
+        Returns:
+            bool: True if successfully moving towards waste area
         """
         self.state = "searching_waste"
 
@@ -314,6 +368,9 @@ class RobotAgent(Agent):  # type: ignore
         Description: Makes the agent move in the direction of the light source where the source area is found. Returns True, indicating the action was executed.
         Translation: go to the source
         Spoon Translation: seek the source area
+
+        Returns:
+            bool: True if successfully moving towards source area
         """
         self.state = "searching_source"
 
@@ -327,6 +384,9 @@ class RobotAgent(Agent):  # type: ignore
         Description: Makes the agent move in a random direction. Returns True, indicating the action was executed.
         Translation: search randomly
         Spoon Translation: walk randomly
+
+        Returns:
+            bool: True if random walk was performed successfully
         """
         self.state = "wandering"
 
@@ -340,6 +400,9 @@ class RobotAgent(Agent):  # type: ignore
         Description: Freeze the agent's and stops its movement. Returns True, indicating the action was executed.
         Translation: stop moving
         Spoon Translation: freeze movement
+
+        Returns:
+            bool: True if movement was successfully frozen
         """
         self.state = "static"
 
@@ -465,7 +528,15 @@ class RobotAgent(Agent):  # type: ignore
             self.move = Vector2(0, 0)
 
     def helper_direction_to(self, target: Vector2) -> Vector2:
-        """Calculate direction vector to target position."""
+        """
+        Calculate direction vector to target position.
+
+        Args:
+            target: Target position vector
+
+        Returns:
+            Vector2: Normalized direction vector towards target
+        """
         try:
             dir = target - self.pos
             direction = dir.normalize()

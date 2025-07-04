@@ -10,11 +10,21 @@ class LightSensor:
     """Light sensor for detecting light sources in the environment."""
 
     def __init__(self, agent: Agent):
-        """Initialize light sensor with reference to the agent."""
+        """
+        Initialize light sensor for the given agent.
+
+        Args:
+            agent: Agent that owns this sensor
+        """
         self.agent = agent
 
     def sense_light(self) -> Vector2:
-        """Detect and return direction vector to the nearest light source."""
+        """
+        Sense light intensity at the agent's current position.
+
+        Returns:
+            Vector2: Direction vector to the nearest light source
+        """
         light_pos = self.agent.env.light_pos
         agent_pos = self.agent.pos
         diff_vec: Vector2 = light_pos - agent_pos

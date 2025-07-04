@@ -22,7 +22,16 @@ class Part(Agent):  # type: ignore
         pos: Vector2,
         env: "RobotEnvironment",
     ):
-        """Initialize a part with type, position, and environment reference."""
+        """
+        Initialize a part with type, position, and environment reference.
+
+        Args:
+            images: List of image surfaces for the part
+            simulation: Simulation object this part belongs to
+            type: Type of part ('good' or 'bad')
+            pos: Initial position of the part
+            env: Environment reference for metrics tracking
+        """
         super().__init__(images, simulation, pos)
         self.move = Vector2(0, 0)
         self.images = images
@@ -49,11 +58,24 @@ class Part(Agent):  # type: ignore
             self.pos = self.owner.pos
 
     def can_be_picked_up(self) -> bool:
-        """Check if this part can be picked up by an agent."""
+        """
+        Check if this part can be picked up by an agent.
+
+        Returns:
+            bool: True if part can be picked up, False otherwise
+        """
         return not self.is_permanently_placed and self.owner is None
 
     def pick_up_by(self, agent: Agent) -> bool:
-        """Attempt to pick up this part by the specified agent."""
+        """
+        Attempt to pick up this part by the specified agent.
+
+        Args:
+            agent: Agent attempting to pick up the part
+
+        Returns:
+            bool: True if pickup was successful, False otherwise
+        """
         if self.can_be_picked_up():
             self.owner = agent
 
@@ -74,7 +96,16 @@ class Part(Agent):  # type: ignore
         in_construction: bool,
         in_source: bool,
     ) -> None:
-        """Drop the part and update metrics based on location."""
+        """
+        Drop the part and update metrics based on location.
+
+        Args:
+            in_base: Whether the part is being dropped in base area
+            in_waste: Whether the part is being dropped in waste area
+            in_storage: Whether the part is being dropped in storage area
+            in_construction: Whether the part is being dropped in construction area
+            in_source: Whether the part is being dropped in source area
+        """
         if self.owner is None:
             return
 

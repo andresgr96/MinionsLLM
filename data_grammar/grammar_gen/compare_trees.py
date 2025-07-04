@@ -13,7 +13,21 @@ def validate_node_recursive(
     feedback: Optional[List[str]] = None,
     path: str = "",
 ) -> bool:
-    """Validate a node and its children recursively against a list of valid nodes."""
+    """
+    Validate a node and its children recursively against a list of valid nodes.
+
+    Args:
+        orig_node: Original node element to validate against
+        gen_node: Generated node element to validate
+        conditions: List of valid condition nodes
+        actuator_actions: List of valid actuator actions
+        state_actions: List of valid state actions
+        feedback: List to collect validation feedback messages
+        path: Current path in the tree for error reporting
+
+    Returns:
+        bool: True if node and all children are valid, False otherwise
+    """
     if feedback is None:
         feedback = []
 

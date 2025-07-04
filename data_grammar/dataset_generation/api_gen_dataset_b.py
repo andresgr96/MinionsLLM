@@ -45,7 +45,15 @@ client = OpenAI(
 
 
 def get_tree_content(file_path: str) -> str:
-    """Read and return the content of a tree file."""
+    """
+    Read and return the content of a tree file.
+
+    Args:
+        file_path: Path to the tree file to read
+
+    Returns:
+        str: Content of the tree file
+    """
     with open(file_path, "r") as f:
         return f.read().strip()
 
@@ -72,6 +80,9 @@ def process_tree_with_api(
         state_actions: List of valid state actions
         max_retries: Number of retries if validation fails
         focus_parts: The type of parts to focus on in the generated task
+
+    Returns:
+        Tuple[Optional[str], Optional[str]]: Task description and populated tree, or None if failed
     """
     validation_feedback = ""  # Initialize outside the loop
 
@@ -152,6 +163,17 @@ def _test_tree_metrics_b(
     Test a tree in the simulation environment and check if it achieves any target metrics.
 
     Similar to the one in dataset_generator.py but for string tree content.
+
+    Args:
+        tree_content: XML content of the behavior tree
+        filter_env: Environment to use for testing
+        filter_metrics: Metrics to check against
+
+    Returns:
+        bool: True if tree meets metric targets, False otherwise
+
+    Raises:
+        ValueError: If filter_metrics is not specified
     """
     import tempfile
 
@@ -201,7 +223,17 @@ def _check_metrics_against_targets_b(
     """
     Check if actual metrics meet the target criteria.
 
-    Same logic as in dataset_generator.py but duplicated to avoid circular imports. Might make an utils file at somepoint.
+    Same logic as in dataset_generator.py but duplicated to avoid circular imports.
+
+    Args:
+        actual_metrics: Dictionary of actual metrics from simulation
+        target_metrics: Either a list of metric names or dict of metric targets
+
+    Returns:
+        bool: True if metrics meet targets, False otherwise
+
+    Raises:
+        ValueError: If target_metrics format is invalid
     """
     if target_metrics is None:
         return True
@@ -279,7 +311,22 @@ def process_trees_in_folder(
     actuator_actions: Optional[List[str]] = None,
     state_actions: Optional[List[str]] = None,
 ) -> None:
-    """Process trees in a folder and save results to a JSON file."""
+    """
+    Process trees in a folder and save results to a JSON file.
+
+    Args:
+        folder_path: Path to the folder containing XML tree files
+        output_json_path: Path where the JSON dataset will be saved
+        max_trees: Maximum number of trees to process
+        filter_env: Environment to filter the trees
+        filter_metrics: List of metrics that must be > 0 for tree to be valid
+        node_translations: Dictionary mapping node names to technical translations
+        node_connectors: Dictionary with connectors for nodes
+        spoon_node_translations: Dictionary mapping node names to spoon translations
+        conditions: List of valid condition nodes
+        actuator_actions: List of valid actuator actions
+        state_actions: List of valid state actions
+    """
     dataset = []
     processed_count = 0
 

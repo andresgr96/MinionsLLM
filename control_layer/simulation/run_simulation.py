@@ -21,19 +21,22 @@ def run_simulation(
     config: Optional[Config] = None,
 ) -> Dict[str, Any]:
     """
-    Run a behavior tree simulation with the specified parameters.
+    Run a simulation with specified parameters.
 
     Args:
         bt_path: Path to the behavior tree XML file
-        env_type: Type of environment to simulate ('robot')
-        n_agents: Number of agents in the environment
-        n_parts: Number of parts in the environment
-        scenario: Scenario for the simulation
-        headless: Whether to run the simulation in headless mode (no display)
-        config: Optional custom configuration for the simulation
+        env_type: Type of environment to create
+        n_agents: Number of agents to spawn in the simulation
+        n_parts: Number of parts to place in the environment
+        scenario: Scenario configuration to use
+        headless: Whether to run the simulation without GUI
+        config: Optional configuration object for the simulation
 
     Returns:
-        Metrics from the simulation run
+        Dict[str, Any]: Dictionary containing simulation metrics and results
+
+    Raises:
+        ValueError: If env_type is not supported
     """
     # Create default config if none provided
     if config is None:
