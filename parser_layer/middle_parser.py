@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+from typing import Dict, Optional, Tuple
 from .base_nodes import BaseNode, ConditionNode, ActuatorActionNode, StateActionNode, SequenceNode, SelectorNode
 
 class UnknownNodeTypeError(Exception):
@@ -11,7 +12,7 @@ def parse_behavior_tree(file_path: str) -> BaseNode:
     return parse_node(root)
 
 
-def parse_behavior_tree_with_metadata(file_path: str) -> tuple[BaseNode, dict]:
+def parse_behavior_tree_with_metadata(file_path: str) -> Tuple[Optional[BaseNode], Dict[str, str]]:
     """
     Parses the XML file containing the behavior tree and metadata.
 
@@ -19,7 +20,7 @@ def parse_behavior_tree_with_metadata(file_path: str) -> tuple[BaseNode, dict]:
         file_path (str): Path to the XML file.
 
     Returns:
-        tuple[BaseNode, dict]: The parsed behavior tree and a dictionary containing metadata.
+        Tuple[Optional[BaseNode], Dict[str, str]]: The parsed behavior tree and a dictionary containing metadata.
     """
     with open(file_path, "r") as file:
         content = file.read()
@@ -37,7 +38,7 @@ def parse_behavior_tree_with_metadata(file_path: str) -> tuple[BaseNode, dict]:
         behavior_tree = None  # Mark the behavior tree as None if parsing fails
 
     # Parse the metadata
-    metadata = {}
+    metadata: Dict[str, str] = {}
     if metadata_str.strip():
         # Parse the metadata elements manually
         metadata_lines = metadata_str.strip().splitlines()
@@ -55,7 +56,7 @@ def parse_node(node: ET.Element) -> BaseNode:
     node_type = node.tag.lower()
 
     if node_type == "condition":
-        condition_name = node.text.strip()
+        condition_name = node.text.strip() if node.text else ""
         return ConditionNode(condition_name)
     elif node_type == "behaviortree":
         if len(node) != 1:
@@ -63,10 +64,10 @@ def parse_node(node: ET.Element) -> BaseNode:
         top_level_node = parse_node(node[0])
         return top_level_node
     elif node_type == "actuatoraction":
-        action_name = node.text.strip()
+        action_name = node.text.strip() if node.text else ""
         return ActuatorActionNode(action_name)
     elif node_type == "stateaction":
-        action_name = node.text.strip()
+        action_name = node.text.strip() if node.text else ""
         return StateActionNode(action_name)
     elif node_type == "sequence":
         children = [parse_node(child) for child in node]
@@ -113,8 +114,8 @@ def save_behavior_tree_xml(data: str, file_path: str) -> None:
         print(f"Error parsing XML: {e}")
         print(f"Data: {data}")
 
-def save_behavior_tree_with_metadata(data: str, behaviors: dict, agent_class_name: str, env_name: str,
-                                      task_name:str, model_name: str, technique:str, style_name:str, file_path: str) -> None:
+def save_behavior_tree_with_metadata(data: str, behaviors: Dict[str, str], agent_class_name: str, env_name: str,
+                                      task_name: str, model_name: str, technique: str, style_name: str, file_path: str) -> None:
     if not data:
         print("No valid XML content to save.")
         return

@@ -50,7 +50,8 @@ class BehaviorTreeGrammarValidator:
                             non_terminal_rules.append(rule[1])
             if not non_terminal_rules: continue
             
-            combinations, amounts = [], {}
+            combinations = []
+            amounts: Dict[str, int] = {}
             for rule_children in non_terminal_rules:
                 combination = self._process_rule_children(rule_children, grammar_rules, amounts)
                 if combination:
@@ -93,8 +94,8 @@ class BehaviorTreeGrammarValidator:
                     expanded_rule.append(symbol)
         return [expanded_rule]
 
-    def _expand_symbol_fully(self, symbol: str, grammar_rules: Dict[str, Any], visited: Optional[set] = None) -> List[List[str]]:
-        if visited is None: visited = set()
+    def _expand_symbol_fully(self, symbol: str, grammar_rules: Dict[str, Any], visited: Optional[set[str]] = None) -> List[List[str]]:
+        if visited is None: visited = set[str]()
         if symbol in visited: return [[f"RECURSIVE:{symbol}"]]
         if symbol not in grammar_rules: return [[symbol]]
 
@@ -140,7 +141,7 @@ class BehaviorTreeGrammarValidator:
             return unique_options
         return options
 
-    def _mark_unlimited_amounts(self, options: List[List[str]], amounts: Dict[str, int], min_amount: int):
+    def _mark_unlimited_amounts(self, options: List[List[str]], amounts: Dict[str, int], min_amount: int) -> None:
         for option_list in options:
             for option in option_list:
                 if isinstance(option, str) and not option.startswith("RECURSIVE:"):
@@ -173,7 +174,8 @@ class BehaviorTreeGrammarValidator:
     def _extract_tree_shapes(self, xml_string: str) -> Dict[str, Any]:
         try:
             root = ET.fromstring(xml_string.strip())
-            shapes, node_counters = {}, {}
+            shapes: Dict[str, Dict[str, List[str]]] = {}
+            node_counters: Dict[str, int] = {}
             
             def remove_consecutive_duplicates(child_types: List[str], parent_node_type: str) -> List[str]:
                 if not child_types: return []
@@ -184,7 +186,7 @@ class BehaviorTreeGrammarValidator:
                         result.append(child_types[i])
                 return result
             
-            def extract_node_shape(node):
+            def extract_node_shape(node: ET.Element) -> None:
                 node_type = node.tag
                 children = [child for child in node if child.tag is not None]
                 if children:

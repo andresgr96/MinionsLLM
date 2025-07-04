@@ -4,7 +4,7 @@ Agent Docstring Parser that automatically generates grammar configuration from a
 
 import re
 import warnings
-from typing import Dict, Type
+from typing import Any, Dict, List, Type
 from vi import Agent
 
 class AgentDocstringParser:
@@ -39,13 +39,13 @@ class AgentDocstringParser:
             agent_class: The agent class to parse docstrings from.
         """
         self.agent_class = agent_class
-        self.conditions = []
-        self.actuator_actions = []
-        self.state_actions = []
-        self.node_translations = {}
-        self.spoon_node_translations = {}
+        self.conditions: List[str] = []
+        self.actuator_actions: List[str] = []
+        self.state_actions: List[str] = []
+        self.node_translations: Dict[str, str] = {}
+        self.spoon_node_translations: Dict[str, str] = {}
         
-    def extract_docstring_config(self) -> Dict:
+    def extract_docstring_config(self) -> Dict[str, Any]:
         """
         Extract complete docstring configuration from the agent class.
         
