@@ -1,6 +1,4 @@
-"""
-Agent Docstring Parser that automatically generates grammar configuration from agent classes.
-"""
+"""Agent docstring parser for extracting behavior tree primitives from agent classes."""
 
 import re
 import warnings
@@ -10,8 +8,7 @@ from vi import Agent
 
 
 class AgentDocstringParser:
-    """
-    Parses agent class methods' docstrings to extract node information like type and translations.
+    r"""Parses agent class methods' docstrings to extract node information like type and translations.
 
     This class is used to automatically generate configuration for behavior tree nodes
     by inspecting the docstrings of methods in an agent class. For a method to be
@@ -65,9 +62,7 @@ class AgentDocstringParser:
         }
 
     def _parse_agent_methods(self) -> None:
-        """
-        Parse all methods in the agent class and categorize them by node type.
-        """
+        """Parse all methods in the agent class and categorize them by node type."""
         for method_name in dir(self.agent_class):
             if self._should_include_method(method_name):
                 method = getattr(self.agent_class, method_name)

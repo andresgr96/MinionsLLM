@@ -1,3 +1,5 @@
+"""Middle-layer parser for behavior tree XML processing and node manipulation."""
+
 import xml.etree.ElementTree as ET
 from typing import Dict, Optional, Tuple
 
@@ -18,6 +20,7 @@ class UnknownNodeTypeError(Exception):
 
 
 def parse_behavior_tree(file_path: str) -> BaseNode:
+    """Parse a behavior tree XML file and return a list of nodes."""
     tree = ET.parse(file_path)
     root = tree.getroot()
     return parse_node(root)
@@ -27,7 +30,7 @@ def parse_behavior_tree_with_metadata(
     file_path: str,
 ) -> Tuple[Optional[BaseNode], Dict[str, str]]:
     """
-    Parses the XML file containing the behavior tree and metadata.
+    Parse the XML file containing the behavior tree and metadata.
 
     Args:
         file_path (str): Path to the XML file.
@@ -68,6 +71,7 @@ def parse_behavior_tree_with_metadata(
 
 
 def parse_node(node: ET.Element) -> BaseNode:
+    """Parse an individual XML node and return its data structure."""
     node_type = node.tag.lower()
 
     if node_type == "condition":
@@ -98,9 +102,7 @@ def parse_node(node: ET.Element) -> BaseNode:
 
 
 def print_nodes(node: BaseNode, indent: int = 0) -> None:
-    """
-    Recursively prints all nodes in the behavior tree.
-    """
+    """Print the parsed nodes in a readable format."""
     indent_str = "  " * indent
 
     if isinstance(node, SequenceNode):
@@ -122,6 +124,7 @@ def print_nodes(node: BaseNode, indent: int = 0) -> None:
 
 
 def save_behavior_tree_xml(data: str, file_path: str) -> None:
+    """Save parsed nodes back to an XML file."""
     if not data:
         print("No valid XML content to save.")
         return
@@ -145,6 +148,7 @@ def save_behavior_tree_with_metadata(
     style_name: str,
     file_path: str,
 ) -> None:
+    """Save behavior tree data with metadata to an XML file."""
     if not data:
         print("No valid XML content to save.")
         return

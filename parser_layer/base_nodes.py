@@ -1,3 +1,5 @@
+"""Base node classes for behavior tree parsing and execution."""
+
 from abc import ABC, abstractmethod
 from typing import List
 
@@ -25,10 +27,14 @@ class BaseNode(ABC):
 
 
 class SequenceNode(BaseNode):
-    def __init__(self, children: List[BaseNode]):
+    """Sequence node that executes children in order until one fails."""
+
+    def __init__(self, children: List["BaseNode"]):
+        """Initialize sequence node with child nodes."""
         self.children: List[BaseNode] = children
 
     def run(self, agent: Agent) -> bool:
+        """Execute all child nodes in sequence, returning False if any fail."""
         for child in self.children:
             if not child.run(agent):
                 return False
@@ -36,10 +42,14 @@ class SequenceNode(BaseNode):
 
 
 class SelectorNode(BaseNode):
-    def __init__(self, children: List[BaseNode]):
+    """Selector node that executes children until one succeeds."""
+
+    def __init__(self, children: List["BaseNode"]):
+        """Initialize selector node with child nodes."""
         self.children: List[BaseNode] = children
 
     def run(self, agent: Agent) -> bool:
+        """Execute child nodes until one succeeds, returning True if any succeed."""
         for child in self.children:
             if child.run(agent):
                 return True
@@ -47,10 +57,14 @@ class SelectorNode(BaseNode):
 
 
 class ConditionNode(BaseNode):
+    """Condition node that evaluates a boolean condition."""
+
     def __init__(self, condition_name: str):
+        """Initialize condition node with a condition function."""
         self.condition_name: str = condition_name
 
     def run(self, agent: Agent) -> bool:
+        """Execute the condition function and return its result."""
         condition_func = getattr(agent, self.condition_name, None)
         if not condition_func:
             raise ValueError(
@@ -62,10 +76,14 @@ class ConditionNode(BaseNode):
 
 
 class ActuatorActionNode(BaseNode):
+    """Actuator action node that performs physical actions."""
+
     def __init__(self, action_name: str):
+        """Initialize actuator action node with an action function."""
         self.action_name: str = action_name
 
     def run(self, agent: Agent) -> bool:
+        """Execute the actuator action and return its result."""
         action_func = getattr(agent, self.action_name, None)
         if not action_func:
             raise ValueError(
@@ -76,10 +94,14 @@ class ActuatorActionNode(BaseNode):
 
 
 class StateActionNode(BaseNode):
+    """State action node that modifies internal agent state."""
+
     def __init__(self, action_name: str):
+        """Initialize state action node with a state function."""
         self.action_name: str = action_name
 
     def run(self, agent: Agent) -> bool:
+        """Execute the state action and return its result."""
         action_func = getattr(agent, self.action_name, None)
         if not action_func:
             raise ValueError(

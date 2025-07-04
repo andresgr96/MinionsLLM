@@ -1,3 +1,5 @@
+"""LLM-based behavior tree generation using various prompting techniques."""
+
 import os
 import subprocess
 import tempfile
@@ -27,6 +29,8 @@ from vi import Agent
 
 
 class BehaviorTreeGenerator:
+    """Generator for behavior trees using LLM-based prompting techniques."""
+
     def __init__(
         self,
         agent_class: Type[Agent],

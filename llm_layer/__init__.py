@@ -1,4 +1,4 @@
-""" Module for the LLM layer """
+"""LLM layer for behavior tree generation."""
 
 from .layer_LLM import BehaviorTreeGenerator
 

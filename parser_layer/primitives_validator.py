@@ -1,8 +1,4 @@
-"""
-Primitives Validator for Behavior Trees and Agents
-
-This module provides validation of behavior trees against an agent's available primitives.
-"""
+"""Validation utilities for behavior tree primitives."""
 
 import xml.etree.ElementTree as ET
 from typing import List, Type
@@ -20,9 +16,7 @@ def _validate_node_recursive(
     feedback: List[str],
     path: str,
 ) -> bool:
-    """
-    Recursively validates a node and its children against lists of valid primitives.
-    """
+    """Recursively validate a node and its children against lists of valid primitives."""
     current_path = f"{path}/{node.tag}" if path else node.tag
 
     if node.text and node.text.strip():
@@ -53,7 +47,7 @@ def _validate_node_recursive(
 
 def validate_primitives(tree_xml: str, agent_class: Type[Agent]) -> tuple[bool, str]:
     """
-    Validates that the primitives in a behavior tree are available to the agent.
+    Validate that the primitives in a behavior tree are available to the agent.
 
     This function traverses a behavior tree and checks if each primitive (Condition,
     ActuatorAction, StateAction) corresponds to a method in the provided agent class.
