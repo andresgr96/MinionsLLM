@@ -74,6 +74,9 @@ class BehaviorTreeGenerator:
             schema: LanceDB schema for the table (optional, only needed for RAG)
             max_retries: Maximum number of retries for behavior tree generation (default: 1)
             **kwargs: Additional backend-specific parameters
+
+        Raises:
+            ValueError: If invalid backend is specified
         """
         load_dotenv()
 
@@ -110,7 +113,17 @@ class BehaviorTreeGenerator:
             self._init_ollama(model_path_or_url, ollama_model_name, **kwargs)
 
     def _validate_llamacpp_requirements(self, model_path: str) -> None:
-        """Validate requirements for llamacpp backend."""
+        """
+        Validate requirements for llamacpp backend.
+
+        Args:
+            model_path: Path to the model file
+
+        Raises:
+            ImportError: If llama-cpp-python is not available
+            ValueError: If model path is invalid or not a GGUF file
+            FileNotFoundError: If model file does not exist
+        """
         if not LLAMACPP_AVAILABLE:
             raise ImportError("llama-cpp-python is required for llamacpp backend")
 
@@ -126,7 +139,18 @@ class BehaviorTreeGenerator:
     def _validate_ollama_requirements(
         self, model_path_or_url: Optional[str], ollama_model_name: Optional[str]
     ) -> None:
-        """Validate requirements for ollama backend."""
+        """
+        Validate requirements for ollama backend.
+
+        Args:
+            model_path_or_url: Path to model file or HuggingFace URL
+            ollama_model_name: Name of existing Ollama model
+
+        Raises:
+            ImportError: If ollama package is not available
+            ValueError: If neither model_path_or_url nor ollama_model_name is provided
+            RuntimeError: If Ollama service is not running or accessible
+        """
         if not OLLAMA_AVAILABLE:
             raise ImportError(
                 "ollama is required for ollama backend. Install with: pip install ollama (also needs to be downloaded and installed from https://ollama.com)"
@@ -152,7 +176,18 @@ class BehaviorTreeGenerator:
         n_threads: Optional[int],
         **kwargs: Any,
     ) -> None:
-        """Initialize llamacpp backend."""
+        """
+        Initialize llamacpp backend.
+
+        Args:
+            model_path_or_url: Path to the model file
+            gpu_layers: Number of GPU layers to use
+            n_threads: Number of threads to use
+            **kwargs: Additional llamacpp-specific parameters
+
+        Raises:
+            ValueError: If model_path_or_url is None
+        """
         if model_path_or_url is None:
             raise ValueError("model_path_or_url is required for llamacpp backend")
         self._validate_llamacpp_requirements(model_path_or_url)
@@ -190,7 +225,17 @@ class BehaviorTreeGenerator:
         ollama_model_name: Optional[str],
         **kwargs: Any,
     ) -> None:
-        """Initialize ollama backend."""
+        """
+        Initialize ollama backend.
+
+        Args:
+            model_path_or_url: Path to model file or HuggingFace URL
+            ollama_model_name: Name of existing Ollama model
+            **kwargs: Additional ollama-specific parameters
+
+        Raises:
+            ValueError: If model path/URL format is invalid
+        """
         self._validate_ollama_requirements(model_path_or_url, ollama_model_name)
 
         # Determine the model to use
@@ -218,7 +263,18 @@ class BehaviorTreeGenerator:
         print(f"Ollama backend initialized with model: {self.ollama_model}")
 
     def _pull_model(self, model_name: str) -> str:
-        """Pull a model using Ollama (supports both Ollama models and HuggingFace URLs)."""
+        """
+        Pull a model using Ollama (supports both Ollama models and HuggingFace URLs).
+
+        Args:
+            model_name: Name or URL of the model to pull
+
+        Returns:
+            str: The name of the pulled model
+
+        Raises:
+            RuntimeError: If model pull fails or authentication is required
+        """
         try:
             print(f"Pulling model '{model_name}'...")
             print("This may take a while depending on model size...")
@@ -273,7 +329,18 @@ class BehaviorTreeGenerator:
             raise RuntimeError(f"Failed to pull model '{model_name}': {e}")
 
     def _auto_import_gguf(self, gguf_path: str) -> str:
-        """Auto-import a GGUF file into Ollama and return the model name."""
+        """
+        Auto-import a GGUF file into Ollama and return the model name.
+
+        Args:
+            gguf_path: Path to the GGUF file
+
+        Returns:
+            str: The name of the imported model
+
+        Raises:
+            RuntimeError: If import fails or Ollama command is not found
+        """
         gguf_path = os.path.abspath(gguf_path)
         model_name = f"custom-{Path(gguf_path).stem}"
 
@@ -364,7 +431,17 @@ class BehaviorTreeGenerator:
             os.unlink(modelfile_path)
 
     def _verify_ollama_model(self, model_name: str) -> None:
-        """Verify that the model exists in Ollama, download if necessary."""
+        """
+        Verify that the specified model exists in Ollama.
+
+        Args:
+            model_name: Name of the model to verify
+
+        Raises:
+            ValueError: If model is not found
+            RuntimeError: If there's an error verifying the model
+            Exception: If there's an unexpected error
+        """
         # Normalize the model name - add :latest if not present
         if ":" not in model_name:
             search_model_name = f"{model_name}:latest"
@@ -435,7 +512,18 @@ class BehaviorTreeGenerator:
                 raise RuntimeError(f"Failed to verify Ollama model: {e}")
 
     def _generate_completion(self, messages: List[Dict[str, str]]) -> Dict[str, Any]:
-        """Generate completion using the configured backend."""
+        """
+        Generate completion using the configured backend.
+
+        Args:
+            messages: List of message dictionaries with role and content
+
+        Returns:
+            Dict[str, Any]: Response from the model
+
+        Raises:
+            ValueError: If unknown backend is specified
+        """
         if self.backend == "llamacpp":
             return self.llm.create_chat_completion(messages=messages)  # type: ignore
 
@@ -484,6 +572,7 @@ class BehaviorTreeGenerator:
 
         Raises:
             RuntimeError: If RAG is not enabled or there's an error querying the database
+            ValueError: If no examples are retrieved from vector database
         """
         if not self.rag_enabled:
             raise RuntimeError(
@@ -726,7 +815,12 @@ class BehaviorTreeGenerator:
         return behavior_tree_xml
 
     def _suggest_similar_models(self, model_name: str) -> None:
-        """Suggest similar or popular models if the requested model fails to download."""
+        """
+        Suggest similar or popular models if the requested model fails to download.
+
+        Args:
+            model_name: The model name that failed to download
+        """
         popular_models = [
             "llama3.2:latest",
             "llama3.1:latest",
