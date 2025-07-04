@@ -1,0 +1,4 @@
+{
+    "prompt": "Find any type of part and pick it up. If you are holding a good part then stop moving.",
+    "tree": "<BehaviorTree><Selector><Sequence><Condition>is_agent_holding_good_part</Condition><StateAction>state_movement_freeze</StateAction></Sequence><Sequence><Condition>is_part_detected</Condition><ActuatorAction>pick_up_part</ActuatorAction></Sequence><StateAction>state_seek_source_area</StateAction></Selector></BehaviorTree>"
+}

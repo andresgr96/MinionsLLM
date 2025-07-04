@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<BehaviorTree>
+    <Selector>
+        <Sequence>
+            <Condition>is_agent_holding_good_part</Condition>
+            <ActuatorAction>pick_up_part</ActuatorAction>
+        </Sequence>
+        <Sequence>
+            <Condition>is_agent_holding_good_part</Condition>
+            <StateAction>state_movement_freeze</StateAction>
+        </Sequence>
+        <Sequence>
+            <Condition>is_agent_in_waste_area</Condition>
+            <ActuatorAction>drop_part</ActuatorAction>
+        </Sequence>
+    </Selector>
+</BehaviorTree>

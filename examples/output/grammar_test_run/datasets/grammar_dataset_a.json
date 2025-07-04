@@ -1,0 +1,32 @@
+[
+    {
+        "layman_task": "If you're in the waste area, go ahead and drop the part there.",
+        "technical_task": "iiiif you are in the waste theeeen drop the part.",
+        "spoon_task": "iiiif you are in the waste area theeeen drop the part.",
+        "tree": "<?xml version=\"1.0\" ?>\n<BehaviorTree>\n    <Sequence>\n        <Condition>is_agent_in_waste_area</Condition>\n        <ActuatorAction>drop_part</ActuatorAction>\n    </Sequence>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to pick up the part if you are in the construction area.",
+        "technical_task": "iiiif you are in the construction theeeen pick up the part.",
+        "spoon_task": "iiiif you are in the construction area theeeen pick up the part.",
+        "tree": "<?xml version=\"1.0\" ?>\n<BehaviorTree>\n    <Sequence>\n        <Condition>is_agent_in_construction_area</Condition>\n        <ActuatorAction>pick_up_part</ActuatorAction>\n    </Sequence>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "If you have a scrap part, then just drop it.",
+        "technical_task": "iiiif you are holding a scrap part theeeen drop the part.",
+        "spoon_task": "iiiif you are holding a scrap part theeeen drop the part.",
+        "tree": "<?xml version=\"1.0\" ?>\n<BehaviorTree>\n    <Sequence>\n        <Condition>is_agent_holding_scrap_part</Condition>\n        <ActuatorAction>drop_part</ActuatorAction>\n    </Sequence>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "If you have a scrap part, pick it up and take it to the waste.",
+        "technical_task": "iiiif you are holding a scrap part theeeen pick up the part aaaand theeeen go to the waste.",
+        "spoon_task": "iiiif you are holding a scrap part theeeen pick up the part aaaand theeeen seek the waste area.",
+        "tree": "<?xml version=\"1.0\" ?>\n<BehaviorTree>\n    <Sequence>\n        <Condition>is_agent_holding_scrap_part</Condition>\n        <ActuatorAction>pick_up_part</ActuatorAction>\n        <StateAction>state_seek_waste_area</StateAction>\n    </Sequence>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to go to the waste area and pick up any parts you find there.",
+        "technical_task": "iiiif you are in the waste theeeen pick up the part.",
+        "spoon_task": "iiiif you are in the waste area theeeen pick up the part.",
+        "tree": "<?xml version=\"1.0\" ?>\n<BehaviorTree>\n    <Sequence>\n        <Condition>is_agent_in_waste_area</Condition>\n        <ActuatorAction>pick_up_part</ActuatorAction>\n    </Sequence>\n</BehaviorTree>"
+    }
+]

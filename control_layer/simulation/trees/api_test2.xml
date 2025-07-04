@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<BehaviorTree>
+    <Selector>
+        <Sequence>
+            <Condition>is_agent_holding_scrap_part</Condition>
+            <Action>state_movement_freeze</Action>
+        </Sequence>
+
+        <Sequence>
+            <Condition>is_part_detected</Condition>
+            <Action>pick_up_part</Action>
+        </Sequence> 
+
+        <StateAction>state_random_walk</StateAction>
+    </Selector>
+</BehaviorTree>

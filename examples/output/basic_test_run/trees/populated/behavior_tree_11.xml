@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<BehaviorTree>
+    <Sequence>
+        <ActuatorAction>pick_up_part</ActuatorAction>
+        <StateAction>state_seek_storage_area</StateAction>
+    </Sequence>
+</BehaviorTree>

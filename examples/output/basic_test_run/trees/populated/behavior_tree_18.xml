@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<BehaviorTree>
+    <Selector>
+        <Sequence>
+            <ActuatorAction>drop_part</ActuatorAction>
+        </Sequence>
+        <Sequence>
+            <ActuatorAction>pick_up_part</ActuatorAction>
+        </Sequence>
+        <Sequence>
+            <ActuatorAction>drop_part</ActuatorAction>
+        </Sequence>
+        <Sequence>
+            <ActuatorAction>pick_up_part</ActuatorAction>
+        </Sequence>
+        <Sequence>
+            <ActuatorAction>pick_up_part</ActuatorAction>
+        </Sequence>
+        <Sequence>
+            <ActuatorAction>pick_up_part</ActuatorAction>
+        </Sequence>
+        <Sequence>
+            <ActuatorAction>pick_up_part</ActuatorAction>
+        </Sequence>
+        <Sequence>
+            <ActuatorAction>pick_up_part</ActuatorAction>
+        </Sequence>
+        <Sequence>
+            <ActuatorAction>pick_up_part</ActuatorAction>
+        </Sequence>
+        <Sequence>
+            <ActuatorAction>drop_part</ActuatorAction>
+        </Sequence>
+        <ActuatorAction>drop_part</ActuatorAction>
+    </Selector>
+</BehaviorTree>

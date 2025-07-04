@@ -1,0 +1,10 @@
+    USER REQUEST: Generate behavior tree to "Find any type ofpart in the environment and pick it up". Output only the XML behavior tree without extra text 
+    or explanations of the tree.
+
+    RESPONSE: {BT_4}
+    
+    USER REQUEST: Generate behavior tree to "{PROMPT}". Output only the XML behavior tree without extra text or explanations of the tree.
+
+    {FIX_MISTAKE}
+
+    RESPONSE: 

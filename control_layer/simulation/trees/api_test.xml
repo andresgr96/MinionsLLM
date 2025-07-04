@@ -1,0 +1,27 @@
+<BehaviorTree>
+    <Selector>
+ 
+        <Sequence>
+            <Condition>is_agent_holding_good_part</Condition>
+            <Condition>is_agent_in_storage_area</Condition>
+            <Action>drop_part</Action>
+        </Sequence>
+
+        <Sequence>
+            <Condition>is_agent_holding_good_part</Condition>
+            <Action>state_seek_base_area</Action>
+        </Sequence>
+
+        <Sequence>
+            <Condition>is_agent_holding_scrap_part</Condition>
+            <Action>state_movement_freeze</Action>
+        </Sequence>   
+
+        <Sequence>
+            <Condition>is_part_detected</Condition>
+            <Action>pick_up_part</Action>
+        </Sequence>       
+
+        <Action>state_seek_source_area</Action>
+    </Selector>
+</BehaviorTree>

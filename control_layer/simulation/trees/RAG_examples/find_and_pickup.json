@@ -1,0 +1,4 @@
+{
+    "prompt": "Find any type of part and pick it up.",
+    "tree": "<BehaviorTree><Selector><Sequence><Condition>is_part_detected</Condition><ActuatorAction>pick_up_part</ActuatorAction></Sequence><StateAction>state_random_walk</StateAction></Selector></BehaviorTree>"
+}

@@ -1,0 +1,15 @@
+
+    USER REQUEST: Generate behavior tree to "{RAG_PROMPT_1}". Output only the XML behavior tree without extra text or explanations of the tree.
+
+    RESPONSE: {RAG_BT_1}
+
+    USER REQUEST: Generate behavior tree to "{RAG_PROMPT_2}". Output only the XML behavior tree without extra text or explanations of the tree.
+
+    RESPONSE: {RAG_BT_2}
+    
+    USER REQUEST: Generate behavior tree to "{PROMPT}". Output only the XML behavior tree without extra text or explanations of the tree.
+
+    {FIX_MISTAKE}
+
+    RESPONSE: 
+

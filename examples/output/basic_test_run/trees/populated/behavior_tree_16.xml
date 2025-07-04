@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<BehaviorTree>
+    <Sequence>
+        <Condition>is_agent_holding_scrap_part</Condition>
+        <ActuatorAction>drop_part</ActuatorAction>
+    </Sequence>
+</BehaviorTree>

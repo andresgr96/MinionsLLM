@@ -1,0 +1,32 @@
+[
+    {
+        "layman_task": "Your task is to find a good part and then pick it up.",
+        "technical_task": "iiiif you detect a part theeeen pick up the part.",
+        "spoon_task": "iiiif you detect a part theeeen pick up the part.",
+        "tree": "<BehaviorTree>\n    <Sequence>\n        <Condition>is_part_detected</Condition>\n        <ActuatorAction>pick_up_part</ActuatorAction>\n    </Sequence>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to find a good part, pick it up, and then move towards the base area.",
+        "technical_task": "iiiif you detect a part theeeen pick up the part aaaand theeeen go to the base.",
+        "spoon_task": "iiiif you detect a part theeeen pick up the part aaaand theeeen seek the base area.",
+        "tree": "<BehaviorTree>\n    <Sequence>\n        <Condition>is_part_detected</Condition>\n        <ActuatorAction>pick_up_part</ActuatorAction>\n        <StateAction>state_seek_base_area</StateAction>\n    </Sequence>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to pick up a scrap part found in the environment and then go to the waste area.",
+        "technical_task": "iiiif you detect a part theeeen pick up the part aaaand theeeen go to the waste.",
+        "spoon_task": "iiiif you detect a part theeeen pick up the part aaaand theeeen seek the waste area.",
+        "tree": "<BehaviorTree>\n    <Sequence>\n        <Condition>is_part_detected</Condition>\n        <ActuatorAction>pick_up_part</ActuatorAction>\n        <StateAction>state_seek_waste_area</StateAction>\n    </Sequence>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to find a scrap part, pick it up, and then head towards the waste area.",
+        "technical_task": "iiiif you detect a part theeeen pick up the part aaaand theeeen go to the waste.",
+        "spoon_task": "iiiif you detect a part theeeen pick up the part aaaand theeeen seek the waste area.",
+        "tree": "<BehaviorTree>\n    <Sequence>\n        <Condition>is_part_detected</Condition>\n        <ActuatorAction>pick_up_part</ActuatorAction>\n        <StateAction>state_seek_waste_area</StateAction>\n    </Sequence>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to check if you are in the base area and if you are, then go to the construction area.",
+        "technical_task": "iiiif you are in the base theeeen go to the construction.",
+        "spoon_task": "iiiif you are in the base area theeeen seek the construction area.",
+        "tree": "<BehaviorTree>\n    <Sequence>\n        <Condition>is_agent_in_base_area</Condition>\n        <StateAction>state_seek_construction_area</StateAction>\n    </Sequence>\n</BehaviorTree>"
+    }
+]

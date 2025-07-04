@@ -1,0 +1,34 @@
+<BehaviorTree>
+    <Sequence>
+        <Selector>
+            <Sequence>
+                <Condition>behavior</Condition>
+                <Sequence>
+                    <Condition>behavior</Condition>
+                    <Action>behavior</Action>
+                </Sequence>
+                <Sequence>
+                    <Condition>behavior</Condition>
+                    <Action>behavior</Action>
+                </Sequence>
+            </Sequence>
+            <Action>behavior</Action>
+        </Selector>
+        <Selector>
+            <Sequence>
+                <Condition>behavior</Condition>
+                <Selector>
+                    <Sequence>
+                        <Condition>behavior</Condition>
+                        <Action>behavior</Action>
+                    </Sequence>
+                    <Sequence>
+                        <Condition>behavior</Condition>
+                        <Action>behavior</Action>
+                    </Sequence>
+                </Selector>
+            </Sequence>
+            <Action>behavior</Action>
+        </Selector>
+    </Sequence>
+</BehaviorTree>

@@ -1,0 +1,18 @@
+    
+    
+            {SYSTEM_PROMPT}
+            
+            USER REQUEST: Generate behavior tree to "Find any part in the environment and pick it up". Output only the XML behavior tree without extra text 
+            or explanations of the tree.
+
+            RESPONSE: {BT_4}
+
+            USER REQUEST: Generate behavior tree to "Find all the good parts in the environment. If you find a good part, go to the base. If you are in the 
+            base then drop it there". Output only the XML behavior tree without extra text or explanations of the tree.
+
+            RESPONSE: {BT_5}
+            
+            USER REQUEST: Generate behavior tree to "{PROMPT}". Output only the XML behavior tree without extra text or explanations of the tree.
+
+            RESPONSE: 
+

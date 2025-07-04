@@ -1,0 +1,4 @@
+{
+    "prompt": "Find any type of part and stop moving.",
+    "tree": "<BehaviorTree><Selector><Sequence><Condition>is_part_detected</Condition><StateAction>state_movement_freeze</StateAction></Sequence><StateAction>state_random_walk</StateAction></Selector></BehaviorTree>"
+}

@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<BehaviorTree><Selector><Sequence><Condition>is_part_detected</Condition><ActuatorAction>pick_up_part</ActuatorAction></Sequence><StateAction>state_random_walk</StateAction></Selector></BehaviorTree>

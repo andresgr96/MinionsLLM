@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<BehaviorTree>
+    <Sequence>
+        <ActuatorAction>drop_part</ActuatorAction>
+    </Sequence>
+</BehaviorTree>

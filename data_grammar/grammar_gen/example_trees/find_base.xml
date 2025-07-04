@@ -1,0 +1,11 @@
+<BehaviorTree>
+    <Selector>
+ 
+        <Sequence>
+            <Condition>is_agent_in_base_area</Condition>
+            <StateAction>state_movement_freeze</StateAction>
+        </Sequence>        
+
+        <StateAction>state_seek_base_area</StateAction>
+    </Selector>
+</BehaviorTree>

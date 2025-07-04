@@ -1,0 +1,32 @@
+[
+    {
+        "layman_task": "Your task is to collect a scrap part and bring it to the waste area. If you are holding a scrap part and are in the waste area, then drop it there.",
+        "technical_task": "if you are holding a scrap part and if you are in the waste then drop the part, or otherwise if you detect a part and if you are in the source and if you are holding a scrap part then pick up the part and then go to the waste.",
+        "spoon_task": "if you are holding a scrap part and if you are in the waste area then drop the part, or otherwise if you detect a part and if you are in the source area and if you are holding a scrap part then pick up the part and then seek the waste area.",
+        "tree": "<BehaviorTree>\n    <Selector>\n        <Sequence>\n            <Condition>is_agent_holding_scrap_part</Condition>\n            <Condition>is_agent_in_waste_area</Condition>\n            <ActuatorAction>drop_part</ActuatorAction>\n        </Sequence>\n        <Sequence>\n            <Condition>is_part_detected</Condition>\n            <Condition>is_agent_in_source_area</Condition>\n            <Condition>is_agent_holding_scrap_part</Condition>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n            <StateAction>state_seek_waste_area</StateAction>\n        </Sequence>\n    </Selector>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to pick up a good part that you have detected in the environment.",
+        "technical_task": "pick up the part.",
+        "spoon_task": "pick up the part.",
+        "tree": "<BehaviorTree>\n    <Sequence>\n        <ActuatorAction>pick_up_part</ActuatorAction>\n    </Sequence>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to check if you are in the waste area and if you are, drop any scrap part you are holding.",
+        "technical_task": "if you are in the waste then drop the part.",
+        "spoon_task": "if you are in the waste area then drop the part.",
+        "tree": "<BehaviorTree>\n    <Sequence>\n        <Condition>is_agent_in_waste_area</Condition>\n        <ActuatorAction>drop_part</ActuatorAction>\n    </Sequence>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to pick up a good part and then seek the base area.",
+        "technical_task": "pick up the part and then go to the base.",
+        "spoon_task": "pick up the part and then seek the base area.",
+        "tree": "<BehaviorTree>\n    <Sequence>\n        <ActuatorAction>pick_up_part</ActuatorAction>\n        <StateAction>state_seek_base_area</StateAction>\n    </Sequence>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to pick up a good part and then move to the storage area to drop it off.",
+        "technical_task": "pick up the part and then go to the storage.",
+        "spoon_task": "pick up the part and then seek the storage area.",
+        "tree": "<BehaviorTree>\n    <Sequence>\n        <ActuatorAction>pick_up_part</ActuatorAction>\n        <StateAction>state_seek_storage_area</StateAction>\n    </Sequence>\n</BehaviorTree>"
+    }
+]
