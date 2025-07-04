@@ -516,8 +516,11 @@ class DatasetGenerator:
             print("Processing structures separately...")
             all_dataset_entries = []
             
-            for i, (structure_dir, target_count, structure_metrics) in enumerate(structure_result):  # type: ignore
-                print(f"Processing structure {i+1}/{len(structure_result)} from {structure_dir} (target: {target_count} trees)")  # type: ignore
+            for i, (structure_dir, target_count, structure_metrics) in enumerate(structure_result):  
+                # Use structure-specific metrics if available, otherwise fall back to global metrics
+                metrics_to_use = structure_metrics if structure_metrics is not None else filter_metrics
+                print(f"Processing structure {i+1}/{len(structure_result)} from {structure_dir} (target: {target_count} trees)")  
+                print(f"Using metrics: {metrics_to_use}")
                 
                 # Create temporary file for this structure's dataset
                 temp_output = self.datasets_dir / f"temp_structure_{i}.json"
@@ -526,8 +529,8 @@ class DatasetGenerator:
                     folder_path=str(structure_dir),
                     output_json_path=str(temp_output),
                     max_trees=target_count,  # type: ignore
-                    filter_env=filter_env,  # type: ignore
-                    filter_metrics=structure_metrics,  # type: ignore
+                    filter_env=filter_env,  
+                    filter_metrics=metrics_to_use,  
                     node_translations=self.node_translations,
                     node_connectors=self.node_connectors,
                     spoon_node_translations=self.spoon_node_translations,
@@ -652,7 +655,7 @@ class DatasetGenerator:
                 # Create temporary file for this structure's dataset
                 temp_output = self.datasets_dir / f"temp_structure_{i}.json"
                 
-                process_trees_in_folder(  # type: ignore
+                process_trees_in_folder(  
                     folder_path=str(structure_dir),
                     output_json_path=str(temp_output),
                     max_trees=target_count,  # type: ignore
@@ -685,12 +688,12 @@ class DatasetGenerator:
             
         else:
             # Standard processing (single structure or no filtering)
-            process_trees_in_folder(  # type: ignore
+            process_trees_in_folder(  
                 folder_path=str(self.unpopulated_dir),
                 output_json_path=str(output_file),
-                max_trees=max_trees_to_process,  # type: ignore
+                max_trees=max_trees_to_process,  
                 filter_env=filter_env,  # type: ignore
-                filter_metrics=filter_metrics,  # type: ignore
+                filter_metrics=filter_metrics,  
                 node_translations=self.node_translations,
                 node_connectors=self.node_connectors,
                 spoon_node_translations=self.spoon_node_translations,
