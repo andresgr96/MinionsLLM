@@ -8,7 +8,17 @@ from typing import Dict
 def translate_node(
     node: ET.Element, translations: Dict[str, str], connectors: Dict[str, str]
 ) -> str:
-    """Recursively translates a node and its children into natural language."""
+    """
+    Recursively translates a node and its children into natural language.
+
+    Args:
+        node: The XML element node to translate
+        translations: Dictionary mapping node text to natural language
+        connectors: Dictionary mapping node types to connector words
+
+    Returns:
+        str: The natural language translation of the node
+    """
     tag = node.tag
     children = list(node)
     is_selector = tag == "Selector"
@@ -67,7 +77,20 @@ def translate_node(
 def generate_technical_prompt_from_string(
     tree_string: str, translations: Dict[str, str], connectors: Dict[str, str]
 ) -> str:
-    """Generate a technical-style prompt from a tree represented as a string."""
+    """
+    Generate a technical-style prompt from a tree represented as a string.
+
+    Args:
+        tree_string: XML string representation of the behavior tree
+        translations: Dictionary mapping node text to natural language
+        connectors: Dictionary mapping node types to connector words
+
+    Returns:
+        str: The generated technical-style prompt
+
+    Raises:
+        ValueError: If tree structure is invalid or parsing fails
+    """
     try:
         root = ET.fromstring(tree_string)
         if root.tag != "BehaviorTree" or len(root) != 1:
@@ -99,7 +122,20 @@ def generate_technical_prompt_from_string(
 def generate_spoon_prompt_from_string(
     tree_string: str, spoon_translations: Dict[str, str], connectors: Dict[str, str]
 ) -> str:
-    """Generate a spoon-style prompt from a tree represented as a string."""
+    """
+    Generate a spoon-style prompt from a tree represented as a string.
+
+    Args:
+        tree_string: XML string representation of the behavior tree
+        spoon_translations: Dictionary mapping node text to spoon-style language
+        connectors: Dictionary mapping node types to connector words
+
+    Returns:
+        str: The generated spoon-style prompt
+
+    Raises:
+        ValueError: If tree structure is invalid or parsing fails
+    """
     try:
         root = ET.fromstring(tree_string)
         if root.tag != "BehaviorTree" or len(root) != 1:
@@ -131,7 +167,20 @@ def generate_spoon_prompt_from_string(
 def generate_tech_prompt(
     tree_path: str, translations: Dict[str, str], connectors: Dict[str, str]
 ) -> str:
-    """Generate a technical-style prompt from a behavior tree XML file."""
+    """
+    Generate a technical-style prompt from a behavior tree XML file.
+
+    Args:
+        tree_path: Path to the behavior tree XML file
+        translations: Dictionary mapping node text to natural language
+        connectors: Dictionary mapping node types to connector words
+
+    Returns:
+        str: The generated technical-style prompt
+
+    Raises:
+        ValueError: If tree structure is invalid
+    """
     tree = ET.parse(tree_path)
     root = tree.getroot()
 
@@ -159,7 +208,20 @@ def generate_tech_prompt(
 def generate_spoon_prompt(
     tree_path: str, spoon_translations: Dict[str, str], connectors: Dict[str, str]
 ) -> str:
-    """Generate a spoonfed-style prompt from a behavior tree XML file."""
+    """
+    Generate a spoonfed-style prompt from a behavior tree XML file.
+
+    Args:
+        tree_path: Path to the behavior tree XML file
+        spoon_translations: Dictionary mapping node text to spoon-style language
+        connectors: Dictionary mapping node types to connector words
+
+    Returns:
+        str: The generated spoon-style prompt
+
+    Raises:
+        ValueError: If tree structure is invalid
+    """
     tree = ET.parse(tree_path)
     root = tree.getroot()
 
@@ -188,7 +250,12 @@ def generate_spoon_prompt(
 
 # Backward compatibility functions that use default translations
 def generate_prompts_from_folder(folder_path: str) -> None:
-    """Process all XML files in the folder and generate prompts using default translations."""
+    """
+    Process all XML files in the folder and generate prompts using default translations.
+
+    Args:
+        folder_path: Path to the folder containing XML files
+    """
     from .node_translations import node_connectors, node_translations
 
     for file_name in os.listdir(folder_path):

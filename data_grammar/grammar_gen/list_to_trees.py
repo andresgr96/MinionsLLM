@@ -13,7 +13,22 @@ def list_to_xml(
     actuator_actions: Optional[List[str]] = None,
     state_actions: Optional[List[str]] = None,
 ) -> ET.Element:
-    """Convert the nested list representation of a behavior tree into XML."""
+    """
+    Convert the nested list representation of a behavior tree into XML.
+
+    Args:
+        node_list: Nested list representation of the behavior tree
+        placeholders: Whether to use placeholder text for terminal nodes
+        conditions: List of available condition primitives
+        actuator_actions: List of available actuator action primitives
+        state_actions: List of available state action primitives
+
+    Returns:
+        ET.Element: The root XML element of the behavior tree
+
+    Raises:
+        ValueError: If root node does not have a single child
+    """
     # print(f"Processing root node: {node_list[0]}")
     # Root node is always the first
     root = ET.Element(node_list[0])
@@ -36,7 +51,19 @@ def process_node(
     actuator_actions: Optional[List[str]] = None,
     state_actions: Optional[List[str]] = None,
 ) -> ET.Element:
-    """Recursively processes non-root nodes into XML."""
+    """
+    Recursively processes non-root nodes into XML.
+
+    Args:
+        node_list: List representation of the node and its children
+        placeholders: Whether to use placeholder text for terminal nodes
+        conditions: List of available condition primitives
+        actuator_actions: List of available actuator action primitives
+        state_actions: List of available state action primitives
+
+    Returns:
+        ET.Element: The processed XML element
+    """
     # print(f"Processing node: {node_list[0]}")
     node = ET.Element(node_list[0])
     children = node_list[1]
@@ -76,7 +103,22 @@ def create_sequence_node(
     actuator_actions: Optional[List[str]] = None,
     state_actions: Optional[List[str]] = None,
 ) -> ET.Element:
-    """Create an XML node for a Sequence with its children."""
+    """
+    Create an XML node for a Sequence with its children.
+
+    Args:
+        sequence_children: List of child nodes for the sequence
+        placeholders: Whether to use placeholder text for terminal nodes
+        conditions: List of available condition primitives
+        actuator_actions: List of available actuator action primitives
+        state_actions: List of available state action primitives
+
+    Returns:
+        ET.Element: The sequence XML element
+
+    Raises:
+        ValueError: If unexpected child type is encountered in sequence
+    """
     # print(f"Creating Sequence node with children: {sequence_children}")
     sequence_node = ET.Element("Sequence")
     for child in sequence_children:
@@ -103,7 +145,22 @@ def create_selector_node(
     actuator_actions: Optional[List[str]] = None,
     state_actions: Optional[List[str]] = None,
 ) -> ET.Element:
-    """Create an XML node for a Selector with its children."""
+    """
+    Create an XML node for a Selector with its children.
+
+    Args:
+        selector_children: List of child nodes for the selector
+        placeholders: Whether to use placeholder text for terminal nodes
+        conditions: List of available condition primitives
+        actuator_actions: List of available actuator action primitives
+        state_actions: List of available state action primitives
+
+    Returns:
+        ET.Element: The selector XML element
+
+    Raises:
+        ValueError: If unexpected child type is encountered in selector
+    """
     # print(f"Creating Selector node with children: {selector_children}")
     selector_node = ET.Element("Selector")
     for child in selector_children:
@@ -130,7 +187,22 @@ def assign_terminal_text(
     actuator_actions: Optional[List[str]] = None,
     state_actions: Optional[List[str]] = None,
 ) -> str:
-    """Assign appropriate text to terminal nodes."""
+    """
+    Assign appropriate text to terminal nodes.
+
+    Args:
+        node_type: Type of the terminal node
+        placeholders: Whether to use placeholder text
+        conditions: List of available condition primitives
+        actuator_actions: List of available actuator action primitives
+        state_actions: List of available state action primitives
+
+    Returns:
+        str: The assigned text for the terminal node
+
+    Raises:
+        ValueError: If unexpected node type is encountered
+    """
     if node_type == "Condition":
         return (
             random.choice(conditions)
@@ -154,7 +226,15 @@ def assign_terminal_text(
 
 
 def pretty_print_xml(element: ET.Element) -> str:
-    """Return a pretty-printed XML string for an ElementTree element."""
+    """
+    Return a pretty-printed XML string for an ElementTree element.
+
+    Args:
+        element: The XML element to pretty print
+
+    Returns:
+        str: Pretty-printed XML string
+    """
     rough_string = ET.tostring(element, "utf-8")
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="    ")
