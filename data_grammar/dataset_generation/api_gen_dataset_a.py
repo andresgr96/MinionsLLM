@@ -1,3 +1,5 @@
+"""API-based dataset generation using populated trees (Method A)."""
+
 import json
 import os
 from typing import Dict, Optional, Tuple
@@ -13,7 +15,7 @@ client = OpenAI(
 
 
 def get_tree_content(file_path: str) -> str:
-    """Reads the content of an XML file."""
+    """Read the content of an XML file."""
     with open(file_path, "r") as f:
         return f.read().strip()
 
@@ -24,8 +26,7 @@ def process_tree_with_api(
     node_connectors: Dict[str, str],
     spoon_node_translations: Dict[str, str],
 ) -> Tuple[str, str, str]:
-    """Sends the tree and technical prompt to the API and retrieves the layman task."""
-
+    """Send the tree and technical prompt to the API and retrieve the layman task."""
     tech_prompt = generate_tech_prompt(tree_content, node_translations, node_connectors)
     spoon_prompt = generate_spoon_prompt(
         tree_content, spoon_node_translations, node_connectors
@@ -60,9 +61,7 @@ def process_trees_in_folder(
     node_connectors: Optional[Dict[str, str]] = None,
     spoon_node_translations: Optional[Dict[str, str]] = None,
 ) -> None:
-    """
-    Processes trees in a folder and saves results to a JSON file.
-    """
+    """Process trees in a folder and save results to a JSON file."""
     dataset = []
     processed_count = 0
 

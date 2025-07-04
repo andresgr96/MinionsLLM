@@ -1,3 +1,5 @@
+"""API-based dataset generation using placeholder trees (Method B)."""
+
 import json
 import os
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -16,6 +18,8 @@ from .sys_prompt import system_prompt_b
 
 
 class TreeResponse(BaseModel):
+    """Response model for tree generation API calls."""
+
     task: str = Field(description="The task that the tree is solving")
     tree: str = Field(description="The raw behavior tree XML that solves the task")
 
@@ -41,7 +45,7 @@ client = OpenAI(
 
 
 def get_tree_content(file_path: str) -> str:
-    """Reads the content of an XML file."""
+    """Read and return the content of a tree file."""
     with open(file_path, "r") as f:
         return f.read().strip()
 
@@ -56,7 +60,8 @@ def process_tree_with_api(
     max_retries: int = 1,
     focus_parts: str = "any",
 ) -> Tuple[Optional[str], Optional[str]]:
-    """Sends the placeholder tree to the API and retrieves the populated task and tree.
+    """
+    Send the placeholder tree to the API and retrieve the populated task and tree.
 
     Args:
         tree_content: The tree content string with placeholders
@@ -145,6 +150,7 @@ def _test_tree_metrics_b(
 ) -> bool:
     """
     Test a tree in the simulation environment and check if it achieves any target metrics.
+
     Similar to the one in dataset_generator.py but for string tree content.
     """
     import tempfile
@@ -194,6 +200,7 @@ def _check_metrics_against_targets_b(
 ) -> bool:
     """
     Check if actual metrics meet the target criteria.
+
     Same logic as in dataset_generator.py but duplicated to avoid circular imports. Might make an utils file at somepoint.
     """
     if target_metrics is None:
@@ -272,9 +279,7 @@ def process_trees_in_folder(
     actuator_actions: Optional[List[str]] = None,
     state_actions: Optional[List[str]] = None,
 ) -> None:
-    """
-    Process trees in a folder and save results to a JSON file.
-    """
+    """Process trees in a folder and save results to a JSON file."""
     dataset = []
     processed_count = 0
 

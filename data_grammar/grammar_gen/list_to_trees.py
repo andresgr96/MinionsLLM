@@ -1,3 +1,5 @@
+"""Convert nested list representations to XML behavior trees."""
+
 import random
 import xml.etree.ElementTree as ET
 from typing import Any, List, Optional
@@ -11,7 +13,7 @@ def list_to_xml(
     actuator_actions: Optional[List[str]] = None,
     state_actions: Optional[List[str]] = None,
 ) -> ET.Element:
-    """Converts the nested list representation of a behavior tree into XML."""
+    """Convert the nested list representation of a behavior tree into XML."""
     # print(f"Processing root node: {node_list[0]}")
     # Root node is always the first
     root = ET.Element(node_list[0])
@@ -74,7 +76,7 @@ def create_sequence_node(
     actuator_actions: Optional[List[str]] = None,
     state_actions: Optional[List[str]] = None,
 ) -> ET.Element:
-    """Creates an XML node for a Sequence with its children."""
+    """Create an XML node for a Sequence with its children."""
     # print(f"Creating Sequence node with children: {sequence_children}")
     sequence_node = ET.Element("Sequence")
     for child in sequence_children:
@@ -101,7 +103,7 @@ def create_selector_node(
     actuator_actions: Optional[List[str]] = None,
     state_actions: Optional[List[str]] = None,
 ) -> ET.Element:
-    """Creates an XML node for a Selector with its children."""
+    """Create an XML node for a Selector with its children."""
     # print(f"Creating Selector node with children: {selector_children}")
     selector_node = ET.Element("Selector")
     for child in selector_children:
@@ -128,7 +130,7 @@ def assign_terminal_text(
     actuator_actions: Optional[List[str]] = None,
     state_actions: Optional[List[str]] = None,
 ) -> str:
-    """Assigns appropriate text to terminal nodes."""
+    """Assign appropriate text to terminal nodes."""
     if node_type == "Condition":
         return (
             random.choice(conditions)
@@ -152,7 +154,7 @@ def assign_terminal_text(
 
 
 def pretty_print_xml(element: ET.Element) -> str:
-    """Returns a pretty-printed XML string for an ElementTree element."""
+    """Return a pretty-printed XML string for an ElementTree element."""
     rough_string = ET.tostring(element, "utf-8")
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="    ")

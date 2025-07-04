@@ -1,3 +1,1 @@
-"""
-Grammar generation subpackage for defining and processing behavior tree grammars.
-"""
+"""Grammar generation subpackage for behavior tree grammar rules."""

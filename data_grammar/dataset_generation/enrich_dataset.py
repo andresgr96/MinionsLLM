@@ -1,6 +1,4 @@
-"""
-Dataset enrichment functionality for adding handcoded examples to generated datasets.
-"""
+"""Dataset enrichment functionality for adding handcoded examples to generated datasets."""
 
 import json
 from typing import Any, Dict, List, Optional

@@ -1,6 +1,4 @@
-"""
-Data Grammar package for generating behavior trees and datasets.
-"""
+"""Data Grammar package for generating behavior trees and datasets."""
 
 from .dataset_generator import DatasetGenerator
 

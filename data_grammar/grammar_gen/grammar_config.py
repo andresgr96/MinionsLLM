@@ -1,4 +1,4 @@
-""" Here we define everything regarding the grammar, its production rules and parameters to control the size of the trees generated."""
+"""Grammar configuration for behavior tree generation."""
 
 # Defining the grammar rules
 grammar_rules = {

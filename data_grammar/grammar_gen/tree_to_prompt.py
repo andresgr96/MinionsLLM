@@ -1,3 +1,5 @@
+"""Convert behavior trees to natural language prompts."""
+
 import os
 import xml.etree.ElementTree as ET
 from typing import Dict
@@ -65,7 +67,7 @@ def translate_node(
 def generate_technical_prompt_from_string(
     tree_string: str, translations: Dict[str, str], connectors: Dict[str, str]
 ) -> str:
-    """Generates a technical-style prompt from a tree represented as a string."""
+    """Generate a technical-style prompt from a tree represented as a string."""
     try:
         root = ET.fromstring(tree_string)
         if root.tag != "BehaviorTree" or len(root) != 1:
@@ -97,7 +99,7 @@ def generate_technical_prompt_from_string(
 def generate_spoon_prompt_from_string(
     tree_string: str, spoon_translations: Dict[str, str], connectors: Dict[str, str]
 ) -> str:
-    """Generates a spoon-style prompt from a tree represented as a string."""
+    """Generate a spoon-style prompt from a tree represented as a string."""
     try:
         root = ET.fromstring(tree_string)
         if root.tag != "BehaviorTree" or len(root) != 1:
@@ -129,7 +131,7 @@ def generate_spoon_prompt_from_string(
 def generate_tech_prompt(
     tree_path: str, translations: Dict[str, str], connectors: Dict[str, str]
 ) -> str:
-    """Generates a technical-style prompt from a behavior tree XML file."""
+    """Generate a technical-style prompt from a behavior tree XML file."""
     tree = ET.parse(tree_path)
     root = tree.getroot()
 
@@ -157,7 +159,7 @@ def generate_tech_prompt(
 def generate_spoon_prompt(
     tree_path: str, spoon_translations: Dict[str, str], connectors: Dict[str, str]
 ) -> str:
-    """Generates a spoonfed-style prompt from a behavior tree XML file."""
+    """Generate a spoonfed-style prompt from a behavior tree XML file."""
     tree = ET.parse(tree_path)
     root = tree.getroot()
 
@@ -186,7 +188,7 @@ def generate_spoon_prompt(
 
 # Backward compatibility functions that use default translations
 def generate_prompts_from_folder(folder_path: str) -> None:
-    """Processes all XML files in the folder and generates prompts using default translations."""
+    """Process all XML files in the folder and generate prompts using default translations."""
     from .node_translations import node_connectors, node_translations
 
     for file_name in os.listdir(folder_path):

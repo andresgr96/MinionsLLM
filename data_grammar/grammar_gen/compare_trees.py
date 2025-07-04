@@ -1,3 +1,5 @@
+"""Tree comparison and validation utilities for behavior trees."""
+
 import xml.etree.ElementTree as ET
 from typing import List, Optional, Tuple
 
@@ -11,6 +13,7 @@ def validate_node_recursive(
     feedback: Optional[List[str]] = None,
     path: str = "",
 ) -> bool:
+    """Validate a node and its children recursively against a list of valid nodes."""
     if feedback is None:
         feedback = []
 
@@ -84,8 +87,9 @@ def validate_tree_structure(
     state_actions: Optional[List[str]] = None,
 ) -> Tuple[bool, str]:
     """
-    Validates that the generated tree matches the structure of the original tree
-    and that node contents match their expected types.
+    Validate the structure of a behavior tree.
+
+    Checks if all nodes in the tree are valid according to the provided list.
 
     Args:
         original_tree: The original template tree string

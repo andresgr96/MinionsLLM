@@ -1,6 +1,4 @@
-""" 
-    This script defines the dictionaries that will be used to automatically generate a technical prompt
- """
+"""Node translations for converting behavior tree nodes to natural language."""
 
 from typing import Dict
 

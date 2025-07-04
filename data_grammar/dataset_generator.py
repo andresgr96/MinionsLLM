@@ -1,7 +1,7 @@
-""" 
-Here we will define the class DatasetGeneratorthat will wrap the entire dataset generation process given a grammar and other parameters
-Example parameters should in addiion to the gramamr should be like the size of the dataset, wether to use procefure a or b.
+"""Dataset generator for behavior tree training data.
 
+Here we will define the class DatasetGenerator that will wrap the entire dataset generation process given a grammar and other parameters.
+Example parameters should in addition to the grammar should be like the size of the dataset, whether to use procedure a or b.
 """
 
 import json
@@ -126,7 +126,7 @@ class DatasetGenerator:
 
     def _generate_trees(
         self,
-        n_trees: int = 100,
+        n_trees: int = 10,
         size: int = 10,
         placeholders: bool = True,
         filter_env: Optional[SimEnvironment] = None,
@@ -136,13 +136,13 @@ class DatasetGenerator:
         start_index: int = 0,
     ) -> List[str]:
         """
-        Internal method to generate behavior trees based on grammar rules.
+        Generate behavior trees based on grammar rules.
 
         Args:
             n_trees: Number of trees to generate (or target if filtering)
             size: Size of the integer list used for generation
             placeholders: Whether to use placeholders for node values
-            filter_env: Environment to filter the trees (only works for dataset A). Providing one automartically filters the trees.
+            filter_env: Environment to filter the trees (only works for dataset A). Providing one automatically filters the trees.
             output_dir: Directory to save the generated trees
             filter_metrics: List of metrics that must be > 0 for tree to be valid
             grammar_params: Specific grammar parameters to use (if None, uses self.grammar_parameters)
@@ -217,9 +217,7 @@ class DatasetGenerator:
         grammar_params: Optional[Dict[str, Dict[str, Any]]] = None,
         start_index: int = 0,
     ) -> List[str]:
-        """
-        Generate trees with filtering based on simulation metrics.
-        """
+        """Generate trees with filtering based on simulation metrics."""
         if filter_metrics is None:
             raise ValueError(
                 "filter_metrics must be specified when using filtering. No default metrics are provided."
@@ -391,10 +389,7 @@ class DatasetGenerator:
         filter_env: SimEnvironment,
         filter_metrics: Union[List[str], Dict[str, Any]],
     ) -> bool:
-        """
-        Test a tree in the simulation environment and check if it achieves any target metrics.
-        """
-
+        """Test a tree in the simulation environment and check if it achieves any target metrics."""
         # Create temporary file for the tree
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".xml", delete=False
