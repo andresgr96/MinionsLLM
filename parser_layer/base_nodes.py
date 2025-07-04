@@ -52,7 +52,7 @@ class ConditionNode(BaseNode):
             raise ValueError(f"Condition function '{self.condition_name}' not found in the agent class.")
         result = condition_func()
         # print(f"Condition {self.condition_name} returned {result}")
-        return result
+        return bool(result)
 
 class ActuatorActionNode(BaseNode):
     def __init__(self, action_name: str):
@@ -63,7 +63,7 @@ class ActuatorActionNode(BaseNode):
         if not action_func:
             raise ValueError(f"Action function '{self.action_name}' not found in the agent class.")
         # print(f"Executing action {self.action_name}")
-        return action_func()
+        return bool(action_func())
     
 class StateActionNode(BaseNode):
     def __init__(self, action_name: str):
@@ -74,4 +74,4 @@ class StateActionNode(BaseNode):
         if not action_func:
             raise ValueError(f"Action function '{self.action_name}' not found in the agent class.")
         # print(f"Executing action {self.action_name}")
-        return action_func()
+        return bool(action_func())

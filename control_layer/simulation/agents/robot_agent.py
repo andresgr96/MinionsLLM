@@ -11,7 +11,7 @@ from .elements import Part
 if TYPE_CHECKING:
     from ..envs.base_env import SimEnvironment
 
-class RobotAgent(Agent):
+class RobotAgent(Agent):  # type: ignore
     def __init__(self, images: List[pg.Surface], simulation: Simulation, pos: Vector2, env: 'SimEnvironment', xml_path: str):
         super().__init__(images=images, simulation=simulation, pos=pos)
         self.simulation = simulation
@@ -182,6 +182,8 @@ class RobotAgent(Agent):
                     return True
             
             return False
+        
+        return False
 
     def drop_part(self) -> bool:
         """
@@ -416,7 +418,7 @@ class RobotAgent(Agent):
             if direction.length() > 0:
                 direction.scale_to_length(self.config.movement_speed)
 
-            return direction
+            return Vector2(direction.x, direction.y)
         except ValueError:
             return Vector2(0, 0)
 

@@ -91,7 +91,7 @@ class AgentDocstringParser:
             
             method = getattr(self.agent_class, method_name)
             if hasattr(method, '__qualname__'):
-                return method.__qualname__.startswith(self.agent_class.__name__ + ".")
+                return bool(method.__qualname__.startswith(self.agent_class.__name__ + "."))
         
         return False
     

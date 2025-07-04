@@ -3,22 +3,20 @@ from pygame.surface import Surface
 from vi import Agent, HeadlessSimulation
 from ..envs.base_env import SimEnvironment
 import random
+from typing import Optional, TYPE_CHECKING
 
-class Food(Agent):
-    def __init__(self, images: list[Surface], simulation: HeadlessSimulation, pos: Vector2, env: SimEnvironment):
-        super().__init__(images, simulation, pos)
-        self.move = Vector2(0, 0)
-        self.spawn_center = env.source_pos
+if TYPE_CHECKING:
+    from ..envs.robot_env import RobotEnvironment
 
-class Part(Agent):
-    def __init__(self, images: list[Surface], simulation: HeadlessSimulation, type: str, pos: Vector2, env: SimEnvironment):
+class Part(Agent):  # type: ignore
+    def __init__(self, images: list[Surface], simulation: HeadlessSimulation, type: str, pos: Vector2, env: 'RobotEnvironment'):
         super().__init__(images, simulation, pos)
         self.move = Vector2(0, 0)
         self.images = images
         self.simulation = simulation
         self.type = type
         self.pos = pos
-        self.owner = None
+        self.owner: Optional[Agent] = None
         self.env = env
         self.is_permanently_placed = False
         self.update_img()
@@ -30,14 +28,14 @@ class Part(Agent):
     def remove_part(self) -> None:
         self.kill()
 
-    def update(self):
+    def update(self) -> None:
         if self.owner and not self.is_permanently_placed:
             self.pos = self.owner.pos
 
-    def can_be_picked_up(self):
+    def can_be_picked_up(self) -> bool:
         return not self.is_permanently_placed and self.owner is None
 
-    def pick_up_by(self, agent):
+    def pick_up_by(self, agent: Agent) -> bool:
         if self.can_be_picked_up():
             self.owner = agent
             
@@ -50,7 +48,7 @@ class Part(Agent):
             return True
         return False
 
-    def drop_at_location(self, in_base, in_waste, in_storage, in_construction, in_source):
+    def drop_at_location(self, in_base: bool, in_waste: bool, in_storage: bool, in_construction: bool, in_source: bool) -> None:
         """Drop the part and update metrics based on location"""
         if self.owner is None:
             return

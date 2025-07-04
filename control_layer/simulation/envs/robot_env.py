@@ -5,6 +5,7 @@ from ..agents.robot_agent import RobotAgent
 from ..agents.elements import Part 
 import pygame as pg
 import random
+from typing import Dict, Any
 
 class RobotEnvironment(SimEnvironment):
     def __init__(self, config: Config, bt_path: str, n_agents: int, n_parts: int, task: str, headless: bool):
@@ -98,7 +99,7 @@ class RobotEnvironment(SimEnvironment):
 
 
 
-    def run(self) -> dict:
+    def run(self) -> Dict[str, Any]:
         # Reset metrics at the start of each run for env reusability
         self.good_parts_picked_up = 0
         self.bad_parts_picked_up = 0
