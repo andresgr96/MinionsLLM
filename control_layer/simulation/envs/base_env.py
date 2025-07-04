@@ -1,14 +1,16 @@
-import pygame as pg
 from abc import ABC, abstractmethod
-from vi import Simulation, Config, HeadlessSimulation
-from typing import List, Union, Dict, Any
+from typing import Any, Dict, List, Union
+
+import pygame as pg
+from vi import Config, HeadlessSimulation, Simulation
+
 
 class SimEnvironment(ABC):
     """
     Abstract base class for all simulation environments.
     Defines the essential interface that all environments must implement.
     """
-    
+
     def __init__(self, config: Config, bt_path: str, headless: bool = False):
         self.config = config
         self.simulation: Union[Simulation, HeadlessSimulation] = (
@@ -29,9 +31,9 @@ class SimEnvironment(ABC):
     def run(self) -> Dict[str, Any]:
         """
         Run the simulation and return metrics/results.
-        Must be implemented by all subclasses. 
+        Must be implemented by all subclasses.
         Should ALWAYS include a call to self.simulation.run()
-        
+
         Returns:
             Dict[str, Any]: Dictionary containing simulation results and metrics
         """

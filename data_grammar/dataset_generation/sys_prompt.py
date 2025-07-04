@@ -1523,5 +1523,3 @@ Your output:
 
 Your task is to search for good parts and pick them up. If you pick up a good part then you should take it to the base.
 """
-       
-       

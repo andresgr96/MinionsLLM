@@ -1,9 +1,10 @@
-from vi import Agent
-from pygame.math import Vector2
 import random
 
+from pygame.math import Vector2
+from vi import Agent
 
-class LightSensor():
+
+class LightSensor:
     def __init__(self, agent: Agent):
         self.agent = agent
 

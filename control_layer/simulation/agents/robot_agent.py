@@ -1,25 +1,35 @@
 import math
+from typing import TYPE_CHECKING, List
+
 import pygame as pg
-import random
 from pygame.math import Vector2
 from vi import Agent, Simulation
+
 from parser_layer.middle_parser import parse_behavior_tree
-from typing import List, TYPE_CHECKING
+
 from .agent_sensors import LightSensor
 from .elements import Part
 
 if TYPE_CHECKING:
     from ..envs.base_env import SimEnvironment
 
+
 class RobotAgent(Agent):  # type: ignore
-    def __init__(self, images: List[pg.Surface], simulation: Simulation, pos: Vector2, env: 'SimEnvironment', xml_path: str):
+    def __init__(
+        self,
+        images: List[pg.Surface],
+        simulation: Simulation,
+        pos: Vector2,
+        env: "SimEnvironment",
+        xml_path: str,
+    ):
         super().__init__(images=images, simulation=simulation, pos=pos)
         self.simulation = simulation
         self.env = env
-        self.task = getattr(env, 'task', None)
+        self.task = getattr(env, "task", None)
         self.root_node = parse_behavior_tree(xml_path)
         self.light_sensor = LightSensor(self)
-        self.state = "static" 
+        self.state = "static"
         self.is_agent_in_base_flag = True
         self.is_agent_in_source_flag = False
         self.is_agent_in_waste_flag = False
@@ -35,13 +45,12 @@ class RobotAgent(Agent):  # type: ignore
         self.iterations = 0
         self.holding_part = None  # Reference to the part being held
 
-
     def update(self) -> None:
         # print("---")
-        self.helper_update_flags()        # First we update the agents flags
-        self.root_node.run(self)          # Then we get the state from the tree
+        self.helper_update_flags()  # First we update the agents flags
+        self.root_node.run(self)  # Then we get the state from the tree
         self.helper_control_from_state()  # After we calculate the control input from the state
-        self.update_others()      # Finally we do any other updates here to keep it clean
+        self.update_others()  # Finally we do any other updates here to keep it clean
 
     # ---------------------------------------------------- Condition Nodes ----------------------------------------------------
 
@@ -54,9 +63,9 @@ class RobotAgent(Agent):  # type: ignore
         """
         if self.is_agent_in_base_flag:
             return True
-        
+
         return False
-    
+
     def is_agent_in_construction_area(self) -> bool:
         """
         Node Type: Condition
@@ -66,9 +75,9 @@ class RobotAgent(Agent):  # type: ignore
         """
         if self.is_agent_in_construction_flag:
             return True
-        
+
         return False
-    
+
     def is_agent_in_storage_area(self) -> bool:
         """
         Node Type: Condition
@@ -78,7 +87,7 @@ class RobotAgent(Agent):  # type: ignore
         """
         if self.is_agent_in_storage_flag:
             return True
-        
+
         return False
 
     def is_agent_in_source_area(self) -> bool:
@@ -90,9 +99,9 @@ class RobotAgent(Agent):  # type: ignore
         """
         if self.is_agent_in_source_flag:
             return True
-        
+
         return False
-    
+
     def is_agent_in_waste_area(self) -> bool:
         """
         Node Type: Condition
@@ -102,7 +111,7 @@ class RobotAgent(Agent):  # type: ignore
         """
         if self.is_agent_in_waste_flag:
             return True
-        
+
         return False
 
     def is_agent_holding_good_part(self) -> bool:
@@ -114,9 +123,9 @@ class RobotAgent(Agent):  # type: ignore
         """
         if self.is_agent_holding_good_part_flag:
             return True
-                
+
         return False
-    
+
     def is_agent_holding_scrap_part(self) -> bool:
         """
         Node Type: Condition
@@ -126,9 +135,9 @@ class RobotAgent(Agent):  # type: ignore
         """
         if self.is_agent_holding_bad_part_flag:
             return True
-                
+
         return False
-    
+
     def is_good_part_detected(self) -> bool:
         """
         Node Type: Condition
@@ -141,7 +150,7 @@ class RobotAgent(Agent):  # type: ignore
             if part.can_be_picked_up() and part.type == "good":
                 return True
         return False
-    
+
     def is_scrap_part_detected(self) -> bool:
         """
         Node Type: Condition
@@ -164,25 +173,27 @@ class RobotAgent(Agent):  # type: ignore
         Translation: pick up the part
         Spoon Translation: pick up the part
         """
-        if (self.is_good_part_detected() or self.is_scrap_part_detected()) and not self.holding_any_part:
+        if (
+            self.is_good_part_detected() or self.is_scrap_part_detected()
+        ) and not self.holding_any_part:
             nearby_parts = self.in_proximity_performance().filter_kind(Part)
-            
+
             # Look for a part that can actually be picked up
             for part in nearby_parts:
                 if part.can_be_picked_up() and part.pick_up_by(self):
                     # Set the reference to the held part
                     self.holding_part = part
-                    
+
                     if part.type == "good":
                         self.is_agent_holding_good_part_flag = True
                     elif part.type == "bad":
                         self.is_agent_holding_bad_part_flag = True
-                    
+
                     self.holding_any_part = True
                     return True
-            
+
             return False
-        
+
         return False
 
     def drop_part(self) -> bool:
@@ -194,23 +205,25 @@ class RobotAgent(Agent):  # type: ignore
         """
         if not self.holding_any_part or self.holding_part is None:
             return False
-        
+
         # Get location information for metrics
         in_base = self.is_agent_in_base_flag
         in_construction = self.is_agent_in_construction_flag
         in_source = self.is_agent_in_source_flag
         in_waste = self.is_agent_in_waste_flag
         in_storage = self.is_agent_in_storage_flag
-        
+
         # Drop the part with location context for metrics
-        self.holding_part.drop_at_location(in_base, in_waste, in_storage, in_construction, in_source)
-        
+        self.holding_part.drop_at_location(
+            in_base, in_waste, in_storage, in_construction, in_source
+        )
+
         # Reset agent state
         self.holding_part = None
         self.is_agent_holding_good_part_flag = False
         self.is_agent_holding_bad_part_flag = False
         self.holding_any_part = False
-        
+
         return True
 
     def state_seek_base_area(self) -> bool:
@@ -223,7 +236,7 @@ class RobotAgent(Agent):  # type: ignore
         self.state = "searching_nest"
 
         return True
-    
+
     def state_seek_storage_area(self) -> bool:
         """
         Node Type: StateAction
@@ -234,7 +247,7 @@ class RobotAgent(Agent):  # type: ignore
         self.state = "searching_storage"
 
         return True
-    
+
     def state_seek_construction_area(self) -> bool:
         """
         Node Type: StateAction
@@ -245,7 +258,7 @@ class RobotAgent(Agent):  # type: ignore
         self.state = "searching_repair"
 
         return True
-    
+
     def state_seek_waste_area(self) -> bool:
         """
         Node Type: StateAction
@@ -256,7 +269,7 @@ class RobotAgent(Agent):  # type: ignore
         self.state = "searching_waste"
 
         return True
-    
+
     def state_seek_source_area(self) -> bool:
         """
         Node Type: StateAction
@@ -267,7 +280,7 @@ class RobotAgent(Agent):  # type: ignore
         self.state = "searching_source"
 
         return True
-    
+
     def state_random_walk(self) -> bool:
         """
         Node Type: StateAction
@@ -289,12 +302,12 @@ class RobotAgent(Agent):  # type: ignore
         self.state = "static"
 
         return True
-    
+
     # ---------------------------------------------------- Helper Functions ----------------------------------------------------
 
     def helper_update_flags(self) -> None:
         """
-        Updates the conditionals of the agent 
+        Updates the conditionals of the agent
         """
         # Check for agent in base, if it is, check in which zone
         if self.on_site_id() == 0:
@@ -319,14 +332,12 @@ class RobotAgent(Agent):  # type: ignore
         else:
             self.is_agent_in_source_flag = False
 
-
         # Check if agent is in the waste
         if self.on_site_id() == 2:
             self.is_agent_in_waste_flag = True
             # print("waste")
         else:
             self.is_agent_in_waste_flag = False
-
 
     def update_others(self) -> None:
         """
@@ -340,7 +351,7 @@ class RobotAgent(Agent):  # type: ignore
 
         if self.iterations % 140 == 0:
             # Safely access nest_integrity if it exists (specific to RobotEnvironment)
-            if hasattr(self.env, 'nest_integrity'):
+            if hasattr(self.env, "nest_integrity"):
                 self.env.nest_integrity -= 1
 
         # Update agent color for style
@@ -361,12 +372,12 @@ class RobotAgent(Agent):  # type: ignore
             if state == "static":
                 self.move = Vector2(0, 0)
                 # Safely access stopped_moving if it exists (specific to RobotEnvironment)
-                if hasattr(self.env, 'stopped_moving'):
+                if hasattr(self.env, "stopped_moving"):
                     self.env.stopped_moving = True
 
             elif state == "searching_source":
                 light_dir = self.light_sensor.sense_light()
-                direction = light_dir.normalize()  
+                direction = light_dir.normalize()
                 if direction.length() > 0:
                     direction.scale_to_length(self.config.movement_speed)
 
@@ -374,8 +385,10 @@ class RobotAgent(Agent):  # type: ignore
 
             elif state == "searching_waste":
                 light_dir = self.light_sensor.sense_light()
-                direction_x = -light_dir.x   
-                direction_y = light_dir.y    # Pygames inverted y-axis sheananigans forces this
+                direction_x = -light_dir.x
+                direction_y = (
+                    light_dir.y
+                )  # Pygames inverted y-axis sheananigans forces this
                 direction = Vector2(direction_x, direction_y).normalize()
                 if direction.length() > 0:
                     direction.scale_to_length(self.config.movement_speed)
@@ -383,18 +396,20 @@ class RobotAgent(Agent):  # type: ignore
                 self.move = direction
 
             elif state == "searching_nest":
-                base_pos = getattr(self.env, 'base_pos', Vector2(250, 325))
-                direction = self.helper_direction_to(base_pos)  
+                base_pos = getattr(self.env, "base_pos", Vector2(250, 325))
+                direction = self.helper_direction_to(base_pos)
                 self.move = direction
 
             elif state == "searching_storage":
-                storage_pos = getattr(self.env, 'storage_pos', Vector2(225, 325))
-                direction = self.helper_direction_to(storage_pos)  
+                storage_pos = getattr(self.env, "storage_pos", Vector2(225, 325))
+                direction = self.helper_direction_to(storage_pos)
                 self.move = direction
 
             elif state == "searching_repair":
-                construction_pos = getattr(self.env, 'construction_pos', Vector2(275, 325))
-                direction = self.helper_direction_to(construction_pos)  
+                construction_pos = getattr(
+                    self.env, "construction_pos", Vector2(275, 325)
+                )
+                direction = self.helper_direction_to(construction_pos)
                 self.move = direction
 
             elif state == "wandering":
@@ -403,7 +418,9 @@ class RobotAgent(Agent):  # type: ignore
                     angle = self.shared.prng_move.uniform(-math.pi, math.pi)
                     center_dir = self.helper_direction_to(Vector2(250, 250))
                     direction = Vector2(math.cos(angle), math.sin(angle))
-                    direction = center_dir + direction  # Bias the random walk towards the center
+                    direction = (
+                        center_dir + direction
+                    )  # Bias the random walk towards the center
                     if direction.length() > 0:
                         direction.scale_to_length(self.config.movement_speed)
 
@@ -414,23 +431,10 @@ class RobotAgent(Agent):  # type: ignore
     def helper_direction_to(self, target: Vector2) -> Vector2:
         try:
             dir = target - self.pos
-            direction = dir.normalize()  
+            direction = dir.normalize()
             if direction.length() > 0:
                 direction.scale_to_length(self.config.movement_speed)
 
             return Vector2(direction.x, direction.y)
         except ValueError:
             return Vector2(0, 0)
-
-
-
-
-
-
-
-            
-            
-
-
-
-

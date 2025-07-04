@@ -3,12 +3,23 @@ Primitives Validator for Behavior Trees and Agents
 
 This module provides validation of behavior trees against an agent's available primitives.
 """
+
 import xml.etree.ElementTree as ET
-from typing import Type, List
+from typing import List, Type
+
 from vi import Agent
+
 from .agent_doc_parser import AgentDocstringParser
 
-def _validate_node_recursive(node: ET.Element, conditions: List[str], actuator_actions: List[str], state_actions: List[str], feedback: List[str], path: str) -> bool:
+
+def _validate_node_recursive(
+    node: ET.Element,
+    conditions: List[str],
+    actuator_actions: List[str],
+    state_actions: List[str],
+    feedback: List[str],
+    path: str,
+) -> bool:
     """
     Recursively validates a node and its children against lists of valid primitives.
     """
@@ -16,24 +27,29 @@ def _validate_node_recursive(node: ET.Element, conditions: List[str], actuator_a
 
     if node.text and node.text.strip():
         content = node.text.strip()
-        
+
         primitive_map = {
             "Condition": (conditions, "condition"),
             "ActuatorAction": (actuator_actions, "actuator action"),
             "StateAction": (state_actions, "state action"),
         }
-        
+
         if node.tag in primitive_map:
             valid_primitives, node_type = primitive_map[node.tag]
             if content not in valid_primitives:
-                feedback.append(f"Invalid primitive at {current_path}: '{content}' is not a valid {node_type}.")
+                feedback.append(
+                    f"Invalid primitive at {current_path}: '{content}' is not a valid {node_type}."
+                )
                 return False
 
     for child in node:
-        if not _validate_node_recursive(child, conditions, actuator_actions, state_actions, feedback, current_path):
+        if not _validate_node_recursive(
+            child, conditions, actuator_actions, state_actions, feedback, current_path
+        ):
             return False
-            
+
     return True
+
 
 def validate_primitives(tree_xml: str, agent_class: Type[Agent]) -> tuple[bool, str]:
     """
@@ -45,7 +61,7 @@ def validate_primitives(tree_xml: str, agent_class: Type[Agent]) -> tuple[bool, 
     Args:
         tree_xml: The behavior tree XML string.
         agent_class: The agent class to validate against.
-        
+
     Returns:
         A tuple containing:
         - bool: True if the tree is valid, False otherwise.
@@ -55,14 +71,19 @@ def validate_primitives(tree_xml: str, agent_class: Type[Agent]) -> tuple[bool, 
     try:
         parser = AgentDocstringParser(agent_class)
         config = parser.extract_docstring_config()
-        conditions = config['conditions']
-        actuator_actions = config['actuator_actions']
-        state_actions = config['state_actions']
-        
+        conditions = config["conditions"]
+        actuator_actions = config["actuator_actions"]
+        state_actions = config["state_actions"]
+
         root = ET.fromstring(tree_xml)
-        is_valid = _validate_node_recursive(root, conditions, actuator_actions, state_actions, feedback, "")
+        is_valid = _validate_node_recursive(
+            root, conditions, actuator_actions, state_actions, feedback, ""
+        )
         return is_valid, "\n".join(feedback)
     except ET.ParseError as e:
-        return False, f"XML parsing error at line {e.position[0]}, column {e.position[1]}: {str(e)}"
+        return (
+            False,
+            f"XML parsing error at line {e.position[0]}, column {e.position[1]}: {str(e)}",
+        )
     except Exception as e:
-        return False, f"Unexpected validation error: {str(e)}" 
+        return False, f"Unexpected validation error: {str(e)}"

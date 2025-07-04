@@ -1,10 +1,21 @@
 import xml.etree.ElementTree as ET
 from typing import Dict, Optional, Tuple
-from .base_nodes import BaseNode, ConditionNode, ActuatorActionNode, StateActionNode, SequenceNode, SelectorNode
+
+from .base_nodes import (
+    ActuatorActionNode,
+    BaseNode,
+    ConditionNode,
+    SelectorNode,
+    SequenceNode,
+    StateActionNode,
+)
+
 
 class UnknownNodeTypeError(Exception):
     """Raised when an unknown node type is encountered in the behavior tree."""
+
     pass
+
 
 def parse_behavior_tree(file_path: str) -> BaseNode:
     tree = ET.parse(file_path)
@@ -12,7 +23,9 @@ def parse_behavior_tree(file_path: str) -> BaseNode:
     return parse_node(root)
 
 
-def parse_behavior_tree_with_metadata(file_path: str) -> Tuple[Optional[BaseNode], Dict[str, str]]:
+def parse_behavior_tree_with_metadata(
+    file_path: str,
+) -> Tuple[Optional[BaseNode], Dict[str, str]]:
     """
     Parses the XML file containing the behavior tree and metadata.
 
@@ -27,7 +40,9 @@ def parse_behavior_tree_with_metadata(file_path: str) -> Tuple[Optional[BaseNode
 
     # Split the content between the behavior tree and the metadata
     behavior_tree_str, _, metadata_str = content.partition("</BehaviorTree>")
-    behavior_tree_str += "</BehaviorTree>"  # Add the tag back to the behavior tree string
+    behavior_tree_str += (
+        "</BehaviorTree>"  # Add the tag back to the behavior tree string
+    )
 
     # Parse the behavior tree
     try:
@@ -45,8 +60,8 @@ def parse_behavior_tree_with_metadata(file_path: str) -> Tuple[Optional[BaseNode
         for line in metadata_lines:
             line = line.strip()
             if line.startswith("<") and line.endswith(">"):
-                tag = line[1:line.find(">")]
-                value = line[line.find(">")+1:line.rfind("<")].strip()
+                tag = line[1 : line.find(">")]
+                value = line[line.find(">") + 1 : line.rfind("<")].strip()
                 metadata[tag] = value
 
     return behavior_tree, metadata
@@ -77,14 +92,17 @@ def parse_node(node: ET.Element) -> BaseNode:
         return SelectorNode(children)
     else:
         # Instead of returning None, raise our custom exception
-        raise UnknownNodeTypeError(f"Hallucination Error. Unknown node type: {node_type}")
+        raise UnknownNodeTypeError(
+            f"Hallucination Error. Unknown node type: {node_type}"
+        )
+
 
 def print_nodes(node: BaseNode, indent: int = 0) -> None:
     """
     Recursively prints all nodes in the behavior tree.
     """
     indent_str = "  " * indent
-    
+
     if isinstance(node, SequenceNode):
         print(f"{indent_str}SequenceNode:")
         for child in node.children:
@@ -102,6 +120,7 @@ def print_nodes(node: BaseNode, indent: int = 0) -> None:
     else:
         raise ValueError(f"Unknown node type: {type(node).__name__}")
 
+
 def save_behavior_tree_xml(data: str, file_path: str) -> None:
     if not data:
         print("No valid XML content to save.")
@@ -114,28 +133,38 @@ def save_behavior_tree_xml(data: str, file_path: str) -> None:
         print(f"Error parsing XML: {e}")
         print(f"Data: {data}")
 
-def save_behavior_tree_with_metadata(data: str, behaviors: Dict[str, str], agent_class_name: str, env_name: str,
-                                      task_name: str, model_name: str, technique: str, style_name: str, file_path: str) -> None:
+
+def save_behavior_tree_with_metadata(
+    data: str,
+    behaviors: Dict[str, str],
+    agent_class_name: str,
+    env_name: str,
+    task_name: str,
+    model_name: str,
+    technique: str,
+    style_name: str,
+    file_path: str,
+) -> None:
     if not data:
         print("No valid XML content to save.")
         return
 
     behavior_names = list(behaviors.keys())
     behaviors_str = ", ".join(behavior_names)
-    
+
     try:
         root = ET.fromstring(data)
         tree = ET.ElementTree(root)
         tree.write(file_path, encoding="utf-8", xml_declaration=True)
-        
+
     except ET.ParseError as e:
         print(f"Error parsing XML: {e}")
         print(f"Data: {data}")
-        
+
         dummy_xml = '<?xml version="1.0" encoding="utf-8"?>\n<BehaviorTree>syntactically_incorrect</BehaviorTree>'
-        with open(file_path, 'w') as file:
+        with open(file_path, "w") as file:
             file.write(dummy_xml)
-    
+
     # Always append metadata, regardless of whether the XML was valid so we can compute metrics
     with open(file_path, "a") as file:
         file.write("\n\n<!-- Metadata -->\n")

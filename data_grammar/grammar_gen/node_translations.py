@@ -1,6 +1,6 @@
-''' 
+""" 
     This script defines the dictionaries that will be used to automatically generate a technical prompt
- '''
+ """
 
 from typing import Dict
 
@@ -21,7 +21,7 @@ node_translations: Dict[str, str] = {
     "state_seek_source_area": "go to the source",
     "state_seek_waste_area": "go to the waste",
     "state_movement_freeze": "stop moving",
-    "state_random_walk": "search randomly"
+    "state_random_walk": "search randomly",
 }
 
 spoon_node_translations: Dict[str, str] = {
@@ -41,7 +41,7 @@ spoon_node_translations: Dict[str, str] = {
     "state_seek_source_area": "seek the source area",
     "state_seek_waste_area": "seek the waste area",
     "state_movement_freeze": "freeze movement",
-    "state_random_walk": "walk randomly"
+    "state_random_walk": "walk randomly",
 }
 
 node_connectors: Dict[str, str] = {
@@ -49,5 +49,5 @@ node_connectors: Dict[str, str] = {
     "Sequence": "and",
     "Condition": "if",
     "StateAction": "then",
-    "ActuatorAction": "then"
+    "ActuatorAction": "then",
 }
