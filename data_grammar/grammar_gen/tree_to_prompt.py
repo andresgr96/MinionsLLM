@@ -1,8 +1,9 @@
 import os
 import xml.etree.ElementTree as ET
+from typing import Dict, List
 
 
-def translate_node(node, translations, connectors):
+def translate_node(node: ET.Element, translations: Dict[str, str], connectors: Dict[str, str]) -> str:
     """Recursively translates a node and its children into natural language."""
     tag = node.tag
     children = list(node)
@@ -10,7 +11,8 @@ def translate_node(node, translations, connectors):
     is_sequence = (tag == "Sequence")
 
     if not children:
-        translation = translations.get(node.text.strip(), node.text.strip())
+        text_content = node.text.strip() if node.text else ""
+        translation = translations.get(text_content, text_content)
         if tag in connectors:
             return f"{connectors[tag]} {translation}"
         return translation
@@ -46,7 +48,7 @@ def translate_node(node, translations, connectors):
     return "".join(translate_node(child, translations, connectors) for child in children)
 
 
-def generate_technical_prompt_from_string(tree_string, translations, connectors):
+def generate_technical_prompt_from_string(tree_string: str, translations: Dict[str, str], connectors: Dict[str, str]) -> str:
     """Generates a technical-style prompt from a tree represented as a string."""
     try:
         root = ET.fromstring(tree_string)
@@ -72,7 +74,7 @@ def generate_technical_prompt_from_string(tree_string, translations, connectors)
         raise ValueError(f"Error parsing tree string: {e}")
 
 
-def generate_spoon_prompt_from_string(tree_string, spoon_translations, connectors):
+def generate_spoon_prompt_from_string(tree_string: str, spoon_translations: Dict[str, str], connectors: Dict[str, str]) -> str:
     """Generates a spoon-style prompt from a tree represented as a string."""
     try:
         root = ET.fromstring(tree_string)
@@ -98,7 +100,7 @@ def generate_spoon_prompt_from_string(tree_string, spoon_translations, connector
         raise ValueError(f"Error parsing tree string: {e}")
 
 
-def generate_tech_prompt(tree_path, translations, connectors):
+def generate_tech_prompt(tree_path: str, translations: Dict[str, str], connectors: Dict[str, str]) -> str:
     """Generates a technical-style prompt from a behavior tree XML file."""
     tree = ET.parse(tree_path)
     root = tree.getroot()
@@ -121,7 +123,7 @@ def generate_tech_prompt(tree_path, translations, connectors):
 
     return prompt
 
-def generate_spoon_prompt(tree_path, spoon_translations, connectors):
+def generate_spoon_prompt(tree_path: str, spoon_translations: Dict[str, str], connectors: Dict[str, str]) -> str:
     """Generates a spoonfed-style prompt from a behavior tree XML file."""
     tree = ET.parse(tree_path)
     root = tree.getroot()
@@ -146,7 +148,7 @@ def generate_spoon_prompt(tree_path, spoon_translations, connectors):
 
 
 # Backward compatibility functions that use default translations
-def generate_prompts_from_folder(folder_path):
+def generate_prompts_from_folder(folder_path: str) -> None:
     """Processes all XML files in the folder and generates prompts using default translations."""
     from .node_translations import node_translations, node_connectors
     

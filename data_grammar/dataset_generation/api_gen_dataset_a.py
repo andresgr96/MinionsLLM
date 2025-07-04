@@ -1,5 +1,6 @@
 import os
 import json
+from typing import Dict, List, Optional, Tuple, Any
 from openai import OpenAI
 from .sys_prompt import system_prompt_a
 from ..grammar_gen.tree_to_prompt import generate_tech_prompt, generate_spoon_prompt 
@@ -9,12 +10,12 @@ client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY")
 )
 
-def get_tree_content(file_path):
+def get_tree_content(file_path: str) -> str:
     """Reads the content of an XML file."""
     with open(file_path, "r") as f:
         return f.read().strip()
 
-def process_tree_with_api(tree_content, node_translations, node_connectors, spoon_node_translations):
+def process_tree_with_api(tree_content: str, node_translations: Dict[str, str], node_connectors: Dict[str, str], spoon_node_translations: Dict[str, str]) -> Tuple[str, str, str]:
     """Sends the tree and technical prompt to the API and retrieves the layman task."""
 
     tech_prompt = generate_tech_prompt(tree_content, node_translations, node_connectors)
@@ -39,14 +40,14 @@ def process_tree_with_api(tree_content, node_translations, node_connectors, spoo
         ]
     )
 
-    layman_prompt = completion.choices[0].message.content
+    layman_prompt = completion.choices[0].message.content or ""
 
     return layman_prompt, tech_prompt, spoon_prompt
 
 
-def process_trees_in_folder(folder_path, output_json_path, max_trees=None, 
-                          node_translations=None, node_connectors=None, 
-                          spoon_node_translations=None):
+def process_trees_in_folder(folder_path: str, output_json_path: str, max_trees: Optional[int] = None, 
+                          node_translations: Optional[Dict[str, str]] = None, node_connectors: Optional[Dict[str, str]] = None, 
+                          spoon_node_translations: Optional[Dict[str, str]] = None) -> None:
     """
     Processes trees in a folder and saves results to a JSON file.
     """
@@ -62,9 +63,9 @@ def process_trees_in_folder(folder_path, output_json_path, max_trees=None,
 
                 layman_task, tech_task, spoon_task = process_tree_with_api(
                     tree_path, #this should be the actial tree path, not the content
-                    node_translations, 
-                    node_connectors, 
-                    spoon_node_translations
+                    node_translations or {}, 
+                    node_connectors or {}, 
+                    spoon_node_translations or {}
                 )
 
                 if layman_task and tree_content:

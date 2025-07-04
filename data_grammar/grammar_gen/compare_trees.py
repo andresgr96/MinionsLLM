@@ -1,10 +1,11 @@
 import xml.etree.ElementTree as ET
+from typing import List, Optional, Tuple
 
 def validate_node_recursive(orig_node: ET.Element, gen_node: ET.Element, 
-                          conditions: list = None, 
-                          actuator_actions: list = None, 
-                          state_actions: list = None,
-                          feedback: list[str] = None, 
+                          conditions: Optional[List[str]] = None, 
+                          actuator_actions: Optional[List[str]] = None, 
+                          state_actions: Optional[List[str]] = None,
+                          feedback: Optional[List[str]] = None, 
                           path: str = "") -> bool:
     if feedback is None:
         feedback = []
@@ -19,13 +20,13 @@ def validate_node_recursive(orig_node: ET.Element, gen_node: ET.Element,
     # Check content type if node has content
     if gen_node.text and gen_node.text.strip():
         content = gen_node.text.strip()
-        if gen_node.tag == "Condition" and content not in conditions:
+        if gen_node.tag == "Condition" and conditions is not None and content not in conditions:
             feedback.append(f"Invalid condition content at {current_path}: '{content}' is not a valid condition")
             return False
-        elif gen_node.tag == "ActuatorAction" and content not in actuator_actions:
+        elif gen_node.tag == "ActuatorAction" and actuator_actions is not None and content not in actuator_actions:
             feedback.append(f"Invalid actuator action at {current_path}: '{content}' is not a valid actuator action")
             return False
-        elif gen_node.tag == "StateAction" and content not in state_actions:
+        elif gen_node.tag == "StateAction" and state_actions is not None and content not in state_actions:
             feedback.append(f"Invalid state action at {current_path}: '{content}' is not a valid state action")
             return False
     
@@ -39,9 +40,9 @@ def validate_node_recursive(orig_node: ET.Element, gen_node: ET.Element,
               for orig_child, gen_child in zip(orig_node, gen_node))
 
 def validate_tree_structure(original_tree: str, generated_tree: str, 
-                          conditions: list = None,
-                          actuator_actions: list = None,
-                          state_actions: list = None) -> tuple[bool, str]:
+                          conditions: Optional[List[str]] = None,
+                          actuator_actions: Optional[List[str]] = None,
+                          state_actions: Optional[List[str]] = None) -> Tuple[bool, str]:
     """
     Validates that the generated tree matches the structure of the original tree
     and that node contents match their expected types.
@@ -56,7 +57,7 @@ def validate_tree_structure(original_tree: str, generated_tree: str,
     Returns:
         tuple[bool, str]: (is_valid, feedback_message)
     """
-    feedback = []
+    feedback: List[str] = []
     try:
         # Parse both trees
         try:

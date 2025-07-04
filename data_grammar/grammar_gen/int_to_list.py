@@ -2,7 +2,7 @@ import random
 import sys
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional, Union
 
 sys.tracebacklimit = 1
 
@@ -10,17 +10,17 @@ class BaseNode:
     """Base class for all grammar nodes."""
     def __init__(self, integers: List[int], 
                  index: List[int], 
-                 recursion_depth: Dict[str, Any] = None, 
-                 grammar_rules: Dict[str, List[str]] = None, 
-                 grammar_parameters: Dict[str, Dict[str, Any]] = None):
+                 recursion_depth: Optional[Dict[str, Any]] = None, 
+                 grammar_rules: Optional[Dict[str, List[str]]] = None, 
+                 grammar_parameters: Optional[Dict[str, Dict[str, Any]]] = None):
         
         self.integers = integers
         self.index = index  
         self.recursion_depth = recursion_depth if recursion_depth else {}
-        self.grammar_rules = grammar_rules
+        self.grammar_rules = grammar_rules if grammar_rules else {}
         self.grammar_parameters = grammar_parameters if grammar_parameters else {}
 
-    def expand_symbol(self, symbol):
+    def expand_symbol(self, symbol: str) -> Union[str, List[Any]]:
         """Helper method to automatically instantiate and expand a node for a given symbol. """
         symbol_to_class = {
             "SEL": SELNode,
@@ -40,7 +40,7 @@ class BaseNode:
         else:
             return symbol  # Return the symbol as-is if it's not in the mapping
 
-    def choose_option(self, options, rule_name):
+    def choose_option(self, options: List[Any], rule_name: str) -> Any:
         """Choose an option based on the integer sequence and grammar parameters."""
         params = self.grammar_parameters.get(rule_name, {})
         current_depth = self.recursion_depth.get(rule_name, 0)
@@ -97,7 +97,7 @@ class BaseNode:
         
         return option
 
-    def expand(self):
+    def expand(self) -> Union[str, List[Any]]:
         """Expand the node. This should be implemented by subclasses."""
         raise NotImplementedError("Subclasses must implement the expand method.")
     
@@ -105,7 +105,7 @@ class BaseNode:
 
 class BNode(BaseNode):
     """Node for the 'B' rule."""
-    def expand(self):
+    def expand(self) -> List[Any]:
         options = self.grammar_rules["B"]
         chosen_option = self.choose_option(options, "B")
         
@@ -123,19 +123,23 @@ class BNode(BaseNode):
             expanded_children.append(expanded_child)
         
         # Replace the placeholder children_nodes with actual expanded children
-        if terminal_expansion[0] == "BehaviorTree":
+        if isinstance(terminal_expansion, list) and terminal_expansion[0] == "BehaviorTree":
             return [terminal_expansion[0], expanded_children[0]]
         
-        return terminal_expansion
+        # Cast to List[Any] to satisfy type checker
+        if isinstance(terminal_expansion, list):
+            return terminal_expansion
+        else:
+            return [terminal_expansion]
 
-    def expand_child(self, child):
+    def expand_child(self, child: str) -> Union[str, List[Any]]:
         """Expand a child node for B rule."""
         return self.expand_symbol(child)
 
 
 class SELNode(BaseNode):
     """Node for the 'SEL' rule."""
-    def expand(self):
+    def expand(self) -> List[Any]:
         options = self.grammar_rules["SEL"]
         chosen_option = self.choose_option(options, "SEL")
         if chosen_option[0] == "sel":
@@ -149,8 +153,10 @@ class SELNode(BaseNode):
                     else:
                         child_nodes.append(expanded_child)
             return ["Selector", child_nodes]
+        # Add default return for when chosen_option[0] is not "sel"
+        return ["Selector", []]
 
-    def expand_child(self, child):
+    def expand_child(self, child: str) -> Union[str, List[Any]]:
         """Expand a child node."""
         self.recursion_depth["parent"] = "SEL"
         return self.expand_symbol(child)
@@ -158,30 +164,34 @@ class SELNode(BaseNode):
 
 class SEQNNode(BaseNode):
     """Node for the 'SEQn' rule."""
-    def expand(self):
+    def expand(self) -> List[Any]:
         self.recursion_depth["SEQn"] = self.recursion_depth.get("SEQn", 0) + 1
         options = self.grammar_rules["SEQn"]
         chosen_option = self.choose_option(options, "SEQn")
 
-        child_nodes = []
+        child_nodes: List[Any] = []
         for child in chosen_option:
             expanded_child = self.expand_child(child)
             if expanded_child:
-                if isinstance(expanded_child, list) and expanded_child[0] == "Sequence":
+                if isinstance(expanded_child, list) and len(expanded_child) > 0 and expanded_child[0] == "Sequence":
                     # Preserve sequences as individual entries
                     child_nodes.append(expanded_child)
                 else:
-                    child_nodes.extend(expanded_child if isinstance(expanded_child, list) else [expanded_child])
+                    # Ensure we extend with a list
+                    if isinstance(expanded_child, list):
+                        child_nodes.extend(expanded_child)
+                    else:
+                        child_nodes.append(expanded_child)
 
         self.recursion_depth["SEQn"] -= 1            
         return child_nodes
 
-    def expand_child(self, child):
+    def expand_child(self, child: str) -> Union[str, List[Any]]:
         return self.expand_symbol(child)
 
 class SEQNode(BaseNode):
     """Node for the 'SEQ' rule."""
-    def expand(self):
+    def expand(self) -> List[Any]:
         options = self.grammar_rules["SEQ"]
         chosen_option = self.choose_option(options, "SEQ")
         child_nodes = []
@@ -194,7 +204,7 @@ class SEQNode(BaseNode):
                     child_nodes.append(expanded_child)
         return ["Sequence", child_nodes]
 
-    def expand_child(self, child):
+    def expand_child(self, child: str) -> Union[str, List[Any]]:
         self.recursion_depth["parent"] = "SEQ"
         return self.expand_symbol(child)
         
@@ -203,7 +213,7 @@ class SEQNode(BaseNode):
 
 class PNode(BaseNode):
     """Node for the 'Pn' rule."""
-    def expand(self):
+    def expand(self) -> List[Any]:
         self.recursion_depth["Pn"] = self.recursion_depth.get("Pn", 0) + 1
         options = self.grammar_rules["Pn"]
         chosen_option = self.choose_option(options, "Pn")
@@ -220,18 +230,20 @@ class PNode(BaseNode):
         self.recursion_depth["Pn"] -= 1
         return child_nodes
 
-    def expand_child(self, child):
+    def expand_child(self, child: str) -> Optional[Union[str, List[Any]]]:
         if child == "p":  # Terminal case
             return "Condition"
         elif not child:  # Epsilon rule
             return None
         else:
-            return self.expand_symbol(child)
+            result = self.expand_symbol(child)
+            # expand_symbol can return str or List[Any], both are valid for this method
+            return result
 
 
 class ANode(BaseNode):
     """Node for the 'A' rule."""
-    def expand(self):
+    def expand(self) -> Union[str, List[Any]]:
         options = self.grammar_rules["A"]
         chosen_option = self.choose_option(options, "A")
         child_nodes = []
@@ -244,7 +256,7 @@ class ANode(BaseNode):
 
 class ASNode(BaseNode):
     """Node for the 'As' rule."""
-    def expand(self):
+    def expand(self) -> Union[str, List[Any]]:
         options = self.grammar_rules["As"]
         chosen_option = self.choose_option(options, "As")
         child_nodes = []
@@ -257,24 +269,24 @@ class ASNode(BaseNode):
 
 class ActuatorActionNode(BaseNode):
     """Terminal node for Actuator Actions."""
-    def expand(self):
+    def expand(self) -> str:
         return random.choice(["ActuatorAction"])
 
 
 class StateActionNode(BaseNode):
     """Terminal node for State Actions."""
-    def expand(self):
+    def expand(self) -> str:
         return random.choice(["StateAction"])
 
 
 class BTerminalNode(BaseNode):
     """Terminal node for BehaviorTree."""
-    def expand(self):
+    def expand(self) -> List[Any]:
         return ["BehaviorTree", ["children_nodes"]]
 
 
 # Main driver
-def generate_nested_list(integer_list: List[int], grammar_rules: Dict[str, List[str]], grammar_parameters: Dict[str, Dict[str, Any]]):
+def generate_nested_list(integer_list: List[int], grammar_rules: Dict[str, List[str]], grammar_parameters: Dict[str, Dict[str, Any]]) -> List[Any]:
     """Generates a nested list for the behavior tree."""
     root = BNode(integer_list, index=[0], recursion_depth={}, grammar_rules=grammar_rules, grammar_parameters=grammar_parameters)  # Shared index as a list
     return root.expand()

@@ -3,11 +3,12 @@ Dataset enrichment functionality for adding handcoded examples to generated data
 """
 
 import json
+from typing import Dict, List, Any, Optional
 from ..grammar_gen.tree_to_prompt import generate_technical_prompt_from_string, generate_spoon_prompt_from_string
 
 
 
-def process_example(example: dict, node_translations: dict, node_connectors: dict, spoon_node_translations: dict) -> dict:
+def process_example(example: Dict[str, Any], node_translations: Dict[str, str], node_connectors: Dict[str, str], spoon_node_translations: Dict[str, str]) -> Dict[str, Any]:
     """
     Process a handcoded example by generating technical and spoon prompts.
     
@@ -46,7 +47,7 @@ def process_example(example: dict, node_translations: dict, node_connectors: dic
     }
 
 
-def get_handcoded_examples() -> list:
+def get_handcoded_examples() -> List[Dict[str, Any]]:
     """
     Get the default handcoded examples.
     
@@ -353,10 +354,10 @@ def get_handcoded_examples() -> list:
 
 def enrich_dataset(input_file: str, 
                   output_file: str, 
-                  handcoded_examples: list = None,
-                  node_translations: dict = None,
-                  node_connectors: dict = None,
-                  spoon_node_translations: dict = None) -> None:
+                  handcoded_examples: Optional[List[Dict[str, Any]]] = None,
+                  node_translations: Optional[Dict[str, str]] = None,
+                  node_connectors: Optional[Dict[str, str]] = None,
+                  spoon_node_translations: Optional[Dict[str, str]] = None) -> None:
     """
     Enrich a dataset by appending handcoded examples.
     
@@ -381,9 +382,9 @@ def enrich_dataset(input_file: str,
     for example in handcoded_examples:
         processed_example = process_example(
             example, 
-            node_translations, 
-            node_connectors, 
-            spoon_node_translations
+            node_translations or {}, 
+            node_connectors or {}, 
+            spoon_node_translations or {}
         )
         processed_examples.append(processed_example)
     

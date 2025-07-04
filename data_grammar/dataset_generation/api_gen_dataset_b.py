@@ -4,8 +4,8 @@ from openai import OpenAI
 from .sys_prompt import system_prompt_b, system_prompt_b2
 from ..grammar_gen.tree_to_prompt import generate_technical_prompt_from_string, generate_spoon_prompt_from_string  
 from ..grammar_gen.compare_trees import validate_tree_structure
-from control_layer.simulation.envs.robot_env import SimEnvironment
-from typing import List, Union, Dict, Any, Optional
+from control_layer.simulation.envs.robot_env import RobotEnvironment
+from typing import List, Union, Dict, Any, Optional, Tuple
 from pydantic import BaseModel, Field, ConfigDict
 
 class TreeResponse(BaseModel):
@@ -38,13 +38,13 @@ def get_tree_content(file_path: str) -> str:
         return f.read().strip()
 
 def process_tree_with_api(tree_content: str, 
-                          filter_env: SimEnvironment = None,
-                          filter_metrics: Union[List[str], Dict] = None,
-                          conditions: list = None, 
-                          actuator_actions: list = None, 
-                          state_actions: list = None,
+                          filter_env: Optional[RobotEnvironment] = None,
+                          filter_metrics: Optional[Union[List[str], Dict[str, Any]]] = None,
+                          conditions: Optional[List[str]] = None, 
+                          actuator_actions: Optional[List[str]] = None, 
+                          state_actions: Optional[List[str]] = None,
                           max_retries: int = 1,
-                          focus_parts: str = "any") -> tuple[str, str]:
+                          focus_parts: str = "any") -> Tuple[Optional[str], Optional[str]]:
     """Sends the placeholder tree to the API and retrieves the populated task and tree.
     
     Args:
@@ -101,7 +101,7 @@ def process_tree_with_api(tree_content: str,
             # If structure validation passes, check metrics if filter_env provided
             if is_valid and filter_env is not None:
                 print(f"Tree passed structure validation, testing metrics...")
-                metrics_passed = _test_tree_metrics_b(tree, filter_env, filter_metrics)
+                metrics_passed = _test_tree_metrics_b(tree, filter_env, filter_metrics or [])
                 if not metrics_passed:
                     print(f"Tree failed metrics test, retrying...")
                     validation_feedback += "\nThe generated tree did not achieve meaningful metrics in simulation. Please try a different approach."
@@ -121,8 +121,11 @@ def process_tree_with_api(tree_content: str,
             if attempt == max_retries:
                 print("Max retries reached, skipping this tree")
                 return None, None
+    
+    # If we reach here, all attempts failed
+    return None, None
 
-def _test_tree_metrics_b(tree_content: str, filter_env: SimEnvironment, filter_metrics: Union[List[str], Dict]) -> bool:
+def _test_tree_metrics_b(tree_content: str, filter_env: RobotEnvironment, filter_metrics: Union[List[str], Dict[str, Any]]) -> bool:
     """
     Test a tree in the simulation environment and check if it achieves any target metrics.
     Similar to the one in dataset_generator.py but for string tree content.
@@ -140,13 +143,13 @@ def _test_tree_metrics_b(tree_content: str, filter_env: SimEnvironment, filter_m
     
     try:
         # Create a fresh environment instance for each test
-        test_env = type(filter_env)(
+        test_env = RobotEnvironment(
             config=filter_env.config,
             bt_path=temp_bt_path,
-            n_agents=filter_env.n_agents,
-            n_parts=filter_env.n_parts,
-            task=filter_env.task,
-            headless=filter_env.headless
+            n_agents=getattr(filter_env, 'n_agents', 10),
+            n_parts=getattr(filter_env, 'n_parts', 10),
+            task=getattr(filter_env, 'task', 'default'),
+            headless=getattr(filter_env, 'headless', True)
         )
         
         # Setup and run the fresh environment
@@ -163,7 +166,7 @@ def _test_tree_metrics_b(tree_content: str, filter_env: SimEnvironment, filter_m
         if os.path.exists(temp_bt_path):
             os.unlink(temp_bt_path)
 
-def _check_metrics_against_targets_b(actual_metrics: Dict, target_metrics: Union[List[str], Dict]) -> bool:
+def _check_metrics_against_targets_b(actual_metrics: Dict[str, Any], target_metrics: Union[List[str], Dict[str, Any]]) -> bool:
     """
     Check if actual metrics meet the target criteria.
     Same logic as in dataset_generator.py but duplicated to avoid circular imports. Might make an utils file at somepoint.
@@ -224,17 +227,17 @@ def _check_metrics_against_targets_b(actual_metrics: Dict, target_metrics: Union
     else:
         raise ValueError(f"target_metrics must be list or dict, got {type(target_metrics)}")
 
-def process_trees_in_folder(folder_path, 
-                          output_json_path, 
-                          max_trees=None,
-                          filter_env: SimEnvironment = None,
-                          filter_metrics: Union[List[str], Dict] = None,
-                          node_translations=None, 
-                          node_connectors=None,
-                          spoon_node_translations=None, 
-                          conditions=None,
-                          actuator_actions=None, 
-                          state_actions=None):
+def process_trees_in_folder(folder_path: str, 
+                          output_json_path: str, 
+                          max_trees: Optional[int] = None,
+                          filter_env: Optional[RobotEnvironment] = None,
+                          filter_metrics: Optional[Union[List[str], Dict[str, Any]]] = None,
+                          node_translations: Optional[Dict[str, str]] = None, 
+                          node_connectors: Optional[Dict[str, str]] = None,
+                          spoon_node_translations: Optional[Dict[str, str]] = None, 
+                          conditions: Optional[List[str]] = None,
+                          actuator_actions: Optional[List[str]] = None, 
+                          state_actions: Optional[List[str]] = None) -> None:
     """
     Process trees in a folder and save results to a JSON file.
     """
@@ -279,12 +282,12 @@ def process_trees_in_folder(folder_path,
                     print(f"Task: {task}\n\nTree:\n{tree}\n")
                     
                     try:
-                        technical_task = generate_technical_prompt_from_string(tree, node_translations, node_connectors)
+                        technical_task = generate_technical_prompt_from_string(tree, node_translations or {}, node_connectors or {})
                     except Exception as e:
                         technical_task = f"Error generating technical task: {e}"
 
                     try:
-                        spoon_task = generate_spoon_prompt_from_string(tree, spoon_node_translations, node_connectors)
+                        spoon_task = generate_spoon_prompt_from_string(tree, spoon_node_translations or {}, node_connectors or {})
                     except Exception as e:
                         spoon_task = f"Error generating spoon task: {e}"
 
