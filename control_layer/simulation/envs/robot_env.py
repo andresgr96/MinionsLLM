@@ -1,3 +1,5 @@
+"""Robot simulation environment with parts and areas."""
+
 import random
 from typing import Any, Dict
 
@@ -10,6 +12,8 @@ from .base_env import SimEnvironment
 
 
 class RobotEnvironment(SimEnvironment):
+    """Robot simulation environment with parts, areas, and metrics tracking."""
+
     def __init__(
         self,
         config: Config,
@@ -19,6 +23,7 @@ class RobotEnvironment(SimEnvironment):
         task: str,
         headless: bool,
     ):
+        """Initialize robot environment with configuration and metrics."""
         super().__init__(config, bt_path, headless)
         self.n_agents = n_agents
         self.n_parts = n_parts
@@ -62,6 +67,7 @@ class RobotEnvironment(SimEnvironment):
         )
 
     def draw_obstacle(self) -> None:
+        """Draw obstacle in the simulation environment."""
         x = 350
         y = 100
         self.simulation.spawn_obstacle(
@@ -69,6 +75,7 @@ class RobotEnvironment(SimEnvironment):
         )
 
     def draw_arena(self) -> None:
+        """Draw arena boundaries in the simulation environment."""
         self.simulation.spawn_obstacle(
             "./control_layer/simulation/images/arena_new.png",
             self.arena_pos.x,
@@ -76,6 +83,7 @@ class RobotEnvironment(SimEnvironment):
         )
 
     def draw_source(self) -> None:
+        """Draw source area where good parts are located."""
         self.simulation.spawn_site(
             "./control_layer/simulation/images/source_green.png",
             self.source_pos.x,
@@ -83,6 +91,7 @@ class RobotEnvironment(SimEnvironment):
         )
 
     def draw_nest(self) -> None:
+        """Draw base/nest area where parts should be delivered."""
         self.simulation.spawn_site(
             "./control_layer/simulation/images/blue_nest.png",
             self.base_pos.x,
@@ -90,6 +99,7 @@ class RobotEnvironment(SimEnvironment):
         )
 
     def draw_waste(self) -> None:
+        """Draw waste area where bad parts should be disposed."""
         self.simulation.spawn_site(
             "./control_layer/simulation/images/waste_red.png",
             self.waste_pos.x,
@@ -97,6 +107,7 @@ class RobotEnvironment(SimEnvironment):
         )
 
     def spawn_part(self, type: str, pos: Vector2) -> None:
+        """Spawn a part of specified type at given position."""
         part = Part(
             images=self.loaded_parts_imgs,
             simulation=self.simulation,
@@ -108,9 +119,11 @@ class RobotEnvironment(SimEnvironment):
         self.simulation._all.add(part)
 
     def remove_part(self, part: Part) -> None:
+        """Remove a part from the simulation."""
         part.kill()
 
     def place_parts(self, num_parts: int) -> None:
+        """Place specified number of good and bad parts in the environment."""
         for _ in range(num_parts):
             # Place the good parts
             rand_good_pos = Vector2(
@@ -143,6 +156,7 @@ class RobotEnvironment(SimEnvironment):
             self.simulation._all.add(bad_part)
 
     def setup(self) -> None:
+        """Set up the simulation environment with obstacles, areas, parts, and agents."""
         self.draw_arena()
         self.draw_nest()
         self.draw_source()
@@ -165,6 +179,7 @@ class RobotEnvironment(SimEnvironment):
             self.simulation._all.add(agent)
 
     def run(self) -> Dict[str, Any]:
+        """Run the simulation and return metrics."""
         # Reset metrics at the start of each run for env reusability
         self.good_parts_picked_up = 0
         self.bad_parts_picked_up = 0

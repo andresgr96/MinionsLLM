@@ -1,13 +1,14 @@
 """
-This module provides the run_simulation function that serves as the main entry point
-for running behavior tree simulations.
+This module provides the run_simulation function that serves as the main entry point.
+
+This serves as the main entry point for running behavior tree simulations.
 """
 
 from typing import Any, Dict, Optional
 
 from vi import Config, Window
 
-from .envs.robot_env import RobotEnvironment
+from .envs import RobotEnvironment
 
 
 def run_simulation(

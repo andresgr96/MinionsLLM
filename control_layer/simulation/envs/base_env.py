@@ -1,3 +1,5 @@
+"""Base simulation environment for behavior tree agents."""
+
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Union
 
@@ -8,10 +10,12 @@ from vi import Config, HeadlessSimulation, Simulation
 class SimEnvironment(ABC):
     """
     Abstract base class for all simulation environments.
+
     Defines the essential interface that all environments must implement.
     """
 
     def __init__(self, config: Config, bt_path: str, headless: bool = False):
+        """Initialize the simulation environment."""
         self.config = config
         self.simulation: Union[Simulation, HeadlessSimulation] = (
             Simulation(config) if not headless else HeadlessSimulation(config)
@@ -23,6 +27,7 @@ class SimEnvironment(ABC):
     def setup(self) -> None:
         """
         Set up the environment by spawning agents, obstacles, etc.
+
         Must be implemented by all subclasses.
         """
         pass
@@ -31,6 +36,7 @@ class SimEnvironment(ABC):
     def run(self) -> Dict[str, Any]:
         """
         Run the simulation and return metrics/results.
+
         Must be implemented by all subclasses.
         Should ALWAYS include a call to self.simulation.run()
 

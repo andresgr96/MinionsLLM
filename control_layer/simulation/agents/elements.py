@@ -1,3 +1,5 @@
+"""Part elements for robot simulation environment."""
+
 import random
 from typing import TYPE_CHECKING, Optional
 
@@ -10,6 +12,8 @@ if TYPE_CHECKING:
 
 
 class Part(Agent):  # type: ignore
+    """Part object that can be picked up and moved by robot agents."""
+
     def __init__(
         self,
         images: list[Surface],
@@ -18,6 +22,7 @@ class Part(Agent):  # type: ignore
         pos: Vector2,
         env: "RobotEnvironment",
     ):
+        """Initialize a part with type, position, and environment reference."""
         super().__init__(images, simulation, pos)
         self.move = Vector2(0, 0)
         self.images = images
@@ -30,20 +35,25 @@ class Part(Agent):  # type: ignore
         self.update_img()
 
     def update_img(self) -> None:
+        """Update the part's visual representation."""
         img = 0 if self.type == "good" else 1
         self.change_image(img)
 
     def remove_part(self) -> None:
+        """Remove this part from the simulation."""
         self.kill()
 
     def update(self) -> None:
+        """Update the part's position and state."""
         if self.owner and not self.is_permanently_placed:
             self.pos = self.owner.pos
 
     def can_be_picked_up(self) -> bool:
+        """Check if this part can be picked up by an agent."""
         return not self.is_permanently_placed and self.owner is None
 
     def pick_up_by(self, agent: Agent) -> bool:
+        """Attempt to pick up this part by the specified agent."""
         if self.can_be_picked_up():
             self.owner = agent
 
@@ -64,7 +74,7 @@ class Part(Agent):  # type: ignore
         in_construction: bool,
         in_source: bool,
     ) -> None:
-        """Drop the part and update metrics based on location"""
+        """Drop the part and update metrics based on location."""
         if self.owner is None:
             return
 

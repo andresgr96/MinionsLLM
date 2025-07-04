@@ -1,3 +1,5 @@
+"""Sensor classes for robot agents."""
+
 import random
 
 from pygame.math import Vector2
@@ -5,10 +7,14 @@ from vi import Agent
 
 
 class LightSensor:
+    """Light sensor for detecting light sources in the environment."""
+
     def __init__(self, agent: Agent):
+        """Initialize light sensor with reference to the agent."""
         self.agent = agent
 
     def sense_light(self) -> Vector2:
+        """Detect and return direction vector to the nearest light source."""
         light_pos = self.agent.env.light_pos
         agent_pos = self.agent.pos
         diff_vec: Vector2 = light_pos - agent_pos

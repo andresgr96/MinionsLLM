@@ -1,3 +1,5 @@
+"""Robot agent implementation for behavior tree simulations."""
+
 import math
 from typing import TYPE_CHECKING, List
 
@@ -15,6 +17,8 @@ if TYPE_CHECKING:
 
 
 class RobotAgent(Agent):  # type: ignore
+    """Robot agent that executes behavior trees in simulation environments."""
+
     def __init__(
         self,
         images: List[pg.Surface],
@@ -23,6 +27,7 @@ class RobotAgent(Agent):  # type: ignore
         env: "SimEnvironment",
         xml_path: str,
     ):
+        """Initialize robot agent with behavior tree and environment."""
         super().__init__(images=images, simulation=simulation, pos=pos)
         self.simulation = simulation
         self.env = env
@@ -46,6 +51,7 @@ class RobotAgent(Agent):  # type: ignore
         self.holding_part = None  # Reference to the part being held
 
     def update(self) -> None:
+        """Update the agent's state and execute behavior tree."""
         # print("---")
         self.helper_update_flags()  # First we update the agents flags
         self.root_node.run(self)  # Then we get the state from the tree
@@ -56,6 +62,8 @@ class RobotAgent(Agent):  # type: ignore
 
     def is_agent_in_base_area(self) -> bool:
         """
+        Check if agent is in the base area.
+
         Node Type: Condition
         Description: Checks whether the agent is in the base area. Returns True if the agent is within the base, and False otherwise.
         Translation: you are in the base
@@ -68,6 +76,8 @@ class RobotAgent(Agent):  # type: ignore
 
     def is_agent_in_construction_area(self) -> bool:
         """
+        Check if agent is in the construction area.
+
         Node Type: Condition
         Description: Checks whether the agent is in the construction zone within the base area. Returns True if the agent is within the construction, and False otherwise.
         Translation: you are in the construction
@@ -80,6 +90,8 @@ class RobotAgent(Agent):  # type: ignore
 
     def is_agent_in_storage_area(self) -> bool:
         """
+        Check if agent is in the storage area.
+
         Node Type: Condition
         Description: Checks whether the agent is in the storage zone within the base area. Returns True if the agent is within the storage, and False otherwise.
         Translation: you are in the storage
@@ -92,6 +104,8 @@ class RobotAgent(Agent):  # type: ignore
 
     def is_agent_in_source_area(self) -> bool:
         """
+        Check if agent is in the source area.
+
         Node Type: Condition
         Description: Checks whether the agent is in the source area. Returns True if the agent is within the source, and False otherwise.
         Translation: you are in the source
@@ -104,6 +118,8 @@ class RobotAgent(Agent):  # type: ignore
 
     def is_agent_in_waste_area(self) -> bool:
         """
+        Check if agent is in the waste area.
+
         Node Type: Condition
         Description: Checks whether the agent is in the waste area. Returns True if the agent is within the waste, and False otherwise.
         Translation: you are in the waste
@@ -116,6 +132,8 @@ class RobotAgent(Agent):  # type: ignore
 
     def is_agent_holding_good_part(self) -> bool:
         """
+        Check if agent is holding a good part.
+
         Node Type: Condition
         Description: Checks whether the agent is holding a good part. Returns True if the agent is holding a good part, and False otherwise.
         Translation: you are holding a good part
@@ -128,6 +146,8 @@ class RobotAgent(Agent):  # type: ignore
 
     def is_agent_holding_scrap_part(self) -> bool:
         """
+        Check if agent is holding a scrap part.
+
         Node Type: Condition
         Description: Checks whether the agent is holding a scrap part. Returns True if the agent is holding a scrap part, and False otherwise.
         Translation: you are holding a scrap part
@@ -140,6 +160,8 @@ class RobotAgent(Agent):  # type: ignore
 
     def is_good_part_detected(self) -> bool:
         """
+        Check if a good part is detected nearby.
+
         Node Type: Condition
         Description: Checks whether the agent detects a good part within range to pick it up. Returns True if the agent is within range of a good part, and False otherwise.
         Translation: you detect a good part
@@ -153,6 +175,8 @@ class RobotAgent(Agent):  # type: ignore
 
     def is_scrap_part_detected(self) -> bool:
         """
+        Check if a scrap part is detected nearby.
+
         Node Type: Condition
         Description: Checks whether the agent detects a scrap part within range to pick it up. Returns True if the agent is within range of a scrap part, and False otherwise.
         Translation: you detect a scrap part
@@ -168,6 +192,8 @@ class RobotAgent(Agent):  # type: ignore
 
     def pick_up_part(self) -> bool:
         """
+        Pick up a nearby part.
+
         Node Type: ActuatorAction
         Description: Makes the agent pick up a part if its within range and not already holding a part. Returns True if the agent picks up a part, and False otherwise.
         Translation: pick up the part
@@ -198,6 +224,8 @@ class RobotAgent(Agent):  # type: ignore
 
     def drop_part(self) -> bool:
         """
+        Drop the currently held part.
+
         Node Type: ActuatorAction
         Description: Makes the agent drop a part only if its holding one. Returns True if the agent drops a part, and False otherwise.
         Translation: drop the part
@@ -228,6 +256,8 @@ class RobotAgent(Agent):  # type: ignore
 
     def state_seek_base_area(self) -> bool:
         """
+        Set state to seek the base area.
+
         Node Type: StateAction
         Description: Makes the agent move in the direction of the base. Returns True, indicating the action was executed.
         Translation: go to the base
@@ -239,6 +269,8 @@ class RobotAgent(Agent):  # type: ignore
 
     def state_seek_storage_area(self) -> bool:
         """
+        Set state to seek the storage area.
+
         Node Type: StateAction
         Description: Makes the agent move in the direction of the storage zone within the base. Returns True, indicating the action was executed.
         Translation: go to the storage
@@ -250,6 +282,8 @@ class RobotAgent(Agent):  # type: ignore
 
     def state_seek_construction_area(self) -> bool:
         """
+        Set state to seek the construction area.
+
         Node Type: StateAction
         Description: Makes the agent move in the direction of the construction zone within the base. Returns True, indicating the action was executed.
         Translation: go to the construction
@@ -261,6 +295,8 @@ class RobotAgent(Agent):  # type: ignore
 
     def state_seek_waste_area(self) -> bool:
         """
+        Set state to seek the waste area.
+
         Node Type: StateAction
         Description: Makes the agent move in the opposite direction of light where the waste area is found. Returns True, indicating the action was executed.
         Translation: go to the waste
@@ -272,6 +308,8 @@ class RobotAgent(Agent):  # type: ignore
 
     def state_seek_source_area(self) -> bool:
         """
+        Set state to seek the source area.
+
         Node Type: StateAction
         Description: Makes the agent move in the direction of the light source where the source area is found. Returns True, indicating the action was executed.
         Translation: go to the source
@@ -283,6 +321,8 @@ class RobotAgent(Agent):  # type: ignore
 
     def state_random_walk(self) -> bool:
         """
+        Set state to random walk.
+
         Node Type: StateAction
         Description: Makes the agent move in a random direction. Returns True, indicating the action was executed.
         Translation: search randomly
@@ -294,6 +334,8 @@ class RobotAgent(Agent):  # type: ignore
 
     def state_movement_freeze(self) -> bool:
         """
+        Set state to freeze movement.
+
         Node Type: StateAction
         Description: Freeze the agent's and stops its movement. Returns True, indicating the action was executed.
         Translation: stop moving
@@ -306,9 +348,7 @@ class RobotAgent(Agent):  # type: ignore
     # ---------------------------------------------------- Helper Functions ----------------------------------------------------
 
     def helper_update_flags(self) -> None:
-        """
-        Updates the conditionals of the agent
-        """
+        """Update the conditionals of the agent."""
         # Check for agent in base, if it is, check in which zone
         if self.on_site_id() == 0:
             self.is_agent_in_base_flag = True
@@ -340,9 +380,7 @@ class RobotAgent(Agent):  # type: ignore
             self.is_agent_in_waste_flag = False
 
     def update_others(self) -> None:
-        """
-        Performs different updates that don't fit into the other helper functions.
-        """
+        """Perform different updates that don't fit into the other helper functions."""
         self.iterations += 1
         self.rand_walk_cooldown += 1
 
@@ -363,9 +401,7 @@ class RobotAgent(Agent):  # type: ignore
             self.change_image(0)
 
     def helper_control_from_state(self) -> None:
-        """
-        Produces a control command from the state of the agent defined by the behaviour tree.
-        """
+        """Produce a control command from the state of the agent defined by the behaviour tree."""
         state = self.state
 
         try:
@@ -429,6 +465,7 @@ class RobotAgent(Agent):  # type: ignore
             self.move = Vector2(0, 0)
 
     def helper_direction_to(self, target: Vector2) -> Vector2:
+        """Calculate direction vector to target position."""
         try:
             dir = target - self.pos
             direction = dir.normalize()
