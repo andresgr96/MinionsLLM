@@ -26,15 +26,19 @@ https://drive.google.com/file/d/19GDlBFKiZ7za9IqG7FQQxjw5b5SSKyLZ/view?usp=shari
     pip install -e .
     ```
 
-    ## Introduction
-
+## Introduction
 
 ![MinionsLLM Framework Flow](examples/framework_flow.png)
 
-MinionsLLM provides
-standardized interfaces for defining environments, agents, and behavioral
-primitives, and introduces a novel formal grammar based methodology for syntetic dataset generation to fine-tune LLMs for improved syntactic
-validity and task performance.
+MinionsLLM provides standardized interfaces for defining environments, agents, and behavioral primitives, and introduces a novel formal grammar based methodology for syntetic dataset generation to fine-tune LLMs for improved syntactic validity and task performance. Main packages:
+
+– **LLM Interface**: This Package provides functionality to prompt LLMs locally using different backend options in order to get behavior trees.
+
+– **Agent Control**: Provides functionality for the control of agents in a simulated environment through behavior trees.
+
+– **Tree Parser**: Acting as middleware between the Interface and Control packages, it provides functionality to parse trees into executable commands for the agents.
+
+– **Dataset Grammar**: Provides functionality to generate custom datasets through different methods.
 
 ## Usage
 
