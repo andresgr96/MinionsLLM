@@ -1,6 +1,0 @@
-<?xml version="1.0" ?>
-<BehaviorTree>
-    <Sequence>
-        <StateAction>placeholder_state_action</StateAction>
-    </Sequence>
-</BehaviorTree>
