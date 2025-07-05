@@ -23,22 +23,22 @@ jobs:
     
     - name: Install Tools Dependencies
       run: |
-        pip install -r codetools/requirements.txt
+        pip install -r code_tools/requirements.txt
     
     - name: Run Black
       run: |
-        chmod +x codetools/black/check.sh
-        ./codetools/black/check.sh
+        chmod +x code_tools/black/check.sh
+        ./code_tools/black/check.sh
     
     - name: Run isort
       run: |
-        chmod +x codetools/isort/check.sh
-        ./codetools/isort/check.sh
+        chmod +x code_tools/isort/check.sh
+        ./code_tools/isort/check.sh
     
     - name: Run sort-all
       run: |
-        chmod +x codetools/sort_all/fix.sh
-        ./codetools/sort_all/fix.sh --check
+        chmod +x code_tools/sort_all/fix.sh
+        ./code_tools/sort_all/fix.sh --check
 
   linting:
     name: Code Linting
@@ -60,19 +60,19 @@ jobs:
     
     - name: Install Tools Dependencies
       run: |
-        pip install -r codetools/requirements.txt
+        pip install -r code_tools/requirements.txt
     
     - name: Run Pyflakes
       run: |
-        chmod +x codetools/pyflakes/check.sh
-        ./codetools/pyflakes/check.sh
+        chmod +x code_tools/pyflakes/check.sh
+        ./code_tools/pyflakes/check.sh
     
     - name: Run Pydocstyle
       run: |
-        chmod +x codetools/pydocstyle/check.sh
-        ./codetools/pydocstyle/check.sh
+        chmod +x code_tools/pydocstyle/check.sh
+        ./code_tools/pydocstyle/check.sh
     
     - name: Run Darglint
       run: |
-        chmod +x codetools/darglint/check.sh
-        ./codetools/darglint/check.sh
+        chmod +x code_tools/darglint/check.sh
+        ./code_tools/darglint/check.sh

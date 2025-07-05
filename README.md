@@ -115,7 +115,7 @@ Before submitting your changes, ensure they meet our code quality standards:
 #### Install Code Quality Tools
 ```bash
 # Install code quality requirements
-pip install -r codetools/requirements.txt
+pip install -r code_tools/requirements.txt
 ```
 
 #### Check and Fix Code Quality
@@ -123,7 +123,7 @@ We provide automated scripts to check and fix common issues:
 
 ```bash
 # Check for all code quality issues
-./codetools/fix_all.sh
+./code_tools/fix_all.sh
 ```
 
 #### Code Standards We Enforce

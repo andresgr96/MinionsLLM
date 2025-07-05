@@ -27,9 +27,9 @@ jobs:
     
     - name: Install MyPy
       run: |
-        pip install -r codetools/mypy/requirements.txt
+        pip install -r code_tools/mypy/requirements.txt
     
     - name: Run MyPy
       run: |
-        chmod +x codetools/mypy/check_all.sh
-        ./codetools/mypy/check_all.sh
+        chmod +x code_tools/mypy/check_all.sh
+        ./code_tools/mypy/check_all.sh
