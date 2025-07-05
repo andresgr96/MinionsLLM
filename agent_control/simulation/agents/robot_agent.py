@@ -7,7 +7,7 @@ import pygame as pg
 from pygame.math import Vector2
 from vi import Agent, Simulation
 
-from parser_layer.middle_parser import parse_behavior_tree
+from tree_parser.middle_parser import parse_behavior_tree
 
 from .agent_sensors import LightSensor
 from .elements import Part

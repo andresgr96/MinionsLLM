@@ -65,7 +65,7 @@ node_connectors = {
 
 # Initialize the generator with a small output directory
 generator = DatasetGenerator(
-    output_dir="./examples/data_gen_examples/output/grammar_test_run",
+    output_dir="./examples/03_data_gen_examples/output/grammar_test_run",
     seed=42,
     grammar_rules=grammar_rules,
     grammar_parameters=grammar_parameters,

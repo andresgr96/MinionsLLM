@@ -9,8 +9,8 @@ we can generate a mixed dataset with all the structures, additionally we can fil
 from vi import Config, Window
 
 from data_grammar import DatasetGenerator
-from control_layer.simulation.agents import RobotAgent
-from control_layer.simulation.envs import RobotEnvironment 
+from agent_control.simulation.agents import RobotAgent
+from agent_control.simulation.envs import RobotEnvironment 
 
 filter_env = RobotEnvironment(
     config=Config(
@@ -104,7 +104,7 @@ trees_per_params = [
 # Initialize the generator with mixed structures + filtering
 generator_filtered = DatasetGenerator(
     agent_class=RobotAgent,
-    output_dir="./examples/data_gen_examples/output/mixed_test_run",
+    output_dir="./examples/03_data_gen_examples/output/mixed_test_run",
     seed=42,
     grammar_parameters=trees_per_params,  # Feed the structure param here instead of the specific generation methods
     grammar_rules=grammar_rules

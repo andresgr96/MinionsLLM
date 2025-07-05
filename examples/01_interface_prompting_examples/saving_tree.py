@@ -12,9 +12,9 @@ The example uses the gemma3:1b model and saves the output in the same directory.
 
 import time
 from pathlib import Path
-from llm_layer import BehaviorTreeGenerator
-from control_layer.simulation.agents.robot_agent import RobotAgent
-from parser_layer.middle_parser import save_behavior_tree_xml
+from llm_interface import BehaviorTreeGenerator
+from agent_control.simulation.agents.robot_agent import RobotAgent
+from tree_parser.middle_parser import save_behavior_tree_xml
 
 
 def main():

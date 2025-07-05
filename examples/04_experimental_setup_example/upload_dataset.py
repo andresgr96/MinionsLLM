@@ -2,7 +2,7 @@ from datasets import Dataset
 import json
 from typing import List, Dict
 import os
-from control_layer.simulation import RobotAgent  # Change this to the agent you want to use
+from agent_control.simulation import RobotAgent  # Change this to the agent you want to use
 
 def load_unformatted_dataset(dataset_path: str) -> List[Dict]:
     """Load the unformatted dataset from JSON file."""
@@ -51,8 +51,8 @@ def call_behaviors(agent_class = RobotAgent) -> dict:
 def format_conversation(prompt: str, tree: str, style: str) -> List[Dict]:
     """Format a single conversation in Llama-3 ShareGPT style."""
     # Load system prompt and example
-    system_prompt = load_xml_template("./llm_layer/prompt_techniques/system_prompt.xml")
-    bt_3_example = load_xml_template("./llm_layer/prompt_techniques/bt_3.xml")
+    system_prompt = load_xml_template("./llm_interface/prompt_techniques/system_prompt.xml")
+    bt_3_example = load_xml_template("./llm_interface/prompt_techniques/bt_3.xml")
     behaviors = call_behaviors(RobotAgent)
     
     # Replace placeholders in system prompt

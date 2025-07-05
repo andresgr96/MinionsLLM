@@ -12,7 +12,7 @@ The example uses the "collect" scenario where robots find good parts and
 bring them back to the base area.
 """
 
-from control_layer.simulation.envs.robot_env import RobotEnvironment
+from agent_control.simulation.envs.robot_env import RobotEnvironment
 from vi import Config, Window
 
 
@@ -29,7 +29,7 @@ def main():
     
     # Path to the behavior tree XML file
     # This tree implements a "collect good parts" behavior
-    bt_path = "./examples/simulation_examples/collect.xml"
+    bt_path = "./examples/02_simulation_examples/collect.xml"
     
     print("Creating Robot Environment...")
     

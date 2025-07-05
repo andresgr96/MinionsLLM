@@ -6,8 +6,8 @@ the llamacpp backend to generate behavior trees from natural language prompts.
 """
 
 import time
-from llm_layer import BehaviorTreeGenerator
-from control_layer.simulation.agents.robot_agent import RobotAgent
+from llm_interface import BehaviorTreeGenerator
+from agent_control.simulation.agents.robot_agent import RobotAgent
 
 
 def main():
@@ -20,7 +20,7 @@ def main():
     generator = BehaviorTreeGenerator(
         agent_class=RobotAgent,
         backend="llamacpp",
-        model_path_or_url="./llm_layer/models/gemma-3-1b-it-qat-B.Q8_0.gguf",
+        model_path_or_url="./llm_interface/models/gemma-3-1b-it-qat-B.Q8_0.gguf",
         chat_format="llama-3",
         context_length=1024*4,
         gpu_layers=0,        

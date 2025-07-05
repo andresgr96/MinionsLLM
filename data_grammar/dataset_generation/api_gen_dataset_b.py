@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 from openai import OpenAI
 from pydantic import BaseModel, Field
 
-from control_layer.simulation.envs.robot_env import RobotEnvironment
+from agent_control.simulation.envs.robot_env import RobotEnvironment
 
 from ..grammar_gen.compare_trees import validate_tree_structure
 from ..grammar_gen.tree_to_prompt import (

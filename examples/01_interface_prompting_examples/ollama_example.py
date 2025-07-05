@@ -10,8 +10,8 @@ DISCLAIMER: You need to have Ollama installed and running.
 """
 
 import time
-from llm_layer import BehaviorTreeGenerator
-from control_layer.simulation.agents.robot_agent import RobotAgent
+from llm_interface import BehaviorTreeGenerator
+from agent_control.simulation.agents.robot_agent import RobotAgent
 
 
 def example_existing_model():

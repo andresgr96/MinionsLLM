@@ -11,7 +11,7 @@ from data_grammar import DatasetGenerator
 # Initialize the generator with a small output directory
 # Will use default rules, parameters and agent class. Check the class definition for more details.
 generator = DatasetGenerator(
-    output_dir="./examples/data_gen_examples/output/basic_test_run",
+    output_dir="./examples/03_data_gen_examples/output/basic_test_run",
     seed=42
 )
 
