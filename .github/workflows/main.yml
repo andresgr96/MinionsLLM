@@ -10,20 +10,20 @@ jobs:
   formatting:
     name: Code Formatting
     runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          python-version: ["3.10", "3.11"]
     steps:
     - uses: actions/checkout@v4
     
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: ${{ matrix.python-version }}
     
-    - name: Install formatting tools
+    - name: Install Tools Dependencies
       run: |
-        pip install -r codetools/black/requirements.txt
-        pip install -r codetools/isort/requirements.txt
-        pip install -r codetools/sort_all/requirements.txt
-        pip install toml
+        pip install -r codetools/requirements.txt
     
     - name: Run Black
       run: |
@@ -43,23 +43,20 @@ jobs:
   linting:
     name: Code Linting
     runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          python-version: ["3.10", "3.11"]
     steps:
     - uses: actions/checkout@v4
     
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: ${{ matrix.python-version }}
     
-    - name: Install project dependencies
+    - name: Install Project Dependencies
       run: |
         pip install -e .
-    
-    - name: Install linting tools
-      run: |
-        pip install -r codetools/pyflakes/requirements.txt
-        pip install -r codetools/pydocstyle/requirements.txt
-        pip install -r codetools/darglint/requirements.txt
     
     - name: Run Pyflakes
       run: |
