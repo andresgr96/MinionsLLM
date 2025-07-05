@@ -1,0 +1,26 @@
+[
+    {
+        "layman_task": "Your task is to move to the base area only if you are holding a scrap part, not holding a good part, and currently in the waste area.",
+        "technical_task": "if you are holding a scrap part and if you are in the waste and if you are holding a good part then go to the base.",
+        "spoon_task": "if you are holding a scrap part and if you are in the waste area and if you are holding a good part then seek the base area.",
+        "tree": "<?xml version=\"1.0\" ?>\n<BehaviorTree>\n    <Sequence>\n        <Condition>is_agent_holding_scrap_part</Condition>\n        <Condition>is_agent_in_waste_area</Condition>\n        <Condition>is_agent_holding_good_part</Condition>\n        <StateAction>state_seek_base_area</StateAction>\n    </Sequence>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to find any part (good or scrap), pick it up, and then go to the base area.",
+        "technical_task": "if you detect a scrap part then pick up the part and then go to the base.",
+        "spoon_task": "if you detect a scrap part then pick up the part and then seek the base area.",
+        "tree": "<?xml version=\"1.0\" ?>\n<BehaviorTree>\n    <Sequence>\n        <Condition>is_scrap_part_detected</Condition>\n        <ActuatorAction>pick_up_part</ActuatorAction>\n        <StateAction>state_seek_base_area</StateAction>\n    </Sequence>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to go to the base area if you are holding a part of any type.",
+        "technical_task": "if you are holding a good part and if you are in the base then go to the base.",
+        "spoon_task": "if you are holding a good part and if you are in the base area then seek the base area.",
+        "tree": "<?xml version=\"1.0\" ?>\n<BehaviorTree>\n    <Sequence>\n        <Condition>is_agent_holding_good_part</Condition>\n        <Condition>is_agent_in_base_area</Condition>\n        <StateAction>state_seek_base_area</StateAction>\n    </Sequence>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to pick up a good part if it is detected nearby.",
+        "technical_task": "if you detect a good part then pick up the part.",
+        "spoon_task": "if you detect a good part then pick up the part.",
+        "tree": "<?xml version=\"1.0\" ?>\n<BehaviorTree>\n    <Sequence>\n        <Condition>is_good_part_detected</Condition>\n        <ActuatorAction>pick_up_part</ActuatorAction>\n    </Sequence>\n</BehaviorTree>"
+    }
+]

@@ -177,9 +177,7 @@ class DatasetGenerator:
             )
 
         # Original logic for non-filtered generation
-        print(
-            f"Generating {n_trees} trees with size {size} and placeholders: {placeholders}"
-        )
+        print(f"Generating {n_trees} trees with placeholders: {placeholders}")
         for i in range(n_trees):
             if i % 1000 == 0 and i > 0:
                 print(f"Processing tree {i} of {n_trees}")
@@ -653,18 +651,13 @@ class DatasetGenerator:
                 # Create temporary file for this structure's dataset
                 temp_output = self.datasets_dir / f"temp_structure_{i}.json"
 
-                process_trees_in_folder(  # type: ignore
+                process_trees_in_folder(
                     folder_path=str(structure_dir),
                     output_json_path=str(temp_output),
                     max_trees=target_count,  # type: ignore
-                    filter_env=filter_env,
-                    filter_metrics=metrics_to_use,
                     node_translations=self.node_translations,
                     node_connectors=self.node_connectors,
                     spoon_node_translations=self.spoon_node_translations,
-                    conditions=self.extracted_config["conditions"],
-                    actuator_actions=self.extracted_config["actuator_actions"],
-                    state_actions=self.extracted_config["state_actions"],
                 )
 
                 # Load the results and add to combined dataset
@@ -760,6 +753,11 @@ class DatasetGenerator:
             )
         else:
             # Generate single structure trees
+            if self.over_generate_trees:
+                n_trees = (
+                    n_trees * 50
+                )  # We over-generate trees to account for filtering and llm mistakes. Lazy, should be improved.
+
             self._generate_trees(
                 n_trees=n_trees,
                 size=tree_size,

@@ -1,0 +1,22 @@
+<BehaviorTree>
+    <Selector>
+
+        <Sequence>
+            <Condition>is_agent_holding_good_part</Condition>
+            <Condition>is_agent_in_base_area</Condition>
+            <ActuatorAction>drop_part</ActuatorAction>
+        </Sequence>
+
+        <Sequence>
+            <Condition>is_agent_holding_good_part</Condition>
+            <StateAction>state_seek_base_area</StateAction>
+        </Sequence>
+ 
+        <Sequence>
+            <Condition>is_good_part_detected</Condition>
+            <ActuatorAction>pick_up_part</ActuatorAction>
+        </Sequence>       
+
+        <StateAction>state_seek_source_area</StateAction>
+    </Selector>
+</BehaviorTree>

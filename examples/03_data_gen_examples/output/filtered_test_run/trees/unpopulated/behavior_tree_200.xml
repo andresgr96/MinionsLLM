@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<BehaviorTree>
+    <Selector>
+        <Sequence>
+            <StateAction>placeholder_state_action</StateAction>
+        </Sequence>
+        <Sequence>
+            <ActuatorAction>placeholder_actuator_action</ActuatorAction>
+        </Sequence>
+        <ActuatorAction>placeholder_actuator_action</ActuatorAction>
+    </Selector>
+</BehaviorTree>

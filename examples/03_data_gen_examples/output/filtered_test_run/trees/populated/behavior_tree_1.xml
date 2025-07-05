@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<BehaviorTree>
+    <Selector>
+        <Sequence>
+            <ActuatorAction>pick_up_part</ActuatorAction>
+            <StateAction>state_movement_freeze</StateAction>
+        </Sequence>
+        <Sequence>
+            <Condition>is_good_part_detected</Condition>
+            <ActuatorAction>drop_part</ActuatorAction>
+        </Sequence>
+        <Sequence>
+            <StateAction>state_seek_waste_area</StateAction>
+        </Sequence>
+        <Sequence>
+            <ActuatorAction>drop_part</ActuatorAction>
+        </Sequence>
+    </Selector>
+</BehaviorTree>
