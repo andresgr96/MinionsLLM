@@ -23,6 +23,7 @@ jobs:
         pip install -r codetools/black/requirements.txt
         pip install -r codetools/isort/requirements.txt
         pip install -r codetools/sort_all/requirements.txt
+        pip install toml
     
     - name: Run Black
       run: |
