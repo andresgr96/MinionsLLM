@@ -1,0 +1,76 @@
+name: Code Quality Checks
+
+on:
+  pull_request:
+    branches: [ main, development ]
+  push:
+    branches: [ main, development ]
+
+jobs:
+  formatting:
+    name: Code Formatting
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install formatting tools
+      run: |
+        pip install -r codetools/black/requirements.txt
+        pip install -r codetools/isort/requirements.txt
+        pip install -r codetools/sort_all/requirements.txt
+    
+    - name: Run Black
+      run: |
+        chmod +x codetools/black/check.sh
+        ./codetools/black/check.sh
+    
+    - name: Run isort
+      run: |
+        chmod +x codetools/isort/check.sh
+        ./codetools/isort/check.sh
+    
+    - name: Run sort-all
+      run: |
+        chmod +x codetools/sort_all/fix.sh
+        ./codetools/sort_all/fix.sh --check
+
+  linting:
+    name: Code Linting
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install project dependencies
+      run: |
+        pip install -e .
+    
+    - name: Install linting tools
+      run: |
+        pip install -r codetools/pyflakes/requirements.txt
+        pip install -r codetools/pydocstyle/requirements.txt
+        pip install -r codetools/darglint/requirements.txt
+    
+    - name: Run Pyflakes
+      run: |
+        chmod +x codetools/pyflakes/check.sh
+        ./codetools/pyflakes/check.sh
+    
+    - name: Run Pydocstyle
+      run: |
+        chmod +x codetools/pydocstyle/check.sh
+        ./codetools/pydocstyle/check.sh
+    
+    - name: Run Darglint
+      run: |
+        chmod +x codetools/darglint/check.sh
+        ./codetools/darglint/check.sh
