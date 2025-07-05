@@ -69,17 +69,17 @@ Run behavior tree simulations in robot environments:
 
 1. **Generate a behavior tree from text:**
    ```bash
-   python examples/interface_prompting/saving_tree.py
+    examples/01_interface_prompting/saving_tree.py
    ```
 
 2. **Run a robot simulation:**
    ```bash
-   python examples/simulate_environment.py
+    examples/02_simulate_environment.py
    ```
 
 3. **Generate training datasets:**
    ```bash
-   python examples/data_gen_examples/basic_dataset_generation.py
+    examples/03_data_gen_examples/basic_dataset_generation.py
    ```
 
 ### 📖 Example Descriptions
