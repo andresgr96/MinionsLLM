@@ -46,35 +46,44 @@ MinionsLLM provides several example scripts to help you get started with differe
 
 ### 📁 Examples Overview
 
-#### **Interface Prompting Examples** (`examples/interface_prompting/`)
+#### **Interface Prompting Examples** (`examples/01_interface_prompting_examples/`)
 Learn how to use the LLM interface to generate behavior trees from natural language prompts:
 
 - **`llamacpp_example.py`** - Generate behavior trees using the LlamaCPP backend with local GGUF models
 - **`ollama_examples.py`** - Two examples showing how to use Ollama backend (existing models + auto-import from Hugging Face)
 - **`saving_tree.py`** - Complete workflow: prompt LLM, generate behavior tree, and save as XML file
 
-#### **Data Generation Examples** (`examples/data_gen_examples/`)
-Explore synthetic dataset generation using formal grammars:
-
-- **`basic_dataset_generation.py`** - Simple dataset generation using default grammar rules
-- **`filtered_dataset_generation.py`** - Advanced dataset generation with simulation-based filtering
-
-#### **Simulation Examples** (`examples/`)
+#### **Simulation Examples** (`examples/02_simulation_examples/`)
 Run behavior tree simulations in robot environments:
 
 - **`simulate_environment.py`** - Complete example of running a robot simulation with behavior trees
-- **`bt_prompting.py`** - Demonstrate behavior tree prompting capabilities
+
+#### **Data Generation Examples** (`examples/03_data_gen_examples/`)
+Explore synthetic dataset generation using formal grammars:
+
+- **`basic_dataset_generation.py`** - Simple dataset generation using default grammar rules
+- **`custom_grammar_gen.py`** - Generate datasets using custom grammar configurations
+- **`filtered_dataset_generation.py`** - Advanced dataset generation with simulation-based filtering
+- **`mixed_gen.py`** - Mixed dataset generation combining multiple approaches
+
+#### **Experimental Setup Examples** (`examples/04_experimental_setup_example/`)
+Complete experimental pipeline example for research and evaluation:
+
+- **`generate_datasets.py`** - Generate comprehensive datasets for experimental evaluation
+- **`run_experiment.py`** - Execute full experimental runs with multiple models and configurations
+- **`compute_metrics.py`** - Analyze and compute performance metrics from experimental results
+- **`upload_dataset.py`** - Upload generated datasets to Hugging Face Hub 
 
 ### 🚀 Quick Start
 
 1. **Generate a behavior tree from text:**
    ```bash
-    examples/01_interface_prompting/saving_tree.py
+    examples/01_interface_prompting_examples/saving_tree.py
    ```
 
 2. **Run a robot simulation:**
    ```bash
-    examples/02_simulate_environment.py
+    examples/02_simulation_examples/simulate_environment.py
    ```
 
 3. **Generate training datasets:**
@@ -85,8 +94,8 @@ Run behavior tree simulations in robot environments:
 ### 📖 Example Descriptions
 
 - **Interface Prompting**: Use LLMs to convert natural language descriptions into executable behavior trees
-- **Data Generation**: Create synthetic datasets for training and fine-tuning LLMs using formal grammars
 - **Simulation**: Execute behavior trees in multi-agent robot environments with physics simulation
+- **Data Generation**: Create synthetic datasets for training and fine-tuning LLMs using formal grammars
 
 Each example includes detailed comments and documentation to help you understand the framework components and adapt them to your specific use cases.
 
