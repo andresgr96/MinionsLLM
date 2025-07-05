@@ -10,7 +10,7 @@ authors = [
     {name = "Andres Garcia", email = "a.a.garciarincon@student.vu.nl"}
 ]
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.8,<3.13"
 dependencies = [
     "pygame==2.5.2",
     "numpy<2.0.0",
