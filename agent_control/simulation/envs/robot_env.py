@@ -64,15 +64,15 @@ class RobotEnvironment(SimEnvironment):
         # Preloaded Images
         self.loaded_agent_images = self.load_images(
             [
-                "./control_layer/simulation/images/white.png",
-                "./control_layer/simulation/images/red circle.png",
-                "./control_layer/simulation/images/green.png",
+                "./agent_control/simulation/images/white.png",
+                "./agent_control/simulation/images/red circle.png",
+                "./agent_control/simulation/images/green.png",
             ]
         )
         self.loaded_parts_imgs = self.load_images(
             [
-                "./control_layer/simulation/images/part_green.png",
-                "./control_layer/simulation/images/part_red.png",
+                "./agent_control/simulation/images/part_green.png",
+                "./agent_control/simulation/images/part_red.png",
             ]
         )
 
@@ -81,13 +81,13 @@ class RobotEnvironment(SimEnvironment):
         x = 350
         y = 100
         self.simulation.spawn_obstacle(
-            "./control_layer/simulation/images/rect_obst.png", x, y
+            "./agent_control/simulation/images/rect_obst.png", x, y
         )
 
     def draw_arena(self) -> None:
         """Draw arena boundaries in the simulation environment."""
         self.simulation.spawn_obstacle(
-            "./control_layer/simulation/images/arena_new.png",
+            "./agent_control/simulation/images/arena_new.png",
             self.arena_pos.x,
             self.arena_pos.y,
         )
@@ -95,7 +95,7 @@ class RobotEnvironment(SimEnvironment):
     def draw_source(self) -> None:
         """Draw source area where good parts are located."""
         self.simulation.spawn_site(
-            "./control_layer/simulation/images/source_green.png",
+            "./agent_control/simulation/images/source_green.png",
             self.source_pos.x,
             self.source_pos.y,
         )
@@ -103,7 +103,7 @@ class RobotEnvironment(SimEnvironment):
     def draw_nest(self) -> None:
         """Draw base/nest area where parts should be delivered."""
         self.simulation.spawn_site(
-            "./control_layer/simulation/images/blue_nest.png",
+            "./agent_control/simulation/images/blue_nest.png",
             self.base_pos.x,
             self.base_pos.y,
         )
@@ -111,7 +111,7 @@ class RobotEnvironment(SimEnvironment):
     def draw_waste(self) -> None:
         """Draw waste area where bad parts should be disposed."""
         self.simulation.spawn_site(
-            "./control_layer/simulation/images/waste_red.png",
+            "./agent_control/simulation/images/waste_red.png",
             self.waste_pos.x,
             self.waste_pos.y,
         )

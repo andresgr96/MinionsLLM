@@ -34,10 +34,10 @@ packages = [
     "data_grammar", 
     "data_grammar.grammar_gen", 
     "data_grammar.dataset_generation",
-    "control_layer",
-    "control_layer.simulation",
-    "control_layer.simulation.agents",
-    "control_layer.simulation.envs",
-    "parser_layer",
-    "llm_layer"
+    "agent_control",
+    "agent_control.simulation",
+    "agent_control.simulation.agents",
+    "agent_control.simulation.envs",
+    "tree_parser",
+    "llm_interface"
 ] 

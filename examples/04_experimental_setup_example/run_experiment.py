@@ -5,14 +5,14 @@ from datetime import datetime
 import gc
 import torch   # You will need to install torch separately. I used to to clean up the VRAM.
 
-import llm_layer.layer_LLM as layer_LLM
+import llm_interface.layer_LLM as layer_LLM
 from tqdm import tqdm
 
 
 from dotenv import load_dotenv
 from openai import OpenAI
-from control_layer.simulation import RobotAgent
-from parser_layer import save_behavior_tree_with_metadata
+from agent_control.simulation import RobotAgent
+from tree_parser import save_behavior_tree_with_metadata
 
 load_dotenv()
 

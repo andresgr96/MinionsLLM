@@ -2,10 +2,10 @@ import os
 import xml.etree.ElementTree as ET
 import pandas as pd
 import argparse
-from parser_layer.grammar_validator import BehaviorTreeGrammarValidator
-from parser_layer.primitives_validator import validate_primitives
-from control_layer.simulation.agents import RobotAgent
-from control_layer.simulation import RobotEnvironment
+from tree_parser.grammar_validator import BehaviorTreeGrammarValidator
+from tree_parser.primitives_validator import validate_primitives
+from agent_control.simulation.agents import RobotAgent
+from agent_control.simulation import RobotEnvironment
 from vi import Config, Window
 
 

@@ -613,7 +613,7 @@ class BehaviorTreeGenerator:
         Returns:
             The contents of the template file
         """
-        directory = "llm_layer/prompt_techniques"
+        directory = "llm_interface/prompt_techniques"
         file_path = os.path.join(directory, file_name)
         with open(file_path, "r") as file:
             return file.read()

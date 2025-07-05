@@ -13,8 +13,8 @@ from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 from vi import Agent
 
-from control_layer.simulation.agents import RobotAgent
-from control_layer.simulation.envs import RobotEnvironment, SimEnvironment
+from agent_control.simulation.agents import RobotAgent
+from agent_control.simulation.envs import RobotEnvironment, SimEnvironment
 from data_grammar.dataset_generation.enrich_dataset import enrich_dataset as enrich_fn
 from data_grammar.grammar_gen.grammar_config import grammar_parameters as default_params
 from data_grammar.grammar_gen.grammar_config import grammar_rules as default_rules
@@ -23,7 +23,7 @@ from data_grammar.grammar_gen.list_to_trees import list_to_xml, pretty_print_xml
 from data_grammar.grammar_gen.node_translations import (
     node_connectors as default_connectors,
 )
-from parser_layer.agent_doc_parser import AgentDocstringParser
+from tree_parser.agent_doc_parser import AgentDocstringParser
 
 # Add type: ignore for dotenv import since it's an optional dependency
 try:

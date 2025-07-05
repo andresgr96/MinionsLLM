@@ -1,8 +1,8 @@
 from vi import Config, Window
 
 from data_grammar import DatasetGenerator
-from control_layer.simulation.agents import RobotAgent
-from control_layer.simulation.envs import RobotEnvironment 
+from agent_control.simulation.agents import RobotAgent
+from agent_control.simulation.envs import RobotEnvironment 
 
 filter_env = RobotEnvironment(
     config=Config(
@@ -133,7 +133,7 @@ trees_per_params = [
 # Initialize the generator with mixed structures + filtering
 generator_filtered = DatasetGenerator(
     agent_class=RobotAgent,
-    output_dir="./experiments/datasets/structured_filtered_v1",
+    output_dir="./examples/04_experimental_setup_example/datasets/structured_filtered_v1",
     seed=42,
     grammar_parameters=trees_per_params,  
     grammar_rules=grammar_rules
