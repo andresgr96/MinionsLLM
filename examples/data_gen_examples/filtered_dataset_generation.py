@@ -12,7 +12,7 @@ from control_layer.simulation.envs import RobotEnvironment
 # Initialize the generator with a small output directory
 generator = DatasetGenerator(
     agent_class=RobotAgent,  # Since class is provided, the framework automatically extracts the translation of its nodes from docstrings
-    output_dir="./examples/output/filtered_test_run",
+    output_dir="./examples/data_gen_examples/output/filtered_test_run",
     seed=42
 )
 
@@ -24,33 +24,32 @@ filter_env = RobotEnvironment(
         duration=500 
     ),
     bt_path="dummy_path", # This is a dummy path, we will use the trees in the dataset to test the metrics
-    n_agents=5,
-    n_parts=5,
+    n_agents=10,
+    n_parts=10,
     task="dummy_task",
     headless=True
 )
 
-# Generate a small dataset using method A (populated trees)
+# Generate a small dataset using method A with metric filtering
 print("\n=== Generating Dataset A ===")
 dataset_a_path = generator.generate_dataset_a(
     dataset_name="filtered_test_dataset_a",
-    n_trees=50,  # Small number for testing
-    tree_size=8,
+    n_trees=5,  # Small number for testing
     max_trees_to_process=5,
-    filter_env=filter_env
+    filter_env=filter_env,
+    filter_metrics=["good_parts_picked_up", "bad_parts_picked_up"] # Specifying metrics allows to controll the strictness of the filtering
 )
 print(f"FilteredDataset A saved to: {dataset_a_path}")
 
-# Generate a filtered dataset using method B with specificed metrics
+# Generate a filtered dataset using method B with metric filtering
 print("\n=== Generating Dataset B ===")
 
 dataset_b_path = generator.generate_dataset_b(
     dataset_name="filtered_test_dataset_b",
-    n_trees=50,
-    tree_size=8,
+    n_trees=5,
     max_trees_to_process=5,
     filter_env=filter_env,
-    filter_metrics=["good_parts_picked_up", "bad_parts_picked_up"] #specifying metrics allows to controll the strictness of the filtering
+    filter_metrics=["good_parts_picked_up", "bad_parts_picked_up"] # Specifying metrics allows to controll the strictness of the filtering
 )
 print(f"FilteredDataset B saved to: {dataset_b_path}")
 

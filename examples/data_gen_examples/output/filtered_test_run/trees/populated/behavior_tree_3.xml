@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<BehaviorTree>
+    <Selector>
+        <Sequence>
+            <Condition>is_scrap_part_detected</Condition>
+            <Condition>is_agent_in_base_area</Condition>
+            <ActuatorAction>drop_part</ActuatorAction>
+        </Sequence>
+        <Sequence>
+            <ActuatorAction>pick_up_part</ActuatorAction>
+            <StateAction>state_seek_construction_area</StateAction>
+        </Sequence>
+        <StateAction>state_seek_source_area</StateAction>
+    </Selector>
+</BehaviorTree>

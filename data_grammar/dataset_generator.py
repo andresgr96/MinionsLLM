@@ -657,14 +657,9 @@ class DatasetGenerator:
                     folder_path=str(structure_dir),
                     output_json_path=str(temp_output),
                     max_trees=target_count,  # type: ignore
-                    filter_env=filter_env,
-                    filter_metrics=metrics_to_use,
                     node_translations=self.node_translations,
                     node_connectors=self.node_connectors,
-                    spoon_node_translations=self.spoon_node_translations,
-                    conditions=self.extracted_config["conditions"],
-                    actuator_actions=self.extracted_config["actuator_actions"],
-                    state_actions=self.extracted_config["state_actions"],
+                    spoon_node_translations=self.spoon_node_translations
                 )
 
                 # Load the results and add to combined dataset
