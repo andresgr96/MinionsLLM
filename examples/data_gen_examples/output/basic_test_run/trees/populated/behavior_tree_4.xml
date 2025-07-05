@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<BehaviorTree>
+    <Sequence>
+        <Condition>is_good_part_detected</Condition>
+        <ActuatorAction>drop_part</ActuatorAction>
+    </Sequence>
+</BehaviorTree>

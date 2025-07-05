@@ -56,59 +56,7 @@ def get_handcoded_examples() -> List[Dict[str, Any]]:
     Returns:
         List of handcoded example dictionaries
     """
-    bring_good_base = {
-        "layman_task": "Find good parts and bring them to the base.",
-        "tree": """<BehaviorTree>
-                    <Selector>
-
-                        <Sequence>
-                            <Condition>is_agent_holding_good_part</Condition>
-                            <Condition>is_agent_in_base_area</Condition>
-                            <ActuatorAction>drop_part</ActuatorAction>
-                        </Sequence>
-
-                        <Sequence>
-                            <Condition>is_agent_holding_good_part</Condition>
-                            <StateAction>state_seek_base_area</StateAction>
-                        </Sequence>
-                
-                        <Sequence>
-                            <Condition>is_good_part_detected</Condition>
-                            <ActuatorAction>pick_up_part</ActuatorAction>
-                        </Sequence>       
-
-                        <StateAction>state_seek_source_area</StateAction>
-                    </Selector>
-                </BehaviorTree>""",
-    }
-
-    bring_good_storage = {
-        "layman_task": "Find good parts and bring them to the storage.",
-        "tree": """<BehaviorTree>
-                    <Selector>
-
-                        <Sequence>
-                            <Condition>is_agent_holding_good_part</Condition>
-                            <Condition>is_agent_in_storage_area</Condition>
-                            <ActuatorAction>drop_part</ActuatorAction>
-                        </Sequence>
-
-                        <Sequence>
-                            <Condition>is_agent_holding_good_part</Condition>
-                            <StateAction>state_seek_storage_area</StateAction>
-                        </Sequence>
-                
-                        <Sequence>
-                            <Condition>is_good_part_detected</Condition>
-                            <ActuatorAction>pick_up_part</ActuatorAction>
-                        </Sequence>       
-
-                        <StateAction>state_seek_source_area</StateAction>
-                    </Selector>
-                </BehaviorTree>""",
-    }
-
-    bring_scrap_waste = {
+    bring_scrap_storage = {
         "layman_task": "Find scrap parts and bring them to the storage.",
         "tree": """<BehaviorTree>
                     <Selector>
@@ -232,125 +180,12 @@ def get_handcoded_examples() -> List[Dict[str, Any]]:
                 </BehaviorTree>""",
     }
 
-    find_good_stop = {
-        "layman_task": "Find good parts and stop moving when you find one.",
-        "tree": """<BehaviorTree>
-                    <Selector>
-  
-                        <Sequence>
-                            <Condition>is_agent_holding_good_part</Condition>
-                            <StateAction>state_movement_freeze</StateAction>
-                        </Sequence>     
-
-                        <Sequence>
-                            <Condition>is_good_part_detected</Condition>
-                            <ActuatorAction>pick_up_part</ActuatorAction>
-                        </Sequence>   
-
-                        <StateAction>state_seek_source_area</StateAction>
-                    </Selector>
-                </BehaviorTree>""",
-    }
-
-    maintain_freeze = {
-        "layman_task": "Collect as many parts as you can. Bring good parts to the base, while if you find a scrap part, stop moving.",
-        "tree": """<BehaviorTree>
-                    <Selector>
-                
-                        <Sequence>
-                            <Condition>is_agent_holding_good_part</Condition>
-                            <Condition>is_agent_in_base_area</Condition>
-                            <ActuatorAction>drop_part</ActuatorAction>
-                        </Sequence>
-
-
-                        <Sequence>
-                            <Condition>is_agent_holding_good_part</Condition>
-                            <StateAction>state_seek_base_area</StateAction>
-                        </Sequence>
-
-                        <Sequence>
-                            <Condition>is_good_part_detected</Condition>
-                            <ActuatorAction>pick_up_part</ActuatorAction>
-                        </Sequence> 
-
-                        <Sequence>
-                            <Condition>is_agent_holding_scrap_part</Condition>
-                            <Condition>is_agent_in_waste_area</Condition>
-                            <StateAction>state_movement_freeze</StateAction>
-                        </Sequence>
-
-
-                        <Sequence>
-                            <Condition>is_agent_holding_scrap_part</Condition>
-                            <StateAction>state_seek_waste_area</StateAction>
-                        </Sequence>     
-
-                        <Sequence>
-                            <Condition>is_scrap_part_detected</Condition>
-                            <ActuatorAction>pick_up_part</ActuatorAction>
-                        </Sequence>     
-
-                        <StateAction>state_seek_source_area</StateAction>
-                    </Selector>
-                </BehaviorTree>""",
-    }
-
-    maintain_construction = {
-        "layman_task": "Collect as many parts as you can. Bring good parts to the construction area, while if you find a scrap part, bring them to the storage.",
-        "tree": """<BehaviorTree>
-                    <Selector>
-                
-                        <Sequence>
-                            <Condition>is_agent_holding_good_part</Condition>
-                            <Condition>is_agent_in_construction_area</Condition>
-                            <ActuatorAction>drop_part</ActuatorAction>
-                        </Sequence>
-
-                        <Sequence>
-                            <Condition>is_agent_holding_good_part</Condition>
-                            <StateAction>state_seek_construction_area</StateAction>
-                        </Sequence>
-
-                        <Sequence>
-                            <Condition>is_good_part_detected</Condition>
-                            <ActuatorAction>pick_up_part</ActuatorAction>
-                        </Sequence> 
-
-                        <Sequence>
-                            <Condition>is_agent_holding_scrap_part</Condition>
-                            <Condition>is_agent_in_storage_area</Condition>
-                            <ActuatorAction>drop_part</ActuatorAction>
-                        </Sequence>
-
-
-                        <Sequence>
-                            <Condition>is_agent_holding_scrap_part</Condition>
-                            <StateAction>state_seek_storage_area</StateAction>
-                        </Sequence>   
-
-
-                        <Sequence>
-                            <Condition>is_scrap_part_detected</Condition>
-                            <ActuatorAction>pick_up_part</ActuatorAction>
-                        </Sequence>       
-
-                        <StateAction>state_seek_source_area</StateAction>
-                    </Selector>
-                </BehaviorTree>""",
-    }
-
     return [
-        bring_good_base,
-        bring_good_storage,
-        bring_scrap_waste,
+        bring_scrap_storage,
         bring_good_waste,
         bring_scrap_source,
         bring_scrap_construction,
         find_bad_stop,
-        find_good_stop,
-        maintain_freeze,
-        maintain_construction,
     ]
 
 
