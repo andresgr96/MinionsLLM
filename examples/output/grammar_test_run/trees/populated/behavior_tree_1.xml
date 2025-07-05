@@ -1,7 +1,0 @@
-<?xml version="1.0" ?>
-<BehaviorTree>
-    <Sequence>
-        <Condition>is_agent_in_construction_area</Condition>
-        <ActuatorAction>pick_up_part</ActuatorAction>
-    </Sequence>
-</BehaviorTree>

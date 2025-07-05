@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<BehaviorTree>
+    <Selector>
+        <Sequence>
+            <Condition>is_good_part_detected</Condition>
+            <ActuatorAction>pick_up_part</ActuatorAction>
+        </Sequence>
+        <StateAction>state_seek_waste_area</StateAction>
+    </Selector>
+</BehaviorTree>

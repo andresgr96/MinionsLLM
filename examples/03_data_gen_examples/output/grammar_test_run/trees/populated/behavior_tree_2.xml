@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<BehaviorTree>
+    <Selector>
+        <Sequence>
+            <Condition>is_agent_in_storage_area</Condition>
+            <StateAction>state_seek_waste_area</StateAction>
+        </Sequence>
+        <Sequence>
+            <Condition>is_agent_holding_good_part</Condition>
+            <ActuatorAction>drop_part</ActuatorAction>
+            <StateAction>state_seek_waste_area</StateAction>
+        </Sequence>
+        <StateAction>state_movement_freeze</StateAction>
+    </Selector>
+</BehaviorTree>

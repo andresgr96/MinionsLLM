@@ -1,0 +1,32 @@
+[
+    {
+        "layman_task": "Your task is to go to the source area and pick up any parts you find there.",
+        "technical_task": "if you are in the source then pick up the part, or otherwise then go to the source.",
+        "spoon_task": "if you are in the source area then pick up the part, or otherwise then seek the source area.",
+        "tree": "<?xml version=\"1.0\" ?>\n<BehaviorTree>\n    <Selector>\n        <Sequence>\n            <Condition>is_agent_in_source_area</Condition>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n        </Sequence>\n        <StateAction>state_seek_source_area</StateAction>\n    </Selector>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to collect any good parts you find. If you don't find any, then head over to the waste area.",
+        "technical_task": "if you detect a good part then pick up the part, or otherwise then go to the waste.",
+        "spoon_task": "if you detect a good part then pick up the part, or otherwise then seek the waste area.",
+        "tree": "<?xml version=\"1.0\" ?>\n<BehaviorTree>\n    <Selector>\n        <Sequence>\n            <Condition>is_good_part_detected</Condition>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n        </Sequence>\n        <StateAction>state_seek_waste_area</StateAction>\n    </Selector>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to pick up any parts if you're at the base, and if you're not, head towards the source area.",
+        "technical_task": "if you are in the base then pick up the part, or otherwise then go to the source.",
+        "spoon_task": "if you are in the base area then pick up the part, or otherwise then seek the source area.",
+        "tree": "<?xml version=\"1.0\" ?>\n<BehaviorTree>\n    <Selector>\n        <Sequence>\n            <Condition>is_agent_in_base_area</Condition>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n        </Sequence>\n        <StateAction>state_seek_source_area</StateAction>\n    </Selector>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to pick up any scrap parts you find, and if there aren\u2019t any, head over to the waste area.",
+        "technical_task": "if you detect a scrap part then pick up the part, or otherwise then go to the waste.",
+        "spoon_task": "if you detect a scrap part then pick up the part, or otherwise then seek the waste area.",
+        "tree": "<?xml version=\"1.0\" ?>\n<BehaviorTree>\n    <Selector>\n        <Sequence>\n            <Condition>is_scrap_part_detected</Condition>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n        </Sequence>\n        <StateAction>state_seek_waste_area</StateAction>\n    </Selector>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to pick up any good parts you find. If you're in the source area and see a good part, pick it up, and then look around randomly. If you don't find anything, head to the waste area.",
+        "technical_task": "if you detect a good part then pick up the part, or if you are in the source and if you are in the source then pick up the part and then search randomly, or otherwise then go to the waste.",
+        "spoon_task": "if you detect a good part then pick up the part, or if you are in the source area and if you are in the source area then pick up the part and then walk randomly, or otherwise then seek the waste area.",
+        "tree": "<?xml version=\"1.0\" ?>\n<BehaviorTree>\n    <Selector>\n        <Sequence>\n            <Condition>is_good_part_detected</Condition>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n        </Sequence>\n        <Sequence>\n            <Condition>is_agent_in_source_area</Condition>\n            <Condition>is_agent_in_source_area</Condition>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n            <StateAction>state_random_walk</StateAction>\n        </Sequence>\n        <StateAction>state_seek_waste_area</StateAction>\n    </Selector>\n</BehaviorTree>"
+    }
+]

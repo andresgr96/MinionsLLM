@@ -1,0 +1,32 @@
+[
+    {
+        "layman_task": "Your task is to pick up any good parts you find and then stop moving. If you don't find any good parts, just head over to the source area.",
+        "technical_task": "if you detect a good part then pick up the part and then stop moving, or otherwise then go to the source.",
+        "spoon_task": "if you detect a good part then pick up the part and then freeze movement, or otherwise then seek the source area.",
+        "tree": "<?xml version=\"1.0\" ?>\n<BehaviorTree>\n    <Selector>\n        <Sequence>\n            <Condition>is_good_part_detected</Condition>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n            <StateAction>state_movement_freeze</StateAction>\n        </Sequence>\n        <Sequence>\n            <StateAction>state_seek_source_area</StateAction>\n        </Sequence>\n    </Selector>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to look for good parts and pick them up. If you can't find any, explore the area or head towards the source. If you're in the construction area, go to the storage.",
+        "technical_task": "if you detect a good part then pick up the part and then search randomly, or then go to the source, or then pick up the part, or otherwise if you are in the construction then go to the storage.",
+        "spoon_task": "if you detect a good part then pick up the part and then walk randomly, or then seek the source area, or then pick up the part, or otherwise if you are in the construction area then seek the storage area.",
+        "tree": "<?xml version=\"1.0\" ?>\n<BehaviorTree>\n    <Selector>\n        <Sequence>\n            <Condition>is_good_part_detected</Condition>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n            <StateAction>state_random_walk</StateAction>\n        </Sequence>\n        <Sequence>\n            <StateAction>state_seek_source_area</StateAction>\n        </Sequence>\n        <Sequence>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n        </Sequence>\n        <Sequence>\n            <Condition>is_agent_in_construction_area</Condition>\n            <StateAction>state_seek_storage_area</StateAction>\n        </Sequence>\n    </Selector>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to pick up the part and then stay still. If you see a good part, drop the part you're holding. If not, head over to the waste area and drop it there.",
+        "technical_task": "pick up the part and then stop moving, or if you detect a good part then drop the part, or then go to the waste, or otherwise then drop the part.",
+        "spoon_task": "pick up the part and then freeze movement, or if you detect a good part then drop the part, or then seek the waste area, or otherwise then drop the part.",
+        "tree": "<?xml version=\"1.0\" ?>\n<BehaviorTree>\n    <Selector>\n        <Sequence>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n            <StateAction>state_movement_freeze</StateAction>\n        </Sequence>\n        <Sequence>\n            <Condition>is_good_part_detected</Condition>\n            <ActuatorAction>drop_part</ActuatorAction>\n        </Sequence>\n        <Sequence>\n            <StateAction>state_seek_waste_area</StateAction>\n        </Sequence>\n        <Sequence>\n            <ActuatorAction>drop_part</ActuatorAction>\n        </Sequence>\n    </Selector>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Your task is to pick up the part and take it to the waste. If you're at the base, or if you're already in the waste, then just stop moving. Otherwise, go to the waste.",
+        "technical_task": "pick up the part and then go to the waste, or if you are in the base and if you are in the waste then stop moving, or otherwise then go to the waste.",
+        "spoon_task": "pick up the part and then seek the waste area, or if you are in the base area and if you are in the waste area then freeze movement, or otherwise then seek the waste area.",
+        "tree": "<?xml version=\"1.0\" ?>\n<BehaviorTree>\n    <Selector>\n        <Sequence>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n            <StateAction>state_seek_waste_area</StateAction>\n        </Sequence>\n        <Sequence>\n            <Condition>is_agent_in_base_area</Condition>\n            <Condition>is_agent_in_waste_area</Condition>\n            <StateAction>state_movement_freeze</StateAction>\n        </Sequence>\n        <Sequence>\n            <StateAction>state_seek_waste_area</StateAction>\n        </Sequence>\n    </Selector>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "If you're in the construction area, just wander around. If you're holding a scrap part and you're at the base, go to the waste and drop it off. Otherwise, just pick up the part you find.",
+        "technical_task": "if you are in the construction then search randomly, or if you are holding a scrap part and if you are in the base and if you are in the waste then pick up the part, or otherwise then pick up the part.",
+        "spoon_task": "if you are in the construction area then walk randomly, or if you are holding a scrap part and if you are in the base area and if you are in the waste area then pick up the part, or otherwise then pick up the part.",
+        "tree": "<?xml version=\"1.0\" ?>\n<BehaviorTree>\n    <Selector>\n        <Sequence>\n            <Condition>is_agent_in_construction_area</Condition>\n            <StateAction>state_random_walk</StateAction>\n        </Sequence>\n        <Sequence>\n            <Condition>is_agent_holding_scrap_part</Condition>\n            <Condition>is_agent_in_base_area</Condition>\n            <Condition>is_agent_in_waste_area</Condition>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n        </Sequence>\n        <ActuatorAction>pick_up_part</ActuatorAction>\n    </Selector>\n</BehaviorTree>"
+    }
+]
