@@ -6,18 +6,19 @@ from control_layer.simulation.envs import RobotEnvironment
 
 filter_env = RobotEnvironment(
     config=Config(
+        radius=50,
         window=Window.square(500),
         movement_speed=1.0,   # Its important to be consistent with speed and duration, otherwise the metrics will be inconsistent
         duration=500 
     ),
     bt_path="dummy_path", # This is a dummy path, we will use the trees in the dataset to test the metrics
-    n_agents=5,
-    n_parts=5,
+    n_agents=10,
+    n_parts=10,
     task="dummy_task",
     headless=True
 )
 
-# Just adding them as reminder
+# Define custom rules for the grammar
 grammar_rules = {                                                                 
     "B":   [["b", ["SEL"]], ["b", ["SEQ"]]],                                                          
     "SEL": [["sel", ["SEQn", "As"]], ["sel", ["SEQn"]]],                                               
@@ -94,110 +95,65 @@ complex_parameters = {
     "Pn": {"list_max": 2, "exclude": [2]},                                                                    
 }
 
-trees_per_params_no_filtering = [
-
-    
-    [5, simple2_parameters],
-
-    # Mid-complexity parameters with part dropping metrics
-    [5, mid1_parameters],
-
-
-    [5, mid2_parameters],
-
-    # Complex parameters with part dropping metrics
-    [5, complex_parameters]
-]
-
+# Lower numbers and commented mid complexity trees for brevity.
 trees_per_params = [
-    # Simple parameters with basic part pickup metrics
-    # [2, simple1_parameters, {
-    #     "good_parts_picked_up": 1,
-    #     "bad_parts_picked_up": 1
+
+    # Simple trees, get only good parts.
+    [5, simple2_parameters, [
+        "good_parts_picked_up",
+    ]],
+
+    # Simple trees, get only bad parts.
+    [5, simple2_parameters, [
+        "bad_parts_picked_up"
+    ]],
+
+    # # Mid-complexity trees structure 1, get only good parts.
+    # [10, mid1_parameters, {
+    #     "good_parts_picked_up": 1
     # }],
-    
-    # # Also test legacy mode
-    # [50, simple2_parameters, [
-    #     "good_parts_picked_up",
-    #     "bad_parts_picked_up"
-    # ]],
 
-    # Mid-complexity parameters with part dropping metrics
-    [20, mid1_parameters, {
-        "good_parts_picked_up": 1
-    }],
-    # Mid-complexity parameters with part dropping metrics
-    [20, mid1_parameters, {
-        "bad_parts_picked_up": 1,
-        "parts_dropped_in_waste": [0, 1]
-    }],
-
-    # [20, mid2_parameters, {
-    #     "parts_dropped_in_base": [1, 0],
-    #     "good_parts_picked_up": 1,
+    # # Mid-complexity trees structure 1, get only bad parts.
+    # [10, mid1_parameters, {
     #     "bad_parts_picked_up": 1,
-    #     "parts_dropped_in_waste": [0, 1]
     # }],
 
-    # Complex parameters with part dropping metrics
-    [10, complex_parameters, {
-        "parts_dropped_in_base": [1, 0],
-        "good_parts_picked_up": 1,
-        "bad_parts_picked_up": 1,
-        "parts_dropped_in_waste": [0, 1]
-    }]
+    # # Mid-complexity trees structure 2, get only good parts.
+    # [10, mid2_parameters, {
+    #     "good_parts_picked_up": 1,
+    # }],
+
+    # # Mid-complexity trees structure 2, get only bad parts.
+    # [10, mid2_parameters, {
+    #     "bad_parts_picked_up": 1,
+    # }],
+
 ]
-
-
-
-
-
-# # Initialize the generator with mixed structures
-# generator = DatasetGenerator(
-#     output_dir="./tests/output/grammar_test_run/new_grammar_test",
-#     seed=42,
-#     grammar_parameters=trees_per_params_no_filtering,  
-#     grammar_rules=grammar_rules
-# )
-
-
-# Generate dataset with mixed structures using method A (populated trees)
-# Note: n_trees parameter is ignored when using mixed structures
-
-# print("\n=== Generating Dataset A with Mixed Structures ===")
-# dataset_a_path = generator.generate_dataset_a(
-#     dataset_name="mixed_structure_dataset_a",
-# )
-
-# # Generate dataset with mixed structures using method B (placeholder trees)
-# print("\n=== Generating Dataset B with Mixed Structures ===")
-# dataset_b_path = generator.generate_dataset_b(
-#     dataset_name="mixed_structure_dataset_b",
-# )
 
 # Initialize the generator with mixed structures + filtering
 generator_filtered = DatasetGenerator(
     agent_class=RobotAgent,
-    output_dir="./tests/output/grammar_test_run/metrics_filtering_a",
+    output_dir="./experiments/datasets/structured_filtered_v1",
     seed=42,
-    grammar_parameters=trees_per_params,  # This is now a list of [count, params] pairs
+    grammar_parameters=trees_per_params,  
     grammar_rules=grammar_rules
 )
 
-# print("\n=== Generating Dataset A with Mixed Structures + Filtering ===")
-# dataset_a_path = generator_filtered.generate_dataset_a(
-#     dataset_name="mixed_structure_dataset_a_filtered",
-#     # max_trees_to_process will be calculated automatically from trees_per_params when using mixed structures
-#     filter_env=filter_env,
-#     # filter_metrics=["good_parts_picked_up", "bad_parts_picked_up"]  
-# )
 
-
-print("\n=== Generating Dataset B with Mixed Structures + Filtering ===")
-dataset_b_path = generator_filtered.generate_dataset_b(
-    dataset_name="mixed_structure_dataset_b_filtered",
+print("\n=== Generating Dataset A with Mixed Structures + Filtering + Enrichment ===")
+dataset_a_path = generator_filtered.generate_dataset_a(
+    dataset_name="mixed_structure_dataset_a_filtered_enriched",
     # max_trees_to_process will be calculated automatically from trees_per_params when using mixed structures
-    filter_env=filter_env
+    filter_env=filter_env,
+    enrich_dataset=True
+)
+
+print("\n=== Generating Dataset B with Mixed Structures + Filtering + Enrichment ===")
+dataset_b_path = generator_filtered.generate_dataset_b(
+    dataset_name="mixed_structure_dataset_b_filtered_enriched",
+    # max_trees_to_process will be calculated automatically from trees_per_params when using mixed structures
+    filter_env=filter_env,
+    enrich_dataset=True
 )
 
 

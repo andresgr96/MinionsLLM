@@ -53,9 +53,9 @@ def example_existing_model():
         print(f"Generated behavior tree:\n{behavior_tree}")
         
         if error_count == 0:
-            print("\n✅ Successfully generated a valid behavior tree!")
+            print("\nSuccessfully generated a valid behavior tree!")
         else:
-            print(f"\n⚠️  Generated tree has {error_count} validation errors.")
+            print(f"\nGenerated tree has {error_count} validation errors.")
             
     except Exception as e:
         print(f"❌ Error with existing model: {e}")
@@ -101,9 +101,9 @@ def example_auto_import():
         print(f"Generated behavior tree:\n{behavior_tree}")
         
         if error_count == 0:
-            print("\n✅ Successfully generated a valid behavior tree!")
+            print("\nSuccessfully generated a valid behavior tree!")
         else:
-            print(f"\n⚠️  Generated tree has {error_count} validation errors.")
+            print(f"\nGenerated tree has {error_count} validation errors.")
             
     except Exception as e:
         print(f"❌ Error with auto-import: {e}")

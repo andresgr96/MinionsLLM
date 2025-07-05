@@ -52,9 +52,9 @@ def main():
     print(f"Generated behavior tree:\n{behavior_tree}")
     
     if error_count == 0:
-        print("\n✅ Successfully generated a valid behavior tree!")
+        print("\nSuccessfully generated a valid behavior tree!")
     else:
-        print(f"\n⚠️  Generated tree has {error_count} validation errors.")
+        print(f"\nGenerated tree has {error_count} validation errors.")
     
     print("\nTo use this tree in a simulation:")
     print("1. Save the XML to a file")

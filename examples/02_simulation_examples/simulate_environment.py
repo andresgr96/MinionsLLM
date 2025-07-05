@@ -29,7 +29,7 @@ def main():
     
     # Path to the behavior tree XML file
     # This tree implements a "collect good parts" behavior
-    bt_path = "./control_layer/simulation/trees/collect.xml"
+    bt_path = "./examples/simulation_examples/collect.xml"
     
     print("Creating Robot Environment...")
     

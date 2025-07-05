@@ -7,10 +7,9 @@ This example demonstrates how to:
 3. Save the generated tree as an XML file
 4. Provide the saved file path to the user
 
-The example uses the gemma2:2b model and saves the output in the same directory.
+The example uses the gemma3:1b model and saves the output in the same directory.
 """
 
-import os
 import time
 from pathlib import Path
 from llm_layer import BehaviorTreeGenerator
@@ -72,9 +71,9 @@ def main():
         print(f"Generated XML:\n{behavior_tree_xml}")
         
         if error_count == 0:
-            print("\n✅ Successfully generated a valid behavior tree!")
+            print("\nSuccessfully generated a valid behavior tree!")
         else:
-            print(f"\n⚠️  Generated tree has {error_count} validation errors.")
+            print(f"\nGenerated tree has {error_count} validation errors.")
             print("The tree will still be saved for inspection.")
         
         # Save the behavior tree to XML file
@@ -89,23 +88,23 @@ def main():
             # Verify the file was created
             if output_path.exists():
                 file_size = output_path.stat().st_size
-                print(f"✅ Behavior tree saved successfully!")
-                print(f"📁 File location: {output_path.absolute()}")
-                print(f"📊 File size: {file_size} bytes")
+                print(f"Behavior tree saved successfully!")
+                print(f"File location: {output_path.absolute()}")
+                print(f"File size: {file_size} bytes")
                 
                 # Show the saved content
-                print(f"\n📄 Saved content preview:")
+                print(f"\nSaved content preview:")
                 with open(output_path, 'r') as f:
                     content = f.read()
                     print(content[:500] + "..." if len(content) > 500 else content)
                     
             else:
-                print("❌ Error: File was not created successfully.")
+                print("Error: File was not created successfully.")
         else:
-            print("❌ Error: No valid XML content to save.")
+            print("Error: No valid XML content to save.")
             
     except Exception as e:
-        print(f"❌ An error occurred: {e}")
+        print(f"An error occurred: {e}")
         print("\nTroubleshooting tips:")
         print("1. Make sure Ollama is installed and running")
         print("2. Check your internet connection (needed to pull the model)")
@@ -135,7 +134,7 @@ def main():
         
         sample_path = current_dir / "sample_behavior_tree.xml"
         save_behavior_tree_xml(sample_xml, str(sample_path))
-        print(f"\n📄 Created sample XML file at: {sample_path.absolute()}")
+        print(f"\n Created sample XML file at: {sample_path.absolute()}")
     
     print("\n" + "="*60)
     print("NEXT STEPS")
