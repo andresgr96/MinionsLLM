@@ -178,7 +178,7 @@ class DatasetGenerator:
 
         # Original logic for non-filtered generation
         print(
-            f"Generating {n_trees} trees with size {size} and placeholders: {placeholders}"
+            f"Generating {n_trees} trees with placeholders: {placeholders}"
         )
         for i in range(n_trees):
             if i % 1000 == 0 and i > 0:
@@ -755,6 +755,9 @@ class DatasetGenerator:
             )
         else:
             # Generate single structure trees
+            if self.over_generate_trees:
+                n_trees = n_trees * 50  # We over-generate trees to account for filtering and llm mistakes. Lazy, should be improved.
+
             self._generate_trees(
                 n_trees=n_trees,
                 size=tree_size,

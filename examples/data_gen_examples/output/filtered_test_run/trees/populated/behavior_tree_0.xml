@@ -2,26 +2,12 @@
 <BehaviorTree>
     <Selector>
         <Sequence>
+            <Condition>is_good_part_detected</Condition>
             <ActuatorAction>pick_up_part</ActuatorAction>
             <StateAction>state_movement_freeze</StateAction>
         </Sequence>
         <Sequence>
-            <Condition>is_good_part_detected</Condition>
-            <ActuatorAction>drop_part</ActuatorAction>
-            <StateAction>state_seek_waste_area</StateAction>
-        </Sequence>
-        <Sequence>
             <StateAction>state_seek_source_area</StateAction>
         </Sequence>
-        <Sequence>
-            <Condition>is_good_part_detected</Condition>
-            <ActuatorAction>pick_up_part</ActuatorAction>
-            <StateAction>state_seek_source_area</StateAction>
-        </Sequence>
-        <Sequence>
-            <Condition>is_agent_in_waste_area</Condition>
-            <StateAction>state_seek_construction_area</StateAction>
-        </Sequence>
-        <ActuatorAction>drop_part</ActuatorAction>
     </Selector>
 </BehaviorTree>

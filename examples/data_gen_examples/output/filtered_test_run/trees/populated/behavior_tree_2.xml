@@ -2,20 +2,15 @@
 <BehaviorTree>
     <Selector>
         <Sequence>
-            <Condition>is_agent_in_storage_area</Condition>
-            <ActuatorAction>pick_up_part</ActuatorAction>
-            <StateAction>state_seek_source_area</StateAction>
+            <Condition>is_agent_in_construction_area</Condition>
+            <StateAction>state_random_walk</StateAction>
         </Sequence>
         <Sequence>
-            <StateAction>state_seek_source_area</StateAction>
-        </Sequence>
-        <Sequence>
-            <Condition>is_agent_in_storage_area</Condition>
-            <ActuatorAction>drop_part</ActuatorAction>
-        </Sequence>
-        <Sequence>
+            <Condition>is_agent_holding_scrap_part</Condition>
             <Condition>is_agent_in_base_area</Condition>
+            <Condition>is_agent_in_waste_area</Condition>
             <ActuatorAction>pick_up_part</ActuatorAction>
         </Sequence>
+        <ActuatorAction>pick_up_part</ActuatorAction>
     </Selector>
 </BehaviorTree>

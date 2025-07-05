@@ -2,65 +2,16 @@
 <BehaviorTree>
     <Selector>
         <Sequence>
-            <Condition>is_agent_in_construction_area</Condition>
-            <ActuatorAction>drop_part</ActuatorAction>
-            <StateAction>state_seek_source_area</StateAction>
-        </Sequence>
-        <Sequence>
-            <Condition>is_agent_holding_good_part</Condition>
-            <StateAction>state_seek_source_area</StateAction>
-        </Sequence>
-        <Sequence>
-            <Condition>is_agent_holding_scrap_part</Condition>
-            <Condition>is_agent_holding_scrap_part</Condition>
-            <Condition>is_agent_in_storage_area</Condition>
             <ActuatorAction>pick_up_part</ActuatorAction>
-            <StateAction>state_seek_base_area</StateAction>
-        </Sequence>
-        <Sequence>
-            <Condition>is_agent_in_waste_area</Condition>
             <StateAction>state_seek_waste_area</StateAction>
-        </Sequence>
-        <Sequence>
-            <Condition>is_agent_in_source_area</Condition>
-            <Condition>is_agent_holding_scrap_part</Condition>
-            <Condition>is_agent_holding_good_part</Condition>
-            <ActuatorAction>drop_part</ActuatorAction>
-            <StateAction>state_seek_waste_area</StateAction>
-        </Sequence>
-        <Sequence>
-            <Condition>is_agent_in_source_area</Condition>
-            <StateAction>state_seek_construction_area</StateAction>
-        </Sequence>
-        <Sequence>
-            <Condition>is_agent_in_waste_area</Condition>
-            <Condition>is_agent_in_source_area</Condition>
-            <Condition>is_agent_in_construction_area</Condition>
-            <ActuatorAction>pick_up_part</ActuatorAction>
-            <StateAction>state_seek_source_area</StateAction>
-        </Sequence>
-        <Sequence>
-            <Condition>is_good_part_detected</Condition>
-            <StateAction>state_seek_base_area</StateAction>
-        </Sequence>
-        <Sequence>
-            <Condition>is_agent_in_storage_area</Condition>
-            <Condition>is_agent_holding_good_part</Condition>
-            <Condition>is_agent_holding_scrap_part</Condition>
-            <ActuatorAction>drop_part</ActuatorAction>
-            <StateAction>state_seek_base_area</StateAction>
         </Sequence>
         <Sequence>
             <Condition>is_agent_in_base_area</Condition>
-            <StateAction>state_random_walk</StateAction>
+            <Condition>is_agent_in_waste_area</Condition>
+            <StateAction>state_movement_freeze</StateAction>
         </Sequence>
         <Sequence>
-            <Condition>is_good_part_detected</Condition>
-            <Condition>is_agent_holding_good_part</Condition>
-            <Condition>is_good_part_detected</Condition>
-            <ActuatorAction>drop_part</ActuatorAction>
-            <StateAction>state_seek_base_area</StateAction>
+            <StateAction>state_seek_waste_area</StateAction>
         </Sequence>
-        <ActuatorAction>pick_up_part</ActuatorAction>
     </Selector>
 </BehaviorTree>

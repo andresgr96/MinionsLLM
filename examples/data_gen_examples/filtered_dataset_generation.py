@@ -34,10 +34,11 @@ filter_env = RobotEnvironment(
 print("\n=== Generating Dataset A ===")
 dataset_a_path = generator.generate_dataset_a(
     dataset_name="filtered_test_dataset_a",
-    n_trees=5,  # Small number for testing
+    n_trees=5,  
     max_trees_to_process=5,
     filter_env=filter_env,
-    filter_metrics=["good_parts_picked_up", "bad_parts_picked_up"] # Specifying metrics allows to controll the strictness of the filtering
+    filter_metrics=["good_parts_picked_up", "bad_parts_picked_up"] # Specifying metrics allows to controll the strictness of the filtering. 
+                                                                   # List of metrics validates with OR operator. Dictionary uses AND operator.
 )
 print(f"FilteredDataset A saved to: {dataset_a_path}")
 
@@ -46,8 +47,8 @@ print("\n=== Generating Dataset B ===")
 
 dataset_b_path = generator.generate_dataset_b(
     dataset_name="filtered_test_dataset_b",
-    n_trees=5,
-    max_trees_to_process=5,
+    n_trees=1,
+    max_trees_to_process=1, # Small number for testing
     filter_env=filter_env,
     filter_metrics=["good_parts_picked_up", "bad_parts_picked_up"] # Specifying metrics allows to controll the strictness of the filtering
 )
