@@ -122,7 +122,7 @@ class TreeGeneratorOutput(BaseModel):
     """Schema for the structured output of the tree generator tool"""
     behaviour_tree: str = Field(description=" The raw behaviour tree in XML format without any quotes or markdown formatting")
 
-def tree_generator_node(state: GraphState) -> Command[Literal[END]]:
+def tree_generator_node(state: GraphState) -> Command[Literal[END]]:  # type: ignore , ignore the END warning
     task_definition = state.task_definition
     task_metrics_goal = state.task_metrics_goal
 
