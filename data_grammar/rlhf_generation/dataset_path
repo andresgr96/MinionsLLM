@@ -1,0 +1,8 @@
+[
+    {
+        "layman_task": "Find good parts and pick them up",
+        "technical_task": "if you detect a good part then pick up the part, or otherwise then go to the source.",
+        "spoon_task": "if you detect a good part then pick up the part, or otherwise then seek the source area.",
+        "tree": "<BehaviorTree>\n    <Selector>\n        <Sequence>\n            <Condition>is_good_part_detected</Condition>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n        </Sequence>\n        <StateAction>state_seek_source_area</StateAction>\n    </Selector>\n</BehaviorTree>"
+    }
+]

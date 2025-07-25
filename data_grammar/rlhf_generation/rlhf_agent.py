@@ -14,8 +14,9 @@ from tkinter import ttk
 from data_grammar.dataset_generation.sys_prompt import system_prompt_b2
 from tree_parser import BehaviorTreeGrammarValidator
 from tree_parser.primitives_validator import validate_primitives
-from agent_control import RobotAgent, RobotEnvironment
+from agent_control import RobotAgent
 from utils.run_robot_sim import run_robot_sim
+from utils.save_data_point import save_datapoint
 
 
 load_dotenv()
@@ -40,10 +41,11 @@ class GraphState(BaseModel):
     behaviour_tree: Optional[str] = Field(default=None, description="The bahavior tree returned by the LLM")
     passed_validator: bool = Field(default=False, description="Whether the tree passed both the grammar and primitive validator checks")
     validator_feedback: Optional[str] = Field(default=None, description="If the tree doesnt pass, the feedback of both the grammar and primitive validator checks")
-    task_metrics_result: Optional[str] = Field(default=None, description="The metris returned by executing the tree on the simulator")
+    task_metrics_result: Optional[dict] = Field(default=None, description="The metrics returned by executing the tree on the simulator")
     human_feedback: Optional[str] = Field(default=None, description="The feedback of the human on the task execution that will be given to the LLM in case of retries")
     dataset_size: int = Field(default=0, description="The number of samples generated")
     dataset_path: str = Field(description="The path to the dataset")
+    dataset_size_goal: int = Field(description="The number of samples to generate")
 
 # ------------------------------ Define Graph Nodes ------------------------------
 
@@ -104,13 +106,14 @@ def human_task_input_node(input: GraphInput) -> Command[Literal["tree_generator_
             "task_definition": task_definition,
             "task_metrics_goal": task_metrics_goal,
             "dataset_size": 0,
+            "dataset_path": input.dataset_path,
+            "dataset_size_goal": input.dataset_size_goal,
         },
         goto="tree_generator_node",
     )
 
 
 # Tree Generator Node ----------------------------------------------------------
-
 tree_generator_prompt = ChatPromptTemplate.from_messages(
     [
         (
@@ -191,12 +194,12 @@ def tree_validator_node(state: GraphState) -> Command[Literal["environment_simul
 
 # Environment Simulator Node ----------------------------------------------------------
 
-def environment_simulator_node(state: GraphState) -> Command[Literal[END]]:  # type: ignore , ignore the END warning
+def environment_simulator_node(state: GraphState) -> Command[Literal["datapoint_saver_node"]]:  # type: ignore , ignore the END warning
     behaviour_tree = state.behaviour_tree
     task_metrics_goal = state.task_metrics_goal
 
     # Create a UI to display simulation progress and results
-    task_metrics_result = ""
+    task_metrics_result = {}
     
     def run_simulation():
         nonlocal task_metrics_result
@@ -210,10 +213,20 @@ def environment_simulator_node(state: GraphState) -> Command[Literal[END]]:  # t
         # Run the actual simulation
         task_metrics_result = run_robot_sim(behaviour_tree)
         
+        # Force pygame to quit and close all windows
+        try:
+            import pygame
+            pygame.quit()
+        except:
+            pass
+        
+        # Format the metrics dictionary for display
+        metrics_display = "\n".join([f"{key}: {value}" for key, value in task_metrics_result.items()])
+        
         # Update the UI with results
         metrics_achieved_text.config(state="normal")
         metrics_achieved_text.delete("1.0", tk.END)
-        metrics_achieved_text.insert("1.0", task_metrics_result)
+        metrics_achieved_text.insert("1.0", metrics_display)
         metrics_achieved_text.config(state="disabled")
         
         # Enable the close button
@@ -296,6 +309,25 @@ def environment_simulator_node(state: GraphState) -> Command[Literal[END]]:  # t
         update={
             "task_metrics_result": task_metrics_result,
         },
+        goto="datapoint_saver_node",
+    )
+
+# Datapoint Saver Node ----------------------------------------------------------
+
+def datapoint_saver_node(state: GraphState) -> Command[Literal[END]]:  # type: ignore , ignore the END warning
+
+    behaviour_tree = state.behaviour_tree
+    layman_prompt = state.task_definition
+    curr_dataset_size = state.dataset_size
+    dataset_path = state.dataset_path
+
+    save_datapoint(dataset_path=dataset_path, task_description=layman_prompt, tree_str=behaviour_tree, agent_class=RobotAgent)
+    dataset_size = curr_dataset_size + 1
+
+    return Command(
+        update={
+            "dataset_size": dataset_size,
+        },
         goto=END,
     )
 
@@ -306,8 +338,7 @@ def main(dataset_path: str, dataset_size_goal: int) -> Tuple[str, int]:
     workflow.add_node("tree_generator_node", tree_generator_node)
     workflow.add_node("tree_validator_node", tree_validator_node)
     workflow.add_node("environment_simulator_node", environment_simulator_node)
-
-
+    workflow.add_node("datapoint_saver_node", datapoint_saver_node)
 
     workflow.add_edge(START, "human_input_node")
     graph = workflow.compile()
