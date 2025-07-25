@@ -15,14 +15,17 @@ def save_datapoint(dataset_path: str, task_description: str, tree_str: str, agen
     Save a single datapoint to the dataset file after generating other prompt styles.
     
     Args:
-        dataset_path: Path to the JSON dataset file
+        dataset_path: Path to the JSON dataset file (should end with .json)
         task_description: The layman task description
         tree_str: The behavior tree XML string
         agent_class: The agent class to extract translations from
     """
+    # Ensure the dataset path has .json extension
+    if not dataset_path.endswith('.json'):
+        dataset_path = dataset_path + '.json'
+    
     # Retrieve the translations
     doc_parser = AgentDocstringParser(agent_class=agent_class)
-    
     extracted_info_dict = doc_parser.extract_docstring_config()
     spoon_translations = extracted_info_dict["spoon_node_translations"]
     technical_translations = extracted_info_dict["node_translations"]
@@ -68,11 +71,11 @@ def save_datapoint(dataset_path: str, task_description: str, tree_str: str, agen
     # Append the new datapoint
     dataset.append(datapoint)
     
-    # Save the updated dataset
     # Create directory if it doesn't exist
     os.makedirs(os.path.dirname(dataset_path), exist_ok=True)
     
+    # Save the updated dataset
     with open(dataset_path, "w") as json_file:
         json.dump(dataset, json_file, indent=4)
     
-    print(f"Datapoint saved to {dataset_path}. Dataset now contains {len(dataset)} samples.") 
+    print(f"Datapoint saved to {dataset_path}. Dataset now contains {len(dataset)} samples.")

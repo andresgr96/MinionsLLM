@@ -351,4 +351,4 @@ def main(dataset_path: str, dataset_size_goal: int) -> Tuple[str, int]:
     return path, size
 
 if __name__ == "__main__":
-    main(dataset_path="./data_grammar/rlhf_generation/dataset_path", dataset_size_goal=10)
+    main(dataset_path="./data_grammar/rlhf_generation/output/dataset_path.json", dataset_size_goal=10)
