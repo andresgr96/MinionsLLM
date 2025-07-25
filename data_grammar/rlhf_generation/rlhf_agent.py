@@ -1,18 +1,20 @@
 import os
-from data_grammar.dataset_generation.sys_prompt import system_prompt_b2
+from typing import Optional, Literal, Tuple
+from dotenv import load_dotenv
 
 from pydantic import BaseModel, Field
 from dataclasses import dataclass
 from langgraph.graph import StateGraph, START, END
 from langgraph.types import Command
-
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
-
-from typing import Optional, Literal, Tuple
-from dotenv import load_dotenv
 import tkinter as tk
 from tkinter import ttk
+
+from data_grammar.dataset_generation.sys_prompt import system_prompt_b2
+from tree_parser import BehaviorTreeGrammarValidator
+from tree_parser.primitives_validator import validate_primitives
+from agent_control import RobotAgent, RobotEnvironment
 
 load_dotenv()
 
@@ -122,7 +124,7 @@ class TreeGeneratorOutput(BaseModel):
     """Schema for the structured output of the tree generator tool"""
     behaviour_tree: str = Field(description=" The raw behaviour tree in XML format without any quotes or markdown formatting")
 
-def tree_generator_node(state: GraphState) -> Command[Literal[END]]:  # type: ignore , ignore the END warning
+def tree_generator_node(state: GraphState) -> Command[Literal["tree_validator_node"]]:  # type: ignore , ignore the END warning
     task_definition = state.task_definition
     task_metrics_goal = state.task_metrics_goal
 
@@ -136,6 +138,53 @@ def tree_generator_node(state: GraphState) -> Command[Literal[END]]:  # type: ig
         update={
             "behaviour_tree": result.behaviour_tree,
         },
+        goto="tree_validator_node",
+    )
+
+# Tree Validator Node ----------------------------------------------------------
+
+
+def tree_validator_node(state: GraphState) -> Command[Literal[END]]:  # type: ignore , ignore the END warning
+
+    behaviour_tree = state.behaviour_tree
+
+    # Define custom rules for the grammar
+    grammar_rules = {                                                                 
+        "B":   [["b", ["SEL"]], ["b", ["SEQ"]]],                                                          
+        "SEL": [["sel", ["SEQn", "As"]], ["sel", ["SEQn"]]],                                               
+        "SEQn":[["SEQ", "SEQn"], ["SEQ"]], 
+        "SEQ": [["seq", ["Pn", "A"]], ["seq", ["As", "Pn", "A"]]],
+        "b":   ["BehaviorTree", ["children_nodes"]],     
+        "sel": ["Selector", ["children_nodes"]],
+        "seq": ["Sequence", ["children_nodes"]],                                            
+        "A":   [["aa", "sa"], ["aa"], ["sa"]],                                                                  
+        "As":  [["aa"], ["sa"]],                                                                  
+        "aa":  ["ActuatorAction"],                                                    
+        "sa":  ["StateAction"],
+        "Pn":  [["p", "Pn"], ["p"], []], 
+        "p":   ["Condition"]
+    }
+
+    passed_validators = False
+    feedback = None
+    grammar_validator = BehaviorTreeGrammarValidator(grammar_rules)
+
+    passed_grammar_validator, grammar_feedback = grammar_validator.validate_tree(behaviour_tree)
+    passed_primitive_validator, primitive_feedback = validate_primitives(behaviour_tree, RobotAgent)
+
+    passed_validators = passed_grammar_validator and passed_primitive_validator
+
+    if not passed_validators:
+        feedback = f"The tree failed either the grammar or the primitive validator checks. \nGrammar feedback: {grammar_feedback} \nPrimitive feedback: {primitive_feedback}"
+
+    print(f"Passed validators: {passed_validators}")
+    print(f"Feedback: {feedback}")
+
+    return Command(
+        update={
+            "passed_validator": passed_validators,
+            "validator_feedback": feedback,
+        },
         goto=END,
     )
 
@@ -144,6 +193,7 @@ def main(dataset_path: str, dataset_size_goal: int) -> Tuple[str, int]:
     workflow = StateGraph(GraphState, input_schema=GraphInput, output_schema=GraphOutput)
     workflow.add_node("human_input_node", human_task_input_node)
     workflow.add_node("tree_generator_node", tree_generator_node)
+    workflow.add_node("tree_validator_node", tree_validator_node)
 
     workflow.add_edge(START, "human_input_node")
     graph = workflow.compile()
