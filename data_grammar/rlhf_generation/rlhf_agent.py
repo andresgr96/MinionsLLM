@@ -15,6 +15,8 @@ from data_grammar.dataset_generation.sys_prompt import system_prompt_b2
 from tree_parser import BehaviorTreeGrammarValidator
 from tree_parser.primitives_validator import validate_primitives
 from agent_control import RobotAgent, RobotEnvironment
+from utils.run_robot_sim import run_robot_sim
+
 
 load_dotenv()
 
@@ -143,8 +145,7 @@ def tree_generator_node(state: GraphState) -> Command[Literal["tree_validator_no
 
 # Tree Validator Node ----------------------------------------------------------
 
-
-def tree_validator_node(state: GraphState) -> Command[Literal[END]]:  # type: ignore , ignore the END warning
+def tree_validator_node(state: GraphState) -> Command[Literal["environment_simulator_node"]]:  # type: ignore , ignore the END warning
 
     behaviour_tree = state.behaviour_tree
 
@@ -185,6 +186,22 @@ def tree_validator_node(state: GraphState) -> Command[Literal[END]]:  # type: ig
             "passed_validator": passed_validators,
             "validator_feedback": feedback,
         },
+        goto="environment_simulator_node",
+    )
+
+# Environment Simulator Node ----------------------------------------------------------
+
+def environment_simulator_node(state: GraphState) -> Command[Literal[END]]:  # type: ignore , ignore the END warning
+
+    behaviour_tree = state.behaviour_tree
+
+    task_metrics_result = run_robot_sim(behaviour_tree)
+    print(f"Task metrics result: {task_metrics_result}")
+
+    return Command(
+        update={
+            "task_metrics_result": task_metrics_result,
+        },
         goto=END,
     )
 
@@ -194,6 +211,9 @@ def main(dataset_path: str, dataset_size_goal: int) -> Tuple[str, int]:
     workflow.add_node("human_input_node", human_task_input_node)
     workflow.add_node("tree_generator_node", tree_generator_node)
     workflow.add_node("tree_validator_node", tree_validator_node)
+    workflow.add_node("environment_simulator_node", environment_simulator_node)
+
+
 
     workflow.add_edge(START, "human_input_node")
     graph = workflow.compile()
