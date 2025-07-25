@@ -192,10 +192,104 @@ def tree_validator_node(state: GraphState) -> Command[Literal["environment_simul
 # Environment Simulator Node ----------------------------------------------------------
 
 def environment_simulator_node(state: GraphState) -> Command[Literal[END]]:  # type: ignore , ignore the END warning
-
     behaviour_tree = state.behaviour_tree
+    task_metrics_goal = state.task_metrics_goal
 
-    task_metrics_result = run_robot_sim(behaviour_tree)
+    # Create a UI to display simulation progress and results
+    task_metrics_result = ""
+    
+    def run_simulation():
+        nonlocal task_metrics_result
+        # Update the metrics label to show "Running simulation..."
+        metrics_achieved_text.config(state="normal")
+        metrics_achieved_text.delete("1.0", tk.END)
+        metrics_achieved_text.insert("1.0", "Running simulation...")
+        metrics_achieved_text.config(state="disabled")
+        root.update()
+        
+        # Run the actual simulation
+        task_metrics_result = run_robot_sim(behaviour_tree)
+        
+        # Update the UI with results
+        metrics_achieved_text.config(state="normal")
+        metrics_achieved_text.delete("1.0", tk.END)
+        metrics_achieved_text.insert("1.0", task_metrics_result)
+        metrics_achieved_text.config(state="disabled")
+        
+        # Enable the close button
+        close_button.config(state="normal")
+    
+    def on_close():
+        root.destroy()
+    
+    # Create the main window
+    root = tk.Tk()
+    root.title("Tree Simulation")
+    root.geometry("700x500")
+    root.resizable(True, True)
+    
+    # Main frame
+    main_frame = ttk.Frame(root, padding="20")
+    main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+    root.grid_rowconfigure(0, weight=1)
+    root.grid_columnconfigure(0, weight=1)
+    
+    # Success message
+    success_label = ttk.Label(main_frame, text="Tree Validation Passed! Simulating Tree:", 
+                             font=("Arial", 14, "bold"), foreground="green")
+    success_label.grid(row=0, column=0, sticky=tk.W, pady=(0, 10))
+    
+    # Behavior Tree section
+    ttk.Label(main_frame, text="Behavior Tree:", font=("Arial", 12, "bold")).grid(row=1, column=0, sticky=tk.W, pady=(0, 5))
+    tree_text = tk.Text(main_frame, height=8, width=80, wrap=tk.WORD, state="disabled")
+    tree_text.grid(row=2, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 20))
+    tree_text.config(state="normal")
+    tree_text.insert("1.0", behaviour_tree)
+    tree_text.config(state="disabled")
+    
+    # Desired Metrics section
+    ttk.Label(main_frame, text="Desired Metrics:", font=("Arial", 12, "bold")).grid(row=3, column=0, sticky=tk.W, pady=(0, 5))
+    metrics_desired_text = tk.Text(main_frame, height=4, width=80, wrap=tk.WORD, state="disabled")
+    metrics_desired_text.grid(row=4, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 20))
+    metrics_desired_text.config(state="normal")
+    metrics_desired_text.insert("1.0", task_metrics_goal)
+    metrics_desired_text.config(state="disabled")
+    
+    # Metrics Achieved section
+    ttk.Label(main_frame, text="Metrics Achieved:", font=("Arial", 12, "bold")).grid(row=5, column=0, sticky=tk.W, pady=(0, 5))
+    metrics_achieved_text = tk.Text(main_frame, height=4, width=80, wrap=tk.WORD, state="disabled")
+    metrics_achieved_text.grid(row=6, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 20))
+    metrics_achieved_text.config(state="normal")
+    metrics_achieved_text.insert("1.0", "Waiting for simulation to start...")
+    metrics_achieved_text.config(state="disabled")
+    
+    # Button frame
+    button_frame = ttk.Frame(main_frame)
+    button_frame.grid(row=7, column=0, pady=10)
+    
+    # Run simulation button
+    run_button = ttk.Button(button_frame, text="Run Simulation", command=run_simulation)
+    run_button.pack(side=tk.LEFT, padx=(0, 10))
+    
+    # Close button (initially disabled)
+    close_button = ttk.Button(button_frame, text="Close", command=on_close, state="disabled")
+    close_button.pack(side=tk.LEFT)
+    
+    # Configure grid weights for resizing
+    main_frame.grid_rowconfigure(2, weight=2)  # Behavior tree text
+    main_frame.grid_rowconfigure(4, weight=1)  # Desired metrics text
+    main_frame.grid_rowconfigure(6, weight=1)  # Achieved metrics text
+    main_frame.grid_columnconfigure(0, weight=1)
+    
+    # Center the window on screen
+    root.update_idletasks()
+    x = (root.winfo_screenwidth() // 2) - (root.winfo_width() // 2)
+    y = (root.winfo_screenheight() // 2) - (root.winfo_height() // 2)
+    root.geometry(f"+{x}+{y}")
+    
+    # Run the UI
+    root.mainloop()
+    
     print(f"Task metrics result: {task_metrics_result}")
 
     return Command(
