@@ -135,8 +135,13 @@ class TreeGeneratorOutput(BaseModel):
 def tree_generator_node(state: GraphState) -> Command[Literal["tree_validator_node"]]:  # type: ignore , ignore the END warning
     task_definition = state.task_definition
     task_metrics_goal = state.task_metrics_goal
+    human_feedback = state.human_feedback
 
     prompt = "Please generate a behaviour tree for the following task: " + task_definition + " \nThe task metrics goal is: " + task_metrics_goal
+    
+    # Add human feedback if available
+    if human_feedback:
+        prompt += f"\n\nHuman Feedback on Previous Attempt: {human_feedback}\nPlease incorporate this feedback to improve the behavior tree."
 
     tree_gen_chain_oai = tree_generator_prompt | tree_generator_llm.with_structured_output(TreeGeneratorOutput)
     result = tree_gen_chain_oai.invoke({"user_prompt": [("user", prompt)]})
@@ -145,6 +150,7 @@ def tree_generator_node(state: GraphState) -> Command[Literal["tree_validator_no
     return Command(
         update={
             "behaviour_tree": result.behaviour_tree,
+            "human_feedback": None,  # Reset feedback after using it
         },
         goto="tree_validator_node",
     )
@@ -196,10 +202,10 @@ def tree_validator_node(state: GraphState) -> Command[Literal["environment_simul
     )
 
 # Environment Simulator Node ----------------------------------------------------------
-
-def environment_simulator_node(state: GraphState) -> Command[Literal["datapoint_saver_node"]]:  # type: ignore , ignore the END warning
+def environment_simulator_node(state: GraphState) -> Command[Literal["datapoint_saver_node", "human_feedback_node"]]:  # type: ignore , ignore the END warning
     behaviour_tree = state.behaviour_tree
     task_metrics_goal = state.task_metrics_goal
+    give_feedback = False
 
     # Create a UI to display simulation progress and results
     task_metrics_result = {}
@@ -232,10 +238,16 @@ def environment_simulator_node(state: GraphState) -> Command[Literal["datapoint_
         metrics_achieved_text.insert("1.0", metrics_display)
         metrics_achieved_text.config(state="disabled")
         
-        # Enable the close button
+        # Enable the buttons
         close_button.config(state="normal")
+        feedback_button.config(state="normal")
     
     def on_close():
+        root.destroy()
+    
+    def on_give_feedback():
+        nonlocal give_feedback
+        give_feedback = True
         root.destroy()
     
     # Create the main window
@@ -287,6 +299,10 @@ def environment_simulator_node(state: GraphState) -> Command[Literal["datapoint_
     run_button = ttk.Button(button_frame, text="Run Simulation", command=run_simulation)
     run_button.pack(side=tk.LEFT, padx=(0, 10))
     
+    # Feedback button (initially disabled)
+    feedback_button = ttk.Button(button_frame, text="Give Feedback and Retry", command=on_give_feedback, state="disabled")
+    feedback_button.pack(side=tk.LEFT, padx=(0, 10))
+    
     # Close button (initially disabled)
     close_button = ttk.Button(button_frame, text="Save Datapoint", command=on_close, state="disabled")
     close_button.pack(side=tk.LEFT)
@@ -305,16 +321,17 @@ def environment_simulator_node(state: GraphState) -> Command[Literal["datapoint_
     
     # Run the UI
     root.mainloop()
+
+    next_node = "datapoint_saver_node" if not give_feedback else "human_feedback_node"
     
     return Command(
         update={
             "task_metrics_result": task_metrics_result,
         },
-        goto="datapoint_saver_node",
+        goto=next_node,
     )
 
 # Datapoint Saver Node ----------------------------------------------------------
-
 def datapoint_saver_node(state: GraphState) -> Command[Literal[END, "human_input_node"]]:  # type: ignore , ignore the END warning
 
     behaviour_tree = state.behaviour_tree
@@ -412,6 +429,95 @@ def datapoint_saver_node(state: GraphState) -> Command[Literal[END, "human_input
         goto=next_node,
     )
 
+# Human Feedback Input Node ----------------------------------------------------------
+def human_feedback_node(state: GraphState) -> Command[Literal["tree_generator_node"]]:
+    human_feedback = ""
+    sim_results = state.task_metrics_result
+    wanted_metrics = state.task_metrics_goal
+    previous_tree = state.behaviour_tree
+
+    def on_retry():
+        nonlocal human_feedback
+        human_feedback = feedback_entry.get("1.0", tk.END).strip()
+        root.destroy()
+    
+    # Create the main window
+    root = tk.Tk()
+    root.title("Human Feedback")
+    root.geometry("800x700")
+    root.resizable(True, True)
+    
+    # Main frame
+    main_frame = ttk.Frame(root, padding="20")
+    main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+    root.grid_rowconfigure(0, weight=1)
+    root.grid_columnconfigure(0, weight=1)
+    
+    # Title
+    title_label = ttk.Label(main_frame, text="Provide Feedback for Tree Improvement", 
+                           font=("Arial", 16, "bold"))
+    title_label.grid(row=0, column=0, pady=(0, 20))
+    
+    # Behavior Tree section
+    ttk.Label(main_frame, text="Generated Behavior Tree:", font=("Arial", 12, "bold")).grid(row=1, column=0, sticky=tk.W, pady=(0, 5))
+    tree_text = tk.Text(main_frame, height=8, width=90, wrap=tk.WORD, state="disabled")
+    tree_text.grid(row=2, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 15))
+    tree_text.config(state="normal")
+    tree_text.insert("1.0", previous_tree)
+    tree_text.config(state="disabled")
+    
+    # Desired Metrics section
+    ttk.Label(main_frame, text="Desired Metrics:", font=("Arial", 12, "bold")).grid(row=3, column=0, sticky=tk.W, pady=(0, 5))
+    metrics_desired_text = tk.Text(main_frame, height=4, width=90, wrap=tk.WORD, state="disabled")
+    metrics_desired_text.grid(row=4, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 15))
+    metrics_desired_text.config(state="normal")
+    metrics_desired_text.insert("1.0", wanted_metrics)
+    metrics_desired_text.config(state="disabled")
+    
+    # Actual Metrics section
+    ttk.Label(main_frame, text="Actual Metrics Achieved:", font=("Arial", 12, "bold")).grid(row=5, column=0, sticky=tk.W, pady=(0, 5))
+    metrics_actual_text = tk.Text(main_frame, height=4, width=90, wrap=tk.WORD, state="disabled")
+    metrics_actual_text.grid(row=6, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 15))
+    metrics_actual_text.config(state="normal")
+    if sim_results:
+        metrics_display = "\n".join([f"{key}: {value}" for key, value in sim_results.items()])
+        metrics_actual_text.insert("1.0", metrics_display)
+    else:
+        metrics_actual_text.insert("1.0", "No simulation results available")
+    metrics_actual_text.config(state="disabled")
+    
+    # Human Feedback section
+    ttk.Label(main_frame, text="Your Feedback (what should be improved?):", font=("Arial", 12, "bold")).grid(row=7, column=0, sticky=tk.W, pady=(0, 5))
+    feedback_entry = tk.Text(main_frame, height=6, width=90, wrap=tk.WORD)
+    feedback_entry.grid(row=8, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 20))
+    
+    # Retry button
+    retry_button = ttk.Button(main_frame, text="Retry Prompt", command=on_retry)
+    retry_button.grid(row=9, column=0, pady=10)
+    
+    # Configure grid weights for resizing
+    main_frame.grid_rowconfigure(2, weight=2)  # Behavior tree text
+    main_frame.grid_rowconfigure(4, weight=1)  # Desired metrics text
+    main_frame.grid_rowconfigure(6, weight=1)  # Actual metrics text
+    main_frame.grid_rowconfigure(8, weight=1)  # Feedback text
+    main_frame.grid_columnconfigure(0, weight=1)
+    
+    # Center the window on screen
+    root.update_idletasks()
+    x = (root.winfo_screenwidth() // 2) - (root.winfo_width() // 2)
+    y = (root.winfo_screenheight() // 2) - (root.winfo_height() // 2)
+    root.geometry(f"+{x}+{y}")
+    
+    # Run the UI
+    root.mainloop()
+    
+    return Command(
+        update={
+            "human_feedback": human_feedback,
+        },
+        goto="tree_generator_node",
+    )
+
 # ------------------------------ Main Workflow ------------------------------
 def main(dataset_path: str, dataset_size_goal: int) -> Tuple[str, int]:
     workflow = StateGraph(GraphState, input_schema=GraphInput, output_schema=GraphOutput)
@@ -420,6 +526,7 @@ def main(dataset_path: str, dataset_size_goal: int) -> Tuple[str, int]:
     workflow.add_node("tree_validator_node", tree_validator_node)
     workflow.add_node("environment_simulator_node", environment_simulator_node)
     workflow.add_node("datapoint_saver_node", datapoint_saver_node)
+    workflow.add_node("human_feedback_node", human_feedback_node)
 
     workflow.add_edge(START, "human_input_node")
     graph = workflow.compile()
