@@ -11,12 +11,12 @@ from langchain_core.prompts import ChatPromptTemplate
 import tkinter as tk
 from tkinter import ttk
 
-from data_grammar.dataset_generation.sys_prompt import system_prompt_b2
 from tree_parser import BehaviorTreeGrammarValidator
 from tree_parser.primitives_validator import validate_primitives
 from agent_control import RobotAgent
 from utils.run_robot_sim import run_robot_sim
 from utils.save_data_point import save_datapoint
+from utils.prompt_builder import PromptBuilder
 
 
 load_dotenv()
@@ -117,10 +117,14 @@ def human_task_input_node(input: GraphInput, state: Optional[GraphState] = None)
 
 
 # Tree Generator Node ----------------------------------------------------------
+# Initialize prompt builder
+prompt_builder = PromptBuilder(RobotAgent)
+system_prompt = prompt_builder.build_system_prompt()
+
 tree_generator_prompt = ChatPromptTemplate.from_messages(
     [
         (
-            "system", system_prompt_b2
+            "system", system_prompt
         ),
         ("placeholder", "{user_prompt}"),
     ]
