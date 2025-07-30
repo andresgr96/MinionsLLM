@@ -117,7 +117,6 @@ def human_task_input_node(input: GraphInput, state: Optional[GraphState] = None)
 
 
 # Tree Generator Node ----------------------------------------------------------
-# Initialize prompt builder
 prompt_builder = PromptBuilder(RobotAgent)
 system_prompt = prompt_builder.build_system_prompt()
 
@@ -160,7 +159,6 @@ def tree_generator_node(state: GraphState) -> Command[Literal["tree_validator_no
     )
 
 # Tree Validator Node ----------------------------------------------------------
-
 def tree_validator_node(state: GraphState) -> Command[Literal["environment_simulator_node"]]:  # type: ignore , ignore the END warning
 
     behaviour_tree = state.behaviour_tree
