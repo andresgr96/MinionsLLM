@@ -47,13 +47,16 @@ class GraphState(BaseModel):
     dataset_path: str = Field(description="The path to the dataset")
     dataset_size_goal: int = Field(description="The number of samples to generate")
 
+
 # ------------------------------ Define Graph Nodes ------------------------------
 
 # Human Task Input Node ----------------------------------------------------------
-def human_task_input_node(input: GraphInput) -> Command[Literal["tree_generator_node"]]:
+def human_task_input_node(input: GraphInput, state: Optional[GraphState] = None) -> Command[Literal["tree_generator_node"]]:
     # Create a simple UI to get user input
     task_definition = ""
     task_metrics_goal = ""
+
+    current_dataset_size = state.dataset_size if state else 0
     
     def on_submit():
         nonlocal task_definition, task_metrics_goal
@@ -105,7 +108,7 @@ def human_task_input_node(input: GraphInput) -> Command[Literal["tree_generator_
         update={
             "task_definition": task_definition,
             "task_metrics_goal": task_metrics_goal,
-            "dataset_size": 0,
+            "dataset_size": current_dataset_size,
             "dataset_path": input.dataset_path,
             "dataset_size_goal": input.dataset_size_goal,
         },
@@ -285,7 +288,7 @@ def environment_simulator_node(state: GraphState) -> Command[Literal["datapoint_
     run_button.pack(side=tk.LEFT, padx=(0, 10))
     
     # Close button (initially disabled)
-    close_button = ttk.Button(button_frame, text="Close", command=on_close, state="disabled")
+    close_button = ttk.Button(button_frame, text="Save Datapoint", command=on_close, state="disabled")
     close_button.pack(side=tk.LEFT)
     
     # Configure grid weights for resizing
@@ -303,8 +306,6 @@ def environment_simulator_node(state: GraphState) -> Command[Literal["datapoint_
     # Run the UI
     root.mainloop()
     
-    print(f"Task metrics result: {task_metrics_result}")
-
     return Command(
         update={
             "task_metrics_result": task_metrics_result,
@@ -314,21 +315,101 @@ def environment_simulator_node(state: GraphState) -> Command[Literal["datapoint_
 
 # Datapoint Saver Node ----------------------------------------------------------
 
-def datapoint_saver_node(state: GraphState) -> Command[Literal[END]]:  # type: ignore , ignore the END warning
+def datapoint_saver_node(state: GraphState) -> Command[Literal[END, "human_input_node"]]:  # type: ignore , ignore the END warning
 
     behaviour_tree = state.behaviour_tree
     layman_prompt = state.task_definition
     curr_dataset_size = state.dataset_size
     dataset_path = state.dataset_path
+    dataset_size_goal = state.dataset_size_goal
 
     save_datapoint(dataset_path=dataset_path, task_description=layman_prompt, tree_str=behaviour_tree, agent_class=RobotAgent)
     dataset_size = curr_dataset_size + 1
+
+    # Create a UI to ask user if they want to continue generation
+    continue_generation = False
+    
+    def on_continue():
+        nonlocal continue_generation
+        continue_generation = True
+        root.destroy()
+    
+    def on_exit():
+        nonlocal continue_generation
+        continue_generation = False
+        root.destroy()
+    
+    # Create the main window
+    root = tk.Tk()
+    root.title("Dataset Generation Progress")
+    root.geometry("500x300")
+    root.resizable(True, True)
+    
+    # Main frame
+    main_frame = ttk.Frame(root, padding="20")
+    main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+    root.grid_rowconfigure(0, weight=1)
+    root.grid_columnconfigure(0, weight=1)
+    
+    # Success message
+    success_label = ttk.Label(main_frame, text="Datapoint Saved Successfully!", 
+                             font=("Arial", 16, "bold"), foreground="green")
+    success_label.grid(row=0, column=0, pady=(0, 20))
+    
+    # Progress information
+    progress_label = ttk.Label(main_frame, text="Dataset Generation Progress:", 
+                              font=("Arial", 14, "bold"))
+    progress_label.grid(row=1, column=0, pady=(0, 10))
+    
+    # Current size display
+    size_label = ttk.Label(main_frame, text=f"Current Dataset Size: {dataset_size}", 
+                          font=("Arial", 12))
+    size_label.grid(row=2, column=0, pady=(0, 5))
+    
+    # Goal size display
+    goal_label = ttk.Label(main_frame, text=f"Target Dataset Size: {dataset_size_goal}", 
+                          font=("Arial", 12))
+    goal_label.grid(row=3, column=0, pady=(0, 5))
+    
+    # Progress percentage
+    progress_percentage = (dataset_size / dataset_size_goal) * 100 if dataset_size_goal > 0 else 0
+    percentage_label = ttk.Label(main_frame, text=f"Progress: {progress_percentage:.1f}%", 
+                                font=("Arial", 12, "bold"))
+    percentage_label.grid(row=4, column=0, pady=(0, 20))
+    
+    # Button frame
+    button_frame = ttk.Frame(main_frame)
+    button_frame.grid(row=5, column=0, pady=20)
+    
+    # Continue generation button
+    continue_button = ttk.Button(button_frame, text="Continue Generation", command=on_continue)
+    continue_button.pack(side=tk.LEFT, padx=(0, 20))
+    
+    # Exit generation button
+    exit_button = ttk.Button(button_frame, text="Exit Generation", command=on_exit)
+    exit_button.pack(side=tk.LEFT)
+    
+    # Configure grid weights for resizing
+    main_frame.grid_rowconfigure(0, weight=1)
+    main_frame.grid_rowconfigure(5, weight=1)
+    main_frame.grid_columnconfigure(0, weight=1)
+    
+    # Center the window on screen
+    root.update_idletasks()
+    x = (root.winfo_screenwidth() // 2) - (root.winfo_width() // 2)
+    y = (root.winfo_screenheight() // 2) - (root.winfo_height() // 2)
+    root.geometry(f"+{x}+{y}")
+    
+    # Run the UI
+    root.mainloop()
+    
+    next_node = "human_input_node" if continue_generation else END
 
     return Command(
         update={
             "dataset_size": dataset_size,
         },
-        goto=END,
+        goto=next_node,
     )
 
 # ------------------------------ Main Workflow ------------------------------
