@@ -43,7 +43,7 @@ class GraphState(BaseModel):
     validator_feedback: Optional[str] = Field(default=None, description="If the tree doesnt pass, the feedback of both the grammar and primitive validator checks")
     task_metrics_result: Optional[dict] = Field(default=None, description="The metrics returned by executing the tree on the simulator")
     human_feedback: Optional[str] = Field(default=None, description="The feedback of the human on the task execution that will be given to the LLM in case of retries")
-    dataset_size: int = Field(default=0, description="The number of samples generated")
+    dataset_size: int = Field(description="The number of samples generated")
     dataset_path: str = Field(description="The path to the dataset")
     dataset_size_goal: int = Field(description="The number of samples to generate")
 
@@ -56,7 +56,22 @@ def human_task_input_node(input: GraphInput, state: Optional[GraphState] = None)
     task_definition = ""
     task_metrics_goal = ""
 
-    current_dataset_size = state.dataset_size if state else 0
+    # Preserve dataset tracking info from state if available, otherwise use input
+    dataset_path = state.dataset_path if state else input.dataset_path
+    dataset_size_goal = state.dataset_size_goal if state else input.dataset_size_goal
+    
+    # Calculate current dataset size by reading the JSON file
+    import json
+    import os
+    
+    current_dataset_size = 0
+    if os.path.exists(dataset_path):
+        try:
+            with open(dataset_path, "r") as json_file:
+                dataset = json.load(json_file)
+                current_dataset_size = len(dataset)
+        except (json.JSONDecodeError, FileNotFoundError):
+            current_dataset_size = 0
     
     def on_submit():
         nonlocal task_definition, task_metrics_goal
@@ -109,8 +124,8 @@ def human_task_input_node(input: GraphInput, state: Optional[GraphState] = None)
             "task_definition": task_definition,
             "task_metrics_goal": task_metrics_goal,
             "dataset_size": current_dataset_size,
-            "dataset_path": input.dataset_path,
-            "dataset_size_goal": input.dataset_size_goal,
+            "dataset_path": dataset_path,
+            "dataset_size_goal": dataset_size_goal,
         },
         goto="tree_generator_node",
     )
@@ -360,12 +375,26 @@ def datapoint_saver_node(state: GraphState) -> Command[Literal[END, "human_input
 
     behaviour_tree = state.behaviour_tree
     layman_prompt = state.task_definition
-    curr_dataset_size = state.dataset_size
     dataset_path = state.dataset_path
     dataset_size_goal = state.dataset_size_goal
 
+    # Save the datapoint first
     save_datapoint(dataset_path=dataset_path, task_description=layman_prompt, tree_str=behaviour_tree, agent_class=RobotAgent)
-    dataset_size = curr_dataset_size + 1
+    
+    # Calculate actual dataset size by reading the JSON file
+    import json
+    import os
+    
+    dataset_size = 0
+    if os.path.exists(dataset_path):
+        try:
+            with open(dataset_path, "r") as json_file:
+                dataset = json.load(json_file)
+                dataset_size = len(dataset)
+        except (json.JSONDecodeError, FileNotFoundError):
+            dataset_size = 0
+    
+    print(f"Current dataset size after saving: {dataset_size}")
 
     # Create a UI to ask user if they want to continue generation
     continue_generation = False
