@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import threading
 import time
 
+from vi import Agent
 from pydantic import BaseModel, Field
 from dataclasses import dataclass
 from langgraph.graph import StateGraph, START, END
@@ -52,15 +53,16 @@ class GraphState(BaseModel):
 
 # ------------------------------ Unified UI Class ------------------------------
 class UnifiedRLHFUI:
-    def __init__(self, dataset_path: str, dataset_size_goal: int):
+    def __init__(self, dataset_path: str, dataset_size_goal: int, agent_class: Agent=None):
         self.dataset_path = dataset_path
         self.dataset_size_goal = dataset_size_goal
+        self.agent_class = agent_class or RobotAgent  # Default to RobotAgent if none provided
         self.current_state = None
         self.workflow_running = False
         
         # Create main window
         self.root = tk.Tk()
-        self.root.title("RLHF Dataset Generation - Unified Interface")
+        self.root.title(f"RLHF Dataset Generation - {self.agent_class.__name__}")
         self.root.geometry("1000x700")
         self.root.resizable(True, True)
         
@@ -75,7 +77,7 @@ class UnifiedRLHFUI:
         
     def setup_workflow(self):
         """Initialize the workflow graph and LLM components"""
-        self.prompt_builder = PromptBuilder(RobotAgent)
+        self.prompt_builder = PromptBuilder(self.agent_class)
         self.system_prompt = self.prompt_builder.build_system_prompt()
         
         self.tree_generator_prompt = ChatPromptTemplate.from_messages(
@@ -85,7 +87,7 @@ class UnifiedRLHFUI:
         self.tree_generator_llm = ChatOpenAI(model="gpt-4o", temperature=0)
         
         # Initialize agent doc parser for extracting node information
-        self.agent_doc_parser = AgentDocstringParser(RobotAgent)
+        self.agent_doc_parser = AgentDocstringParser(self.agent_class)
         self.agent_config = self.agent_doc_parser.extract_docstring_config()
         
         # Grammar rules for validation
@@ -283,35 +285,41 @@ class UnifiedRLHFUI:
         self.conditions_display.config(state=tk.NORMAL)
         self.conditions_display.delete(1.0, tk.END)
         
+        # Configure text tags for formatting
+        self.conditions_display.tag_configure("title", font=("Arial", 14, "bold"))
+        self.conditions_display.tag_configure("node_name", font=("Arial", 13, "bold"))
+        self.conditions_display.tag_configure("description", font=("Arial", 10))
+        
         conditions = self.agent_config.get("conditions", [])
         
         if conditions:
-            content = "Available Condition Nodes:\n"
-            content += "=" * 50 + "\n\n"
+            # Insert title
+            self.conditions_display.insert(tk.END, "Available Condition Nodes:\n", "title")
+            self.conditions_display.insert(tk.END, "=" * 50 + "\n\n")
             
             for i, condition in enumerate(conditions, 1):
-                content += f"{i}. {condition}\n"
-                content += "-" * 30 + "\n"
+                # Insert node name with bold formatting
+                self.conditions_display.insert(tk.END, f"{i}. {condition}\n", "node_name")
+                self.conditions_display.insert(tk.END, "-" * 30 + "\n")
                 
                 # Try to get more info about the condition from the agent
                 try:
                     # Get the method from the agent class
-                    if hasattr(RobotAgent, condition):
-                        method = getattr(RobotAgent, condition)
+                    if hasattr(self.agent_class, condition):
+                        method = getattr(self.agent_class, condition)
                         if hasattr(method, '__doc__') and method.__doc__:
-                            content += f"Description: {method.__doc__.strip()}\n"
+                            self.conditions_display.insert(tk.END, f"Description: {method.__doc__.strip()}\n", "description")
                         else:
-                            content += "Description: No documentation available\n"
+                            self.conditions_display.insert(tk.END, "Description: No documentation available\n", "description")
                     else:
-                        content += "Description: Method not found in agent class\n"
+                        self.conditions_display.insert(tk.END, "Description: Method not found in agent class\n", "description")
                 except Exception as e:
-                    content += f"Description: Error retrieving info - {str(e)}\n"
+                    self.conditions_display.insert(tk.END, f"Description: Error retrieving info - {str(e)}\n", "description")
                 
-                content += "\n"
+                self.conditions_display.insert(tk.END, "\n")
         else:
-            content = "No condition nodes found."
+            self.conditions_display.insert(tk.END, "No condition nodes found.", "title")
             
-        self.conditions_display.insert(1.0, content)
         self.conditions_display.config(state=tk.DISABLED)
         
     def populate_actuator_actions(self):
@@ -319,35 +327,41 @@ class UnifiedRLHFUI:
         self.actuator_display.config(state=tk.NORMAL)
         self.actuator_display.delete(1.0, tk.END)
         
+        # Configure text tags for formatting
+        self.actuator_display.tag_configure("title", font=("Arial", 14, "bold"))
+        self.actuator_display.tag_configure("node_name", font=("Arial", 13, "bold"))
+        self.actuator_display.tag_configure("description", font=("Arial", 10))
+        
         actuator_actions = self.agent_config.get("actuator_actions", [])
         
         if actuator_actions:
-            content = "Available Actuator Action Nodes:\n"
-            content += "=" * 50 + "\n\n"
+            # Insert title
+            self.actuator_display.insert(tk.END, "Available Actuator Action Nodes:\n", "title")
+            self.actuator_display.insert(tk.END, "=" * 50 + "\n\n")
             
             for i, action in enumerate(actuator_actions, 1):
-                content += f"{i}. {action}\n"
-                content += "-" * 30 + "\n"
+                # Insert node name with bold formatting
+                self.actuator_display.insert(tk.END, f"{i}. {action}\n", "node_name")
+                self.actuator_display.insert(tk.END, "-" * 30 + "\n")
                 
                 # Try to get more info about the action from the agent
                 try:
                     # Get the method from the agent class
-                    if hasattr(RobotAgent, action):
-                        method = getattr(RobotAgent, action)
+                    if hasattr(self.agent_class, action):
+                        method = getattr(self.agent_class, action)
                         if hasattr(method, '__doc__') and method.__doc__:
-                            content += f"Description: {method.__doc__.strip()}\n"
+                            self.actuator_display.insert(tk.END, f"Description: {method.__doc__.strip()}\n", "description")
                         else:
-                            content += "Description: No documentation available\n"
+                            self.actuator_display.insert(tk.END, "Description: No documentation available\n", "description")
                     else:
-                        content += "Description: Method not found in agent class\n"
+                        self.actuator_display.insert(tk.END, "Description: Method not found in agent class\n", "description")
                 except Exception as e:
-                    content += f"Description: Error retrieving info - {str(e)}\n"
+                    self.actuator_display.insert(tk.END, f"Description: Error retrieving info - {str(e)}\n", "description")
                 
-                content += "\n"
+                self.actuator_display.insert(tk.END, "\n")
         else:
-            content = "No actuator action nodes found."
+            self.actuator_display.insert(tk.END, "No actuator action nodes found.", "title")
             
-        self.actuator_display.insert(1.0, content)
         self.actuator_display.config(state=tk.DISABLED)
         
     def populate_state_actions(self):
@@ -355,35 +369,41 @@ class UnifiedRLHFUI:
         self.state_display.config(state=tk.NORMAL)
         self.state_display.delete(1.0, tk.END)
         
+        # Configure text tags for formatting
+        self.state_display.tag_configure("title", font=("Arial", 14, "bold"))
+        self.state_display.tag_configure("node_name", font=("Arial", 13, "bold"))
+        self.state_display.tag_configure("description", font=("Arial", 10))
+        
         state_actions = self.agent_config.get("state_actions", [])
         
         if state_actions:
-            content = "Available State Action Nodes:\n"
-            content += "=" * 50 + "\n\n"
+            # Insert title
+            self.state_display.insert(tk.END, "Available State Action Nodes:\n", "title")
+            self.state_display.insert(tk.END, "=" * 50 + "\n\n")
             
             for i, action in enumerate(state_actions, 1):
-                content += f"{i}. {action}\n"
-                content += "-" * 30 + "\n"
+                # Insert node name with bold formatting
+                self.state_display.insert(tk.END, f"{i}. {action}\n", "node_name")
+                self.state_display.insert(tk.END, "-" * 30 + "\n")
                 
                 # Try to get more info about the action from the agent
                 try:
                     # Get the method from the agent class
-                    if hasattr(RobotAgent, action):
-                        method = getattr(RobotAgent, action)
+                    if hasattr(self.agent_class, action):
+                        method = getattr(self.agent_class, action)
                         if hasattr(method, '__doc__') and method.__doc__:
-                            content += f"Description: {method.__doc__.strip()}\n"
+                            self.state_display.insert(tk.END, f"Description: {method.__doc__.strip()}\n", "description")
                         else:
-                            content += "Description: No documentation available\n"
+                            self.state_display.insert(tk.END, "Description: No documentation available\n", "description")
                     else:
-                        content += "Description: Method not found in agent class\n"
+                        self.state_display.insert(tk.END, "Description: Method not found in agent class\n", "description")
                 except Exception as e:
-                    content += f"Description: Error retrieving info - {str(e)}\n"
+                    self.state_display.insert(tk.END, f"Description: Error retrieving info - {str(e)}\n", "description")
                 
-                content += "\n"
+                self.state_display.insert(tk.END, "\n")
         else:
-            content = "No state action nodes found."
+            self.state_display.insert(tk.END, "No state action nodes found.", "title")
             
-        self.state_display.insert(1.0, content)
         self.state_display.config(state=tk.DISABLED)
         
     def create_dataset_tab(self):
@@ -580,7 +600,7 @@ class UnifiedRLHFUI:
         try:
             grammar_validator = BehaviorTreeGrammarValidator(self.grammar_rules)
             passed_grammar, grammar_feedback = grammar_validator.validate_tree(self.current_state.behaviour_tree)
-            passed_primitive, primitive_feedback = validate_primitives(self.current_state.behaviour_tree, RobotAgent)
+            passed_primitive, primitive_feedback = validate_primitives(self.current_state.behaviour_tree, self.agent_class)
             
             passed_validators = passed_grammar and passed_primitive
             
@@ -699,7 +719,7 @@ class UnifiedRLHFUI:
                 dataset_path=self.current_state.dataset_path,
                 task_description=self.current_state.task_definition,
                 tree_str=self.current_state.behaviour_tree,
-                agent_class=RobotAgent
+                agent_class=self.agent_class
             )
             
             self.update_dataset_info()
@@ -823,10 +843,10 @@ class UnifiedRLHFUI:
         self.root.mainloop()
 
 # ------------------------------ Main Function ------------------------------
-def main(dataset_path: str, dataset_size_goal: int) -> None:
+def main(dataset_path: str, dataset_size_goal: int, agent_class=None) -> None:
     """Main function to run the unified RLHF UI"""
-    ui = UnifiedRLHFUI(dataset_path, dataset_size_goal)
+    ui = UnifiedRLHFUI(dataset_path, dataset_size_goal, agent_class)
     ui.run()
 
 if __name__ == "__main__":
-    main(dataset_path="./data_grammar/rlhf_generation/output/dataset_path.json", dataset_size_goal=10)
+    main(dataset_path="./data_grammar/rlhf_generation/output/dataset_path.json", dataset_size_goal=10, agent_class=RobotAgent)
