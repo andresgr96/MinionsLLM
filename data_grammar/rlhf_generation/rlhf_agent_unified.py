@@ -218,9 +218,52 @@ class UnifiedRLHFUI:
         self.dataset_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.dataset_frame, text="Dataset Explorer")
         
-        # Placeholder content
-        ttk.Label(self.dataset_frame, text="Dataset Explorer", font=("Arial", 16, "bold")).pack(pady=20)
-        ttk.Label(self.dataset_frame, text="(Dataset exploration will be available here)", font=("Arial", 12)).pack()
+        # Main container
+        main_container = ttk.Frame(self.dataset_frame)
+        main_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Title and refresh button
+        title_frame = ttk.Frame(main_container)
+        title_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        ttk.Label(title_frame, text="Dataset Explorer", font=("Arial", 16, "bold")).pack(side=tk.LEFT)
+        self.refresh_button = ttk.Button(title_frame, text="Refresh", command=self.refresh_dataset_list)
+        self.refresh_button.pack(side=tk.RIGHT)
+        
+        # Left side - Datapoint list
+        left_frame = ttk.LabelFrame(main_container, text="Datapoints", padding=10)
+        left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=False, padx=(0, 10))
+        left_frame.config(width=300)
+        
+        # Listbox with scrollbar for datapoints
+        list_frame = ttk.Frame(left_frame)
+        list_frame.pack(fill=tk.BOTH, expand=True)
+        
+        self.datapoint_listbox = tk.Listbox(list_frame, width=40)
+        self.datapoint_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.datapoint_listbox.bind('<<ListboxSelect>>', self.on_datapoint_select)
+        
+        list_scrollbar = ttk.Scrollbar(list_frame, orient=tk.VERTICAL, command=self.datapoint_listbox.yview)
+        list_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.datapoint_listbox.config(yscrollcommand=list_scrollbar.set)
+        
+        # Right side - Datapoint details
+        right_frame = ttk.LabelFrame(main_container, text="Datapoint Details", padding=10)
+        right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        
+        # Layman task display
+        ttk.Label(right_frame, text="Layman Task:", font=("Arial", 12, "bold")).pack(anchor=tk.W, pady=(0, 5))
+        self.layman_display = scrolledtext.ScrolledText(right_frame, height=6, wrap=tk.WORD, state=tk.DISABLED)
+        self.layman_display.pack(fill=tk.X, pady=(0, 15))
+        
+        # Behavior tree display
+        ttk.Label(right_frame, text="Behavior Tree:", font=("Arial", 12, "bold")).pack(anchor=tk.W, pady=(0, 5))
+        self.tree_details_display = scrolledtext.ScrolledText(right_frame, height=15, wrap=tk.WORD, state=tk.DISABLED)
+        self.tree_details_display.pack(fill=tk.BOTH, expand=True)
+        
+        # Load initial data
+        self.dataset_data = []
+        self.refresh_dataset_list()
         
     def reset_workflow(self):
         """Reset the workflow to initial state"""
@@ -293,8 +336,8 @@ class UnifiedRLHFUI:
         task_definition = self.task_entry.get(1.0, tk.END).strip()
         task_metrics_goal = self.metrics_entry.get(1.0, tk.END).strip()
         
-        if not task_definition or not task_metrics_goal:
-            self.update_status("Please fill in both task definition and metrics goal", "red")
+        if not task_definition:
+            self.update_status("Please fill in the task definition", "red")
             return
             
         # Update state
@@ -515,6 +558,92 @@ class UnifiedRLHFUI:
             self.reset_workflow()
         else:
             self.update_status("Generation complete", "blue")
+            
+        # Refresh dataset explorer
+        self.refresh_dataset_list()
+        
+    def refresh_dataset_list(self):
+        """Refresh the dataset list in the explorer tab"""
+        import json
+        
+        # Clear current list
+        self.datapoint_listbox.delete(0, tk.END)
+        self.dataset_data = []
+        
+        # Clear details display
+        self.clear_dataset_details()
+        
+        # Load dataset if it exists
+        if os.path.exists(self.dataset_path):
+            try:
+                with open(self.dataset_path, "r") as f:
+                    self.dataset_data = json.load(f)
+                
+                # Populate listbox
+                for i, datapoint in enumerate(self.dataset_data):
+                    # Show first 50 characters of layman task as preview
+                    preview = datapoint.get("layman_task", "No task description")
+                    if len(preview) > 50:
+                        preview = preview[:47] + "..."
+                    
+                    self.datapoint_listbox.insert(tk.END, f"{i+1}. {preview}")
+                    
+            except (json.JSONDecodeError, FileNotFoundError) as e:
+                self.datapoint_listbox.insert(tk.END, f"Error loading dataset: {str(e)}")
+                
+        if not self.dataset_data:
+            self.datapoint_listbox.insert(tk.END, "No datapoints found")
+            
+    def on_datapoint_select(self, event):
+        """Handle datapoint selection from the list"""
+        selection = self.datapoint_listbox.curselection()
+        if not selection or not self.dataset_data:
+            return
+            
+        index = selection[0]
+        if index < len(self.dataset_data):
+            datapoint = self.dataset_data[index]
+            self.display_datapoint_details(datapoint)
+            
+    def display_datapoint_details(self, datapoint):
+        """Display details of selected datapoint"""
+        # Display layman task
+        self.layman_display.config(state=tk.NORMAL)
+        self.layman_display.delete(1.0, tk.END)
+        self.layman_display.insert(1.0, datapoint.get("layman_task", "No task description available"))
+        self.layman_display.config(state=tk.DISABLED)
+        
+        # Display behavior tree (formatted for better readability)
+        self.tree_details_display.config(state=tk.NORMAL)
+        self.tree_details_display.delete(1.0, tk.END)
+        
+        tree_content = datapoint.get("tree", "No tree available")
+        # Format XML for better readability
+        try:
+            import xml.dom.minidom
+            parsed = xml.dom.minidom.parseString(tree_content)
+            formatted_tree = parsed.toprettyxml(indent="  ")
+            # Remove empty lines and XML declaration
+            lines = [line for line in formatted_tree.split('\n') if line.strip()]
+            if lines and lines[0].startswith('<?xml'):
+                lines = lines[1:]
+            tree_content = '\n'.join(lines)
+        except:
+            # If formatting fails, use original content
+            pass
+            
+        self.tree_details_display.insert(1.0, tree_content)
+        self.tree_details_display.config(state=tk.DISABLED)
+        
+    def clear_dataset_details(self):
+        """Clear the dataset details display"""
+        self.layman_display.config(state=tk.NORMAL)
+        self.layman_display.delete(1.0, tk.END)
+        self.layman_display.config(state=tk.DISABLED)
+        
+        self.tree_details_display.config(state=tk.NORMAL)
+        self.tree_details_display.delete(1.0, tk.END)
+        self.tree_details_display.config(state=tk.DISABLED)
             
     def run(self):
         """Run the UI"""
