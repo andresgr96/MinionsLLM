@@ -58,5 +58,29 @@
         "technical_task": "if you detect a scrap part then pick up the part, or otherwise then search randomly.",
         "spoon_task": "if you detect a scrap part then pick up the part, or otherwise then walk randomly.",
         "tree": "<BehaviorTree>\n    <Selector>\n        <Sequence>\n            <Condition>is_scrap_part_detected</Condition>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n        </Sequence>\n        <StateAction>state_random_walk</StateAction>\n    </Selector>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Find good parts and pick them up",
+        "technical_task": "if you detect a good part then pick up the part, or otherwise then go to the source.",
+        "spoon_task": "if you detect a good part then pick up the part, or otherwise then seek the source area.",
+        "tree": "<BehaviorTree>\n    <Selector>\n        <Sequence>\n            <Condition>is_good_part_detected</Condition>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n        </Sequence>\n        <StateAction>state_seek_source_area</StateAction>\n    </Selector>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Find scrap parts and pick them up",
+        "technical_task": "if you detect a scrap part then pick up the part, or otherwise then search randomly.",
+        "spoon_task": "if you detect a scrap part then pick up the part, or otherwise then walk randomly.",
+        "tree": "<BehaviorTree>\n    <Selector>\n        <Sequence>\n            <Condition>is_scrap_part_detected</Condition>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n        </Sequence>\n        <StateAction>state_random_walk</StateAction>\n    </Selector>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Find scrap parts and pick them up, then take them to the waste area and drop them there",
+        "technical_task": "if you detect a scrap part then pick up the part, or if you are holding a scrap part and if you are in the waste then drop the part, or if you are holding a scrap part then go to the waste, or otherwise then search randomly.",
+        "spoon_task": "if you detect a scrap part then pick up the part, or if you are holding a scrap part and if you are in the waste area then drop the part, or if you are holding a scrap part then seek the waste area, or otherwise then walk randomly.",
+        "tree": "<BehaviorTree>\n    <Selector>\n        <Sequence>\n            <Condition>is_scrap_part_detected</Condition>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n        </Sequence>\n        <Sequence>\n            <Condition>is_agent_holding_scrap_part</Condition>\n            <Condition>is_agent_in_waste_area</Condition>\n            <ActuatorAction>drop_part</ActuatorAction>\n        </Sequence>\n        <Sequence>\n            <Condition>is_agent_holding_scrap_part</Condition>\n            <StateAction>state_seek_waste_area</StateAction>\n        </Sequence>\n        <StateAction>state_random_walk</StateAction>\n    </Selector>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Find scrap parts and pick them up",
+        "technical_task": "if you detect a scrap part then pick up the part, or otherwise then search randomly.",
+        "spoon_task": "if you detect a scrap part then pick up the part, or otherwise then walk randomly.",
+        "tree": "<BehaviorTree>\n    <Selector>\n        <Sequence>\n            <Condition>is_scrap_part_detected</Condition>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n        </Sequence>\n        <StateAction>state_random_walk</StateAction>\n    </Selector>\n</BehaviorTree>"
     }
 ]

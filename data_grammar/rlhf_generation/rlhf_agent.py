@@ -207,6 +207,8 @@ def tree_validator_node(state: GraphState) -> Command[Literal["environment_simul
 def environment_simulator_node(state: GraphState) -> Command[Literal["datapoint_saver_node", "human_feedback_node"]]:  # type: ignore , ignore the END warning
     behaviour_tree = state.behaviour_tree
     task_metrics_goal = state.task_metrics_goal
+    passed_validators = state.passed_validator
+    validator_feedback = state.validator_feedback
     give_feedback = False
 
     # Create a UI to display simulation progress and results
@@ -239,10 +241,6 @@ def environment_simulator_node(state: GraphState) -> Command[Literal["datapoint_
         metrics_achieved_text.delete("1.0", tk.END)
         metrics_achieved_text.insert("1.0", metrics_display)
         metrics_achieved_text.config(state="disabled")
-        
-        # Enable the buttons
-        close_button.config(state="normal")
-        feedback_button.config(state="normal")
     
     def on_close():
         root.destroy()
@@ -264,10 +262,14 @@ def environment_simulator_node(state: GraphState) -> Command[Literal["datapoint_
     root.grid_rowconfigure(0, weight=1)
     root.grid_columnconfigure(0, weight=1)
     
-    # Success message
-    success_label = ttk.Label(main_frame, text="Tree Validation Passed! Simulating Tree:", 
-                             font=("Arial", 14, "bold"), foreground="green")
-    success_label.grid(row=0, column=0, sticky=tk.W, pady=(0, 10))
+    # Status message - Success or Failure
+    if passed_validators:
+        status_label = ttk.Label(main_frame, text="Tree Validation Passed! Simulating Tree:", 
+                                font=("Arial", 14, "bold"), foreground="green")
+    else:
+        status_label = ttk.Label(main_frame, text="Tree Validation Failed!", 
+                                font=("Arial", 14, "bold"), foreground="red")
+    status_label.grid(row=0, column=0, sticky=tk.W, pady=(0, 10))
     
     # Behavior Tree section
     ttk.Label(main_frame, text="Behavior Tree:", font=("Arial", 12, "bold")).grid(row=1, column=0, sticky=tk.W, pady=(0, 5))
@@ -277,36 +279,56 @@ def environment_simulator_node(state: GraphState) -> Command[Literal["datapoint_
     tree_text.insert("1.0", behaviour_tree)
     tree_text.config(state="disabled")
     
-    # Desired Metrics section
-    ttk.Label(main_frame, text="Desired Metrics:", font=("Arial", 12, "bold")).grid(row=3, column=0, sticky=tk.W, pady=(0, 5))
-    metrics_desired_text = tk.Text(main_frame, height=4, width=80, wrap=tk.WORD, state="disabled")
-    metrics_desired_text.grid(row=4, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 20))
-    metrics_desired_text.config(state="normal")
-    metrics_desired_text.insert("1.0", task_metrics_goal)
-    metrics_desired_text.config(state="disabled")
+    # Conditional section - Show either Desired Metrics or Validator Feedback
+    if passed_validators:
+        # Desired Metrics section (only shown when validation passed)
+        ttk.Label(main_frame, text="Desired Metrics:", font=("Arial", 12, "bold")).grid(row=3, column=0, sticky=tk.W, pady=(0, 5))
+        metrics_desired_text = tk.Text(main_frame, height=4, width=80, wrap=tk.WORD, state="disabled")
+        metrics_desired_text.grid(row=4, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 20))
+        metrics_desired_text.config(state="normal")
+        metrics_desired_text.insert("1.0", task_metrics_goal)
+        metrics_desired_text.config(state="disabled")
+    else:
+        # Validator Feedback section (only shown when validation failed)
+        ttk.Label(main_frame, text="Validation Errors:", font=("Arial", 12, "bold"), foreground="red").grid(row=3, column=0, sticky=tk.W, pady=(0, 5))
+        metrics_desired_text = tk.Text(main_frame, height=4, width=80, wrap=tk.WORD, state="disabled")
+        metrics_desired_text.grid(row=4, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 20))
+        metrics_desired_text.config(state="normal")
+        metrics_desired_text.insert("1.0", validator_feedback or "No specific validation feedback available")
+        metrics_desired_text.config(state="disabled")
     
     # Metrics Achieved section
-    ttk.Label(main_frame, text="Metrics Achieved:", font=("Arial", 12, "bold")).grid(row=5, column=0, sticky=tk.W, pady=(0, 5))
-    metrics_achieved_text = tk.Text(main_frame, height=4, width=80, wrap=tk.WORD, state="disabled")
-    metrics_achieved_text.grid(row=6, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 20))
-    metrics_achieved_text.config(state="normal")
-    metrics_achieved_text.insert("1.0", "Waiting for simulation to start...")
-    metrics_achieved_text.config(state="disabled")
+    if passed_validators:
+        ttk.Label(main_frame, text="Metrics Achieved:", font=("Arial", 12, "bold")).grid(row=5, column=0, sticky=tk.W, pady=(0, 5))
+        metrics_achieved_text = tk.Text(main_frame, height=4, width=80, wrap=tk.WORD, state="disabled")
+        metrics_achieved_text.grid(row=6, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 20))
+        metrics_achieved_text.config(state="normal")
+        metrics_achieved_text.insert("1.0", "Waiting for simulation to start...")
+        metrics_achieved_text.config(state="disabled")
+    else:
+        # Show a message that simulation cannot run due to validation failure
+        ttk.Label(main_frame, text="Simulation Status:", font=("Arial", 12, "bold")).grid(row=5, column=0, sticky=tk.W, pady=(0, 5))
+        metrics_achieved_text = tk.Text(main_frame, height=4, width=80, wrap=tk.WORD, state="disabled")
+        metrics_achieved_text.grid(row=6, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 20))
+        metrics_achieved_text.config(state="normal")
+        metrics_achieved_text.insert("1.0", "Cannot run simulation - tree validation failed. Please provide feedback to improve the tree.")
+        metrics_achieved_text.config(state="disabled")
     
     # Button frame
     button_frame = ttk.Frame(main_frame)
     button_frame.grid(row=7, column=0, pady=10)
     
-    # Run simulation button
-    run_button = ttk.Button(button_frame, text="Run Simulation", command=run_simulation)
-    run_button.pack(side=tk.LEFT, padx=(0, 10))
+    # Run simulation button (only enabled if validation passed)
+    if passed_validators:
+        run_button = ttk.Button(button_frame, text="Run Simulation", command=run_simulation)
+        run_button.pack(side=tk.LEFT, padx=(0, 10))
     
-    # Feedback button (initially disabled)
-    feedback_button = ttk.Button(button_frame, text="Give Feedback and Retry", command=on_give_feedback, state="disabled")
+    # Feedback button (always enabled)
+    feedback_button = ttk.Button(button_frame, text="Give Feedback and Retry", command=on_give_feedback)
     feedback_button.pack(side=tk.LEFT, padx=(0, 10))
     
-    # Close button (initially disabled)
-    close_button = ttk.Button(button_frame, text="Save Datapoint", command=on_close, state="disabled")
+    # Save datapoint button (always enabled)
+    close_button = ttk.Button(button_frame, text="Save Datapoint", command=on_close)
     close_button.pack(side=tk.LEFT)
     
     # Configure grid weights for resizing
