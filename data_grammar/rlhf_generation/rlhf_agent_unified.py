@@ -15,6 +15,7 @@ from tkinter import ttk, scrolledtext
 
 from tree_parser import BehaviorTreeGrammarValidator
 from tree_parser.primitives_validator import validate_primitives
+from tree_parser import AgentDocstringParser
 from agent_control import RobotAgent
 from utils.run_robot_sim import run_robot_sim
 from utils.save_data_point import save_datapoint
@@ -82,6 +83,10 @@ class UnifiedRLHFUI:
         )
         
         self.tree_generator_llm = ChatOpenAI(model="gpt-4o", temperature=0)
+        
+        # Initialize agent doc parser for extracting node information
+        self.agent_doc_parser = AgentDocstringParser(RobotAgent)
+        self.agent_config = self.agent_doc_parser.extract_docstring_config()
         
         # Grammar rules for validation
         self.grammar_rules = {                                                                 
@@ -209,9 +214,177 @@ class UnifiedRLHFUI:
         self.nodes_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.nodes_frame, text="Available Nodes")
         
-        # Placeholder content
-        ttk.Label(self.nodes_frame, text="Available Agent Nodes", font=("Arial", 16, "bold")).pack(pady=20)
-        ttk.Label(self.nodes_frame, text="(Node information will be displayed here)", font=("Arial", 12)).pack()
+        # Main container
+        main_container = ttk.Frame(self.nodes_frame)
+        main_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Title
+        title_frame = ttk.Frame(main_container)
+        title_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        ttk.Label(title_frame, text="Available Agent Nodes", font=("Arial", 16, "bold")).pack(side=tk.LEFT)
+        
+        # Create notebook for different node types
+        self.nodes_notebook = ttk.Notebook(main_container)
+        self.nodes_notebook.pack(fill=tk.BOTH, expand=True)
+        
+        # Create tabs for each node type
+        self.create_conditions_tab()
+        self.create_actuator_actions_tab()
+        self.create_state_actions_tab()
+        
+    def create_conditions_tab(self):
+        """Create tab for condition nodes"""
+        conditions_frame = ttk.Frame(self.nodes_notebook)
+        self.nodes_notebook.add(conditions_frame, text="Conditions")
+        
+        # Scrollable text area
+        text_frame = ttk.Frame(conditions_frame)
+        text_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        self.conditions_display = scrolledtext.ScrolledText(text_frame, wrap=tk.WORD, state=tk.DISABLED)
+        self.conditions_display.pack(fill=tk.BOTH, expand=True)
+        
+        # Populate with condition nodes
+        self.populate_conditions()
+        
+    def create_actuator_actions_tab(self):
+        """Create tab for actuator action nodes"""
+        actuator_frame = ttk.Frame(self.nodes_notebook)
+        self.nodes_notebook.add(actuator_frame, text="Actuator Actions")
+        
+        # Scrollable text area
+        text_frame = ttk.Frame(actuator_frame)
+        text_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        self.actuator_display = scrolledtext.ScrolledText(text_frame, wrap=tk.WORD, state=tk.DISABLED)
+        self.actuator_display.pack(fill=tk.BOTH, expand=True)
+        
+        # Populate with actuator action nodes
+        self.populate_actuator_actions()
+        
+    def create_state_actions_tab(self):
+        """Create tab for state action nodes"""
+        state_frame = ttk.Frame(self.nodes_notebook)
+        self.nodes_notebook.add(state_frame, text="State Actions")
+        
+        # Scrollable text area
+        text_frame = ttk.Frame(state_frame)
+        text_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        self.state_display = scrolledtext.ScrolledText(text_frame, wrap=tk.WORD, state=tk.DISABLED)
+        self.state_display.pack(fill=tk.BOTH, expand=True)
+        
+        # Populate with state action nodes
+        self.populate_state_actions()
+        
+    def populate_conditions(self):
+        """Populate conditions tab with available condition nodes"""
+        self.conditions_display.config(state=tk.NORMAL)
+        self.conditions_display.delete(1.0, tk.END)
+        
+        conditions = self.agent_config.get("conditions", [])
+        
+        if conditions:
+            content = "Available Condition Nodes:\n"
+            content += "=" * 50 + "\n\n"
+            
+            for i, condition in enumerate(conditions, 1):
+                content += f"{i}. {condition}\n"
+                content += "-" * 30 + "\n"
+                
+                # Try to get more info about the condition from the agent
+                try:
+                    # Get the method from the agent class
+                    if hasattr(RobotAgent, condition):
+                        method = getattr(RobotAgent, condition)
+                        if hasattr(method, '__doc__') and method.__doc__:
+                            content += f"Description: {method.__doc__.strip()}\n"
+                        else:
+                            content += "Description: No documentation available\n"
+                    else:
+                        content += "Description: Method not found in agent class\n"
+                except Exception as e:
+                    content += f"Description: Error retrieving info - {str(e)}\n"
+                
+                content += "\n"
+        else:
+            content = "No condition nodes found."
+            
+        self.conditions_display.insert(1.0, content)
+        self.conditions_display.config(state=tk.DISABLED)
+        
+    def populate_actuator_actions(self):
+        """Populate actuator actions tab with available actuator action nodes"""
+        self.actuator_display.config(state=tk.NORMAL)
+        self.actuator_display.delete(1.0, tk.END)
+        
+        actuator_actions = self.agent_config.get("actuator_actions", [])
+        
+        if actuator_actions:
+            content = "Available Actuator Action Nodes:\n"
+            content += "=" * 50 + "\n\n"
+            
+            for i, action in enumerate(actuator_actions, 1):
+                content += f"{i}. {action}\n"
+                content += "-" * 30 + "\n"
+                
+                # Try to get more info about the action from the agent
+                try:
+                    # Get the method from the agent class
+                    if hasattr(RobotAgent, action):
+                        method = getattr(RobotAgent, action)
+                        if hasattr(method, '__doc__') and method.__doc__:
+                            content += f"Description: {method.__doc__.strip()}\n"
+                        else:
+                            content += "Description: No documentation available\n"
+                    else:
+                        content += "Description: Method not found in agent class\n"
+                except Exception as e:
+                    content += f"Description: Error retrieving info - {str(e)}\n"
+                
+                content += "\n"
+        else:
+            content = "No actuator action nodes found."
+            
+        self.actuator_display.insert(1.0, content)
+        self.actuator_display.config(state=tk.DISABLED)
+        
+    def populate_state_actions(self):
+        """Populate state actions tab with available state action nodes"""
+        self.state_display.config(state=tk.NORMAL)
+        self.state_display.delete(1.0, tk.END)
+        
+        state_actions = self.agent_config.get("state_actions", [])
+        
+        if state_actions:
+            content = "Available State Action Nodes:\n"
+            content += "=" * 50 + "\n\n"
+            
+            for i, action in enumerate(state_actions, 1):
+                content += f"{i}. {action}\n"
+                content += "-" * 30 + "\n"
+                
+                # Try to get more info about the action from the agent
+                try:
+                    # Get the method from the agent class
+                    if hasattr(RobotAgent, action):
+                        method = getattr(RobotAgent, action)
+                        if hasattr(method, '__doc__') and method.__doc__:
+                            content += f"Description: {method.__doc__.strip()}\n"
+                        else:
+                            content += "Description: No documentation available\n"
+                    else:
+                        content += "Description: Method not found in agent class\n"
+                except Exception as e:
+                    content += f"Description: Error retrieving info - {str(e)}\n"
+                
+                content += "\n"
+        else:
+            content = "No state action nodes found."
+            
+        self.state_display.insert(1.0, content)
+        self.state_display.config(state=tk.DISABLED)
         
     def create_dataset_tab(self):
         """Create the dataset exploration tab"""
