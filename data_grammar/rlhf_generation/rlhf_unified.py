@@ -59,7 +59,8 @@ class UnifiedRLHFUI:
                  agent_class: Agent = None,
                  grammar_rules: dict = None,
                  environment_class = None,
-                 **kwargs):
+                 environment_kwargs: dict = None,
+                 config_kwargs: dict = None):
         self.dataset_path = dataset_path
         self.dataset_size_goal = dataset_size_goal
         self.agent_class = agent_class or RobotAgent  # Default to RobotAgent if none provided
@@ -70,22 +71,9 @@ class UnifiedRLHFUI:
         # Set environment class (use RobotEnvironment if not provided)
         self.environment_class = environment_class or RobotEnvironment
         
-        # Store additional kwargs for environment and config
-        self.environment_kwargs = {}
-        self.config_kwargs = {}
-        
-        # Separate environment and config kwargs
-        env_keys = {'n_agents', 'n_parts', 'task', 'headless', 'bt_path'}
-        config_keys = {'radius', 'visualise_chunks', 'window', 'window_size', 'movement_speed', 'duration'}
-        
-        for key, value in kwargs.items():
-            if key in env_keys:
-                self.environment_kwargs[key] = value
-            elif key in config_keys:
-                self.config_kwargs[key] = value
-            else:
-                # For unknown keys, try environment first, then config
-                self.environment_kwargs[key] = value
+        # Store kwargs for environment and config
+        self.environment_kwargs = environment_kwargs or {}
+        self.config_kwargs = config_kwargs or {}
         
         self.current_state = None
         self.workflow_running = False
@@ -881,38 +869,60 @@ class UnifiedRLHFUI:
         self.root.mainloop()
 
 # ------------------------------ Main Function ------------------------------
-def main(dataset_path: str, dataset_size_goal: int, agent_class=None, **kwargs) -> None:
+def main(dataset_path: str, dataset_size_goal: int, agent_class=None, 
+         grammar_rules: dict = None, environment_class = None,
+         environment_kwargs: dict = None, config_kwargs: dict = None) -> None:
     """Main function to run the unified RLHF UI"""
-    ui = UnifiedRLHFUI(dataset_path, dataset_size_goal, agent_class, **kwargs)
+    ui = UnifiedRLHFUI(
+        dataset_path=dataset_path, 
+        dataset_size_goal=dataset_size_goal, 
+        agent_class=agent_class,
+        grammar_rules=grammar_rules,
+        environment_class=environment_class,
+        environment_kwargs=environment_kwargs,
+        config_kwargs=config_kwargs
+    )
     ui.run()
 
 if __name__ == "__main__":
-    # Example usage with default parameters
+
+    grammar_rules = {                                                                 
+        "B":   [["b", ["SEL"]], ["b", ["SEQ"]]],                                                          
+        "SEL": [["sel", ["SEQn", "As"]], ["sel", ["SEQn"]]],                                               
+        "SEQn":[["SEQ", "SEQn"], ["SEQ"]], 
+        "SEQ": [["seq", ["Pn", "A"]], ["seq", ["As", "Pn", "A"]]],
+        "b":   ["BehaviorTree", ["children_nodes"]],     
+        "sel": ["Selector", ["children_nodes"]],
+        "seq": ["Sequence", ["children_nodes"]],                                            
+        "A":   [["aa", "sa"], ["aa"], ["sa"]],                                                                  
+        "As":  [["aa"], ["sa"]],                                                                  
+        "aa":  ["ActuatorAction"],                                                    
+        "sa":  ["StateAction"],
+        "Pn":  [["p", "Pn"], ["p"], []], 
+        "p":   ["Condition"]
+    }
+
+    # Example usage with custom parameters:
     main(
         dataset_path="./data_grammar/rlhf_generation/output/dataset_path.json", 
         dataset_size_goal=10, 
-        agent_class=RobotAgent
+        agent_class=RobotAgent,
+        environment_class=RobotEnvironment,
+        grammar_rules=grammar_rules,
+
+        # Config parameters for simulation
+        config_kwargs={
+            'radius': 40,
+            'duration': 500,
+            'movement_speed': 1.0,
+            'window_size': 800,
+            'visualise_chunks': True
+        },
+        # Environment parameters
+        environment_kwargs={
+            'n_agents': 15,
+            'n_parts': 20,
+            'task': "custom_task",
+            'headless': False
+        }
     )
-    
-    # Example usage with custom parameters:
-    # main(
-    #     dataset_path="./data_grammar/rlhf_generation/output/dataset_path.json", 
-    #     dataset_size_goal=10, 
-    #     agent_class=RobotAgent,
-    #     environment_class=RobotEnvironment,
-    #     # Custom grammar rules
-    #     grammar_rules={
-    #         "B": [["b", ["SEL"]], ["b", ["SEQ"]]],
-    #         # ... rest of custom grammar
-    #     },
-    #     # Config kwargs
-    #     radius=30,
-    #     duration=2000,
-    #     movement_speed=1.5,
-    #     window_size=800,  # Much simpler than Window.square(800)
-    #     # Environment kwargs
-    #     n_agents=15,
-    #     n_parts=20,
-    #     task="custom_task",
-    #     headless=True
-    # )

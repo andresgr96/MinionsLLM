@@ -17,8 +17,10 @@ def run_robot_sim(
     Args:
         bt_str: The behavior tree XML string
         environment_class: The environment class to use (defaults to RobotEnvironment)
-        environment_kwargs: Keyword arguments for the environment constructor
-        config_kwargs: Keyword arguments for the Config constructor
+        environment_kwargs: Dict of keyword arguments for the environment constructor
+            Example: {'n_agents': 10, 'n_parts': 15, 'task': 'collect', 'headless': False}
+        config_kwargs: Dict of keyword arguments for the Config constructor
+            Example: {'radius': 25, 'duration': 1000, 'window_size': 500, 'movement_speed': 1.0}
         
     Returns:
         Dict containing simulation metrics

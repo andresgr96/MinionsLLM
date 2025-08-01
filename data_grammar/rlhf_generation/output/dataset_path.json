@@ -46,5 +46,11 @@
         "technical_task": "if you detect a scrap part then pick up the part, or otherwise then search randomly.",
         "spoon_task": "if you detect a scrap part then pick up the part, or otherwise then walk randomly.",
         "tree": "<BehaviorTree>\n    <Selector>\n        <Sequence>\n            <Condition>is_scrap_part_detected</Condition>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n        </Sequence>\n        <StateAction>state_random_walk</StateAction>\n    </Selector>\n</BehaviorTree>"
+    },
+    {
+        "layman_task": "Find good parts and pick them up nigga",
+        "technical_task": "if you detect a good part then pick up the part, or otherwise then search randomly.",
+        "spoon_task": "if you detect a good part then pick up the part, or otherwise then walk randomly.",
+        "tree": "<BehaviorTree>\n    <Selector>\n        <Sequence>\n            <Condition>is_good_part_detected</Condition>\n            <ActuatorAction>pick_up_part</ActuatorAction>\n        </Sequence>\n        <StateAction>state_random_walk</StateAction>\n    </Selector>\n</BehaviorTree>"
     }
 ]
