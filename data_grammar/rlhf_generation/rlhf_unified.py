@@ -17,7 +17,7 @@ from tkinter import ttk, scrolledtext
 from tree_parser import BehaviorTreeGrammarValidator
 from tree_parser.primitives_validator import validate_primitives
 from tree_parser import AgentDocstringParser
-from agent_control import RobotAgent
+from agent_control import RobotAgent, RobotEnvironment
 from utils.run_robot_sim import run_robot_sim
 from utils.save_data_point import save_datapoint
 from utils.prompt_builder import PromptBuilder
@@ -53,10 +53,40 @@ class GraphState(BaseModel):
 
 # ------------------------------ Unified UI Class ------------------------------
 class UnifiedRLHFUI:
-    def __init__(self, dataset_path: str, dataset_size_goal: int, agent_class: Agent=None):
+    def __init__(self, 
+                 dataset_path: str, 
+                 dataset_size_goal: int, 
+                 agent_class: Agent = None,
+                 grammar_rules: dict = None,
+                 environment_class = None,
+                 **kwargs):
         self.dataset_path = dataset_path
         self.dataset_size_goal = dataset_size_goal
         self.agent_class = agent_class or RobotAgent  # Default to RobotAgent if none provided
+        
+        # Set grammar rules (use default if not provided)
+        self.grammar_rules = grammar_rules or self._get_default_grammar_rules()
+        
+        # Set environment class (use RobotEnvironment if not provided)
+        self.environment_class = environment_class or RobotEnvironment
+        
+        # Store additional kwargs for environment and config
+        self.environment_kwargs = {}
+        self.config_kwargs = {}
+        
+        # Separate environment and config kwargs
+        env_keys = {'n_agents', 'n_parts', 'task', 'headless', 'bt_path'}
+        config_keys = {'radius', 'visualise_chunks', 'window', 'window_size', 'movement_speed', 'duration'}
+        
+        for key, value in kwargs.items():
+            if key in env_keys:
+                self.environment_kwargs[key] = value
+            elif key in config_keys:
+                self.config_kwargs[key] = value
+            else:
+                # For unknown keys, try environment first, then config
+                self.environment_kwargs[key] = value
+        
         self.current_state = None
         self.workflow_running = False
         
@@ -75,6 +105,24 @@ class UnifiedRLHFUI:
         # Initialize first state
         self.reset_workflow()
         
+    def _get_default_grammar_rules(self):
+        """Get default grammar rules for behavior tree validation"""
+        return {                                                                 
+            "B":   [["b", ["SEL"]], ["b", ["SEQ"]]],                                                          
+            "SEL": [["sel", ["SEQn", "As"]], ["sel", ["SEQn"]]],                                               
+            "SEQn":[["SEQ", "SEQn"], ["SEQ"]], 
+            "SEQ": [["seq", ["Pn", "A"]], ["seq", ["As", "Pn", "A"]]],
+            "b":   ["BehaviorTree", ["children_nodes"]],     
+            "sel": ["Selector", ["children_nodes"]],
+            "seq": ["Sequence", ["children_nodes"]],                                            
+            "A":   [["aa", "sa"], ["aa"], ["sa"]],                                                                  
+            "As":  [["aa"], ["sa"]],                                                                  
+            "aa":  ["ActuatorAction"],                                                    
+            "sa":  ["StateAction"],
+            "Pn":  [["p", "Pn"], ["p"], []], 
+            "p":   ["Condition"]
+        }
+        
     def setup_workflow(self):
         """Initialize the workflow graph and LLM components"""
         self.prompt_builder = PromptBuilder(self.agent_class)
@@ -90,22 +138,7 @@ class UnifiedRLHFUI:
         self.agent_doc_parser = AgentDocstringParser(self.agent_class)
         self.agent_config = self.agent_doc_parser.extract_docstring_config()
         
-        # Grammar rules for validation
-        self.grammar_rules = {                                                                 
-            "B":   [["b", ["SEL"]], ["b", ["SEQ"]]],                                                          
-            "SEL": [["sel", ["SEQn", "As"]], ["sel", ["SEQn"]]],                                               
-            "SEQn":[["SEQ", "SEQn"], ["SEQ"]], 
-            "SEQ": [["seq", ["Pn", "A"]], ["seq", ["As", "Pn", "A"]]],
-            "b":   ["BehaviorTree", ["children_nodes"]],     
-            "sel": ["Selector", ["children_nodes"]],
-            "seq": ["Sequence", ["children_nodes"]],                                            
-            "A":   [["aa", "sa"], ["aa"], ["sa"]],                                                                  
-            "As":  [["aa"], ["sa"]],                                                                  
-            "aa":  ["ActuatorAction"],                                                    
-            "sa":  ["StateAction"],
-            "Pn":  [["p", "Pn"], ["p"], []], 
-            "p":   ["Condition"]
-        }
+
         
     def create_ui(self):
         """Create the main UI with tabs"""
@@ -663,7 +696,12 @@ class UnifiedRLHFUI:
     def run_sim_thread(self):
         """Run simulation in separate thread"""
         try:
-            metrics_result = run_robot_sim(self.current_state.behaviour_tree)
+            metrics_result = run_robot_sim(
+                self.current_state.behaviour_tree,
+                environment_class=self.environment_class,
+                environment_kwargs=self.environment_kwargs,
+                config_kwargs=self.config_kwargs
+            )
             
             # Force pygame to quit
             try:
@@ -843,10 +881,38 @@ class UnifiedRLHFUI:
         self.root.mainloop()
 
 # ------------------------------ Main Function ------------------------------
-def main(dataset_path: str, dataset_size_goal: int, agent_class=None) -> None:
+def main(dataset_path: str, dataset_size_goal: int, agent_class=None, **kwargs) -> None:
     """Main function to run the unified RLHF UI"""
-    ui = UnifiedRLHFUI(dataset_path, dataset_size_goal, agent_class)
+    ui = UnifiedRLHFUI(dataset_path, dataset_size_goal, agent_class, **kwargs)
     ui.run()
 
 if __name__ == "__main__":
-    main(dataset_path="./data_grammar/rlhf_generation/output/dataset_path.json", dataset_size_goal=10, agent_class=RobotAgent)
+    # Example usage with default parameters
+    main(
+        dataset_path="./data_grammar/rlhf_generation/output/dataset_path.json", 
+        dataset_size_goal=10, 
+        agent_class=RobotAgent
+    )
+    
+    # Example usage with custom parameters:
+    # main(
+    #     dataset_path="./data_grammar/rlhf_generation/output/dataset_path.json", 
+    #     dataset_size_goal=10, 
+    #     agent_class=RobotAgent,
+    #     environment_class=RobotEnvironment,
+    #     # Custom grammar rules
+    #     grammar_rules={
+    #         "B": [["b", ["SEL"]], ["b", ["SEQ"]]],
+    #         # ... rest of custom grammar
+    #     },
+    #     # Config kwargs
+    #     radius=30,
+    #     duration=2000,
+    #     movement_speed=1.5,
+    #     window_size=800,  # Much simpler than Window.square(800)
+    #     # Environment kwargs
+    #     n_agents=15,
+    #     n_parts=20,
+    #     task="custom_task",
+    #     headless=True
+    # )
