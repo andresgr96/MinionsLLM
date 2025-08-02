@@ -23,6 +23,7 @@ load_dotenv()
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
+
 class GraphState(BaseModel):
     """Represents the state of our graph."""
 
@@ -1203,72 +1204,3 @@ class UnifiedRLHFUI:
     def run(self) -> None:
         """Start the application."""
         self.root.mainloop()
-
-
-def main(
-    agent_class: Type[Agent] = RobotAgent,
-    grammar_rules: Optional[Dict[str, Any]] = None,
-    environment_class: Optional[Type[Any]] = None,
-    environment_kwargs: Optional[Dict[str, Any]] = None,
-    config_kwargs: Optional[Dict[str, Any]] = None,
-) -> None:
-    """Run the unified RLHF UI application.
-
-    Args:
-        agent_class: The agent class to use for behavior tree validation.
-        grammar_rules: Custom grammar rules for behavior tree validation.
-        environment_class: Custom environment class for simulation.
-        environment_kwargs: Arguments to pass to the environment constructor.
-        config_kwargs: Configuration arguments for the agent.
-    """
-    ui = UnifiedRLHFUI(
-        dataset_path="./data_grammar/rlhf_generation/output/dataset_path.json",
-        dataset_size_goal=10,
-        agent_class=agent_class,
-        grammar_rules=grammar_rules,
-        environment_class=environment_class,
-        environment_kwargs=environment_kwargs,
-        config_kwargs=config_kwargs,
-    )
-    ui.run()
-
-
-if __name__ == "__main__":
-
-    grammar_rules = {
-        "B": [["b", ["SEL"]], ["b", ["SEQ"]]],
-        "SEL": [["sel", ["SEQn", "As"]], ["sel", ["SEQn"]]],
-        "SEQn": [["SEQ", "SEQn"], ["SEQ"]],
-        "SEQ": [["seq", ["Pn", "A"]], ["seq", ["As", "Pn", "A"]]],
-        "b": ["BehaviorTree", ["children_nodes"]],
-        "sel": ["Selector", ["children_nodes"]],
-        "seq": ["Sequence", ["children_nodes"]],
-        "A": [["aa", "sa"], ["aa"], ["sa"]],
-        "As": [["aa"], ["sa"]],
-        "aa": ["ActuatorAction"],
-        "sa": ["StateAction"],
-        "Pn": [["p", "Pn"], ["p"], []],
-        "p": ["Condition"],
-    }
-
-    # Example usage with custom parameters:
-    main(
-        agent_class=RobotAgent,
-        environment_class=RobotEnvironment,
-        grammar_rules=grammar_rules,
-        # Config parameters for simulation
-        config_kwargs={
-            "radius": 40,
-            "duration": 500,
-            "movement_speed": 1.0,
-            "window_size": 800,
-            "visualise_chunks": True,
-        },
-        # Environment parameters
-        environment_kwargs={
-            "n_agents": 10,
-            "n_parts": 10,
-            "task": "custom_task",
-            "headless": False,
-        },
-    )
