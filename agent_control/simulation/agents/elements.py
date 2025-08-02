@@ -54,7 +54,7 @@ class Part(Agent):
 
     def update(self) -> None:
         """Update the part's position and state."""
-        if self.owner and not self.is_permanently_placed and hasattr(self.owner, 'pos'):
+        if self.owner and not self.is_permanently_placed and hasattr(self.owner, "pos"):
             self.pos = self.owner.pos
 
     def can_be_picked_up(self) -> bool:

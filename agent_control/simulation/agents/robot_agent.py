@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, List
 
 import pygame as pg
 from pygame.math import Vector2
-from vi import Agent, Simulation, HeadlessSimulation
+from vi import Agent, HeadlessSimulation, Simulation
 
 from tree_parser.middle_parser import parse_behavior_tree
 
