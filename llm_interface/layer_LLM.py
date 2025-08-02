@@ -21,7 +21,7 @@ try:
 except ImportError:
     OLLAMA_AVAILABLE = False
 
-from dotenv import load_dotenv  # type: ignore
+from dotenv import load_dotenv
 from lancedb import table
 from lancedb.pydantic import LanceModel
 from openai import OpenAI
@@ -406,7 +406,7 @@ class BehaviorTreeGenerator:
                 with open(modelfile_path, "r") as f:
                     modelfile_content = f.read()
 
-                ollama.create(model=model_name, modelfile=modelfile_content)
+                ollama.create(model=model_name, modelfile=modelfile_content)  # type: ignore[call-overload]
                 print(f"Successfully imported model as: {model_name}")
                 # Return with :latest suffix since that's how Ollama stores it
                 return f"{model_name}:latest"
@@ -414,7 +414,7 @@ class BehaviorTreeGenerator:
                 # If API also fails, try one more approach - stream the creation
                 try:
                     print("Trying streaming create...")
-                    for response in ollama.create(
+                    for response in ollama.create(  # type: ignore[call-overload]
                         model=model_name, modelfile=modelfile_content, stream=True
                     ):
                         if "status" in response:
