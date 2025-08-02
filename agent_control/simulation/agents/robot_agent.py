@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, List
 
 import pygame as pg
 from pygame.math import Vector2
-from vi import Agent, Simulation
+from vi import Agent, Simulation, HeadlessSimulation
 
 from tree_parser.middle_parser import parse_behavior_tree
 
@@ -16,13 +16,13 @@ if TYPE_CHECKING:
     from ..envs.base_env import SimEnvironment
 
 
-class RobotAgent(Agent):  # type: ignore
+class RobotAgent(Agent):
     """Robot agent that executes behavior trees in simulation environments."""
 
     def __init__(
         self,
         images: List[pg.Surface],
-        simulation: Simulation,
+        simulation: Simulation | HeadlessSimulation,
         pos: Vector2,
         env: "SimEnvironment",
         xml_path: str,
