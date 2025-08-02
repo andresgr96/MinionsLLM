@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from ..envs.robot_env import RobotEnvironment
 
 
-class Part(Agent):  # type: ignore
+class Part(Agent):
     """Part object that can be picked up and moved by robot agents."""
 
     def __init__(
@@ -38,7 +38,7 @@ class Part(Agent):  # type: ignore
         self.simulation = simulation
         self.type = type
         self.pos = pos
-        self.owner: Optional[Agent] = None
+        self.owner: Optional[Agent | "RobotEnvironment"] = None
         self.env = env
         self.is_permanently_placed = False
         self.update_img()
@@ -50,11 +50,11 @@ class Part(Agent):  # type: ignore
 
     def remove_part(self) -> None:
         """Remove this part from the simulation."""
-        self.kill()
+        self.kill()  # type: ignore[no-untyped-call]
 
     def update(self) -> None:
         """Update the part's position and state."""
-        if self.owner and not self.is_permanently_placed:
+        if self.owner and not self.is_permanently_placed and hasattr(self.owner, "pos"):
             self.pos = self.owner.pos
 
     def can_be_picked_up(self) -> bool:
