@@ -2,7 +2,7 @@
 
 import json
 import os
-from typing import Type
+from typing import Type, Any
 
 from data_grammar.grammar_gen.tree_to_prompt import generate_spoon_prompt_from_string, generate_technical_prompt_from_string
 from data_grammar.grammar_gen.node_translations import node_connectors 
@@ -10,7 +10,7 @@ from agent_control import RobotAgent
 from tree_parser import AgentDocstringParser
 
 
-def save_datapoint(dataset_path: str, task_description: str, tree_str: str, agent_class: Type) -> None:
+def save_datapoint(dataset_path: str, task_description: str, tree_str: str, agent_class: Type[Any]) -> None:
     """
     Save a single datapoint to the dataset file after generating other prompt styles.
     

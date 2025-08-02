@@ -27,7 +27,7 @@ from tree_parser.agent_doc_parser import AgentDocstringParser
 
 # Add type: ignore for dotenv import since it's an optional dependency
 try:
-    from dotenv import load_dotenv  # type: ignore
+    from dotenv import load_dotenv
 
     load_dotenv()
 except ImportError:

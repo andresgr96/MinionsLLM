@@ -8,7 +8,7 @@ import os
 
 def run_robot_sim(
     bt_str: str, 
-    environment_class: Type = None,
+    environment_class: Optional[Type[Any]] = None,
     environment_kwargs: Optional[Dict[str, Any]] = None,
     config_kwargs: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
@@ -77,8 +77,17 @@ def run_robot_sim(
     environment = environment_class(**final_environment)
     environment.setup()
     
-    # Run the simulation and collect metrics
-    results = environment.run()
+    try:
+        # Run the simulation and collect metrics
+        results = environment.run()
+    finally:
+        # Ensure pygame is properly cleaned up
+        try:
+            import pygame
+            pygame.display.quit()
+            pygame.quit()
+        except:
+            pass  # Ignore errors if pygame is not available or already cleaned up
 
     # Delete the temp behavior tree
     os.remove(bt_path)
