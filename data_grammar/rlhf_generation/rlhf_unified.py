@@ -23,28 +23,6 @@ load_dotenv()
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
-
-# ------------------------------ Define Graph Schemas ------------------------------
-class GraphInput(BaseModel):
-    """Input model for the graph workflow."""
-
-    task_definition: str = Field(
-        description="The natural language definition of the task to be executed"
-    )
-    task_metrics_goal: str = Field(
-        description="The user defined metrics the tree should achieve in the simulation"
-    )
-    dataset_size: int = Field(description="The number of samples generated")
-    dataset_path: str = Field(description="The path to the dataset")
-    dataset_size_goal: int = Field(description="The goal number of samples to generate")
-
-
-class GraphOutput(BaseModel):
-    """Output model for the graph workflow."""
-
-    message: str = Field(description="The final message of the graph")
-
-
 class GraphState(BaseModel):
     """Represents the state of our graph."""
 
@@ -92,26 +70,26 @@ class UnifiedRLHFUI:
         environment_kwargs: Optional[Dict[str, Any]] = None,
         config_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
-        """Initialize the unified RLHF UI with the given parameters."""
+        """Initialize the unified RLHF UI with the given parameters.
+
+        Args:
+            dataset_path: Path to the dataset file.
+            dataset_size_goal: Target number of datapoints to generate.
+            agent_class: The agent class to use for behavior tree validation.
+            grammar_rules: Custom grammar rules for behavior tree validation.
+            environment_class: Custom environment class for simulation.
+            environment_kwargs: Arguments to pass to the environment constructor.
+            config_kwargs: Configuration arguments for the agent.
+        """
         self.dataset_path = dataset_path
         self.dataset_size_goal = dataset_size_goal
-        self.agent_class = (
-            agent_class or RobotAgent
-        )  # Default to RobotAgent if none provided
-
-        # Set grammar rules (use default if not provided)
+        self.agent_class = agent_class or RobotAgent
         self.grammar_rules = grammar_rules or self._get_default_grammar_rules()
-
-        # Set environment class (use RobotEnvironment if not provided)
         self.environment_class = environment_class or RobotEnvironment
-
-        # Store kwargs for environment and config
-        # Ensure headless mode is enabled by default to prevent pygame window conflicts
         default_env_kwargs = {"headless": True}
         if environment_kwargs:
             default_env_kwargs.update(environment_kwargs)
         self.environment_kwargs = default_env_kwargs
-
         self.config_kwargs = config_kwargs or {}
 
         self.current_state: Optional[GraphState] = None
@@ -127,15 +105,15 @@ class UnifiedRLHFUI:
 
         # Initialize workflow components
         self.setup_workflow()
-
-        # Create UI
         self.create_ui()
-
-        # Initialize first state
         self.reset_workflow()
 
     def _get_default_grammar_rules(self) -> Dict[str, Any]:
-        """Get default grammar rules for behavior tree validation."""
+        """Get default grammar rules for behavior tree validation.
+
+        Returns:
+            Dictionary containing default grammar rules for behavior tree validation.
+        """
         return {
             "B": [["b", ["SEL"]], ["b", ["SEQ"]]],
             "SEL": [["sel", ["SEQn", "As"]], ["sel", ["SEQn"]]],
@@ -208,7 +186,14 @@ class UnifiedRLHFUI:
         self.create_right_panel(right_frame)
 
     def create_left_panel(self, parent: tk.Widget) -> tk.Widget:
-        """Create the left control panel."""
+        """Create the left control panel.
+
+        Args:
+            parent: The parent widget to attach the panel to.
+
+        Returns:
+            The created left panel widget.
+        """
         # Dataset info
         info_frame = ttk.LabelFrame(parent, text="Dataset Information", padding=10)
         info_frame.pack(fill=tk.X, pady=(0, 10))
@@ -292,7 +277,14 @@ class UnifiedRLHFUI:
         return parent
 
     def create_right_panel(self, parent: tk.Widget) -> tk.Widget:
-        """Create the right information display panel."""
+        """Create the right information display panel.
+
+        Args:
+            parent: The parent widget to attach the panel to.
+
+        Returns:
+            The created right panel widget.
+        """
         # Status display
         status_frame = ttk.LabelFrame(parent, text="Status", padding=10)
         status_frame.pack(fill=tk.X, pady=(0, 10))
@@ -429,7 +421,6 @@ class UnifiedRLHFUI:
             self.conditions_display.insert(tk.END, "=" * 50 + "\n\n")
 
             for i, condition in enumerate(conditions, 1):
-                # Insert node name with bold formatting
                 self.conditions_display.insert(
                     tk.END, f"{i}. {condition}\n", "node_name"
                 )
@@ -437,7 +428,6 @@ class UnifiedRLHFUI:
 
                 # Try to get more info about the condition from the agent
                 try:
-                    # Get the method from the agent class
                     if hasattr(self.agent_class, condition):
                         method = getattr(self.agent_class, condition)
                         if hasattr(method, "__doc__") and method.__doc__:
@@ -491,20 +481,17 @@ class UnifiedRLHFUI:
         actuator_actions = self.agent_config.get("actuator_actions", [])
 
         if actuator_actions:
-            # Insert title
             self.actuator_display.insert(
                 tk.END, "Available Actuator Action Nodes:\n", "title"
             )
             self.actuator_display.insert(tk.END, "=" * 50 + "\n\n")
 
             for i, action in enumerate(actuator_actions, 1):
-                # Insert node name with bold formatting
                 self.actuator_display.insert(tk.END, f"{i}. {action}\n", "node_name")
                 self.actuator_display.insert(tk.END, "-" * 30 + "\n")
 
                 # Try to get more info about the action from the agent
                 try:
-                    # Get the method from the agent class
                     if hasattr(self.agent_class, action):
                         method = getattr(self.agent_class, action)
                         if hasattr(method, "__doc__") and method.__doc__:
@@ -560,20 +547,17 @@ class UnifiedRLHFUI:
         state_actions = self.agent_config.get("state_actions", [])
 
         if state_actions:
-            # Insert title
             self.state_display.insert(
                 tk.END, "Available State Action Nodes:\n", "title"
             )
             self.state_display.insert(tk.END, "=" * 50 + "\n\n")
 
             for i, action in enumerate(state_actions, 1):
-                # Insert node name with bold formatting
                 self.state_display.insert(tk.END, f"{i}. {action}\n", "node_name")
                 self.state_display.insert(tk.END, "-" * 30 + "\n")
 
                 # Try to get more info about the action from the agent
                 try:
-                    # Get the method from the agent class
                     if hasattr(self.agent_class, action):
                         method = getattr(self.agent_class, action)
                         if hasattr(method, "__doc__") and method.__doc__:
@@ -677,7 +661,6 @@ class UnifiedRLHFUI:
 
     def reset_workflow(self) -> None:
         """Reset the workflow to initial state."""
-        # Calculate current dataset size
         current_size = self.get_current_dataset_size()
 
         self.current_state = GraphState(
@@ -687,8 +670,6 @@ class UnifiedRLHFUI:
             dataset_path=self.dataset_path,
             dataset_size_goal=self.dataset_size_goal,
         )
-
-        # Reset workflow state
         self.workflow_running = False
 
         # Clear input fields for fresh start
@@ -703,7 +684,11 @@ class UnifiedRLHFUI:
         self.reset_buttons()
 
     def get_current_dataset_size(self) -> int:
-        """Get current dataset size from file."""
+        """Get current dataset size from file.
+
+        Returns:
+            The current number of datapoints in the dataset file.
+        """
         import json
 
         if os.path.exists(self.dataset_path):
@@ -728,7 +713,12 @@ class UnifiedRLHFUI:
         self.progress_label.config(text=f"Progress: {progress:.1f}%")
 
     def update_status(self, message: str, color: str = "black") -> None:
-        """Update status message."""
+        """Update status message.
+
+        Args:
+            message: The status message to display.
+            color: The color of the status message.
+        """
         self.status_label.config(text=message, foreground=color)
         self.root.update()
 
@@ -780,6 +770,9 @@ class UnifiedRLHFUI:
             )
             self._feedback_mode = False
             self.feedback_frame.pack_forget()
+        else:
+            if self.current_state:
+                self.current_state.human_feedback = None
 
         # Start generation in separate thread
         self.workflow_running = True
@@ -797,11 +790,17 @@ class UnifiedRLHFUI:
                 )
                 return
 
-            # Prepare prompt
-            prompt = f"Please generate a behaviour tree for the following task: {self.current_state.task_definition} \nThe task metrics goal is: {self.current_state.task_metrics_goal}"
+            # Prepare base prompt
+            prompt = f"Please generate a behaviour tree for the following task: {self.current_state.task_definition}"
 
+            # Add metrics goal if provided
+            if self.current_state.task_metrics_goal:
+                prompt += f"\nThe task metrics to achieve are: {self.current_state.task_metrics_goal}"
+
+            # Add feedback section if there's human feedback
             if self.current_state.human_feedback:
-                prompt += f"\n\nHuman Feedback on Previous Attempt: {self.current_state.human_feedback}\nPlease incorporate this feedback to improve the behavior tree."
+                previous_tree = self.current_state.behaviour_tree or "No previous tree"
+                prompt += f"\n\nYour previous attempt was:\n{previous_tree}\n\nHuman Feedback on Previous Attempt: {self.current_state.human_feedback}\n\nPlease incorporate this feedback to improve the behavior tree."
 
             # Generate tree
             class TreeGeneratorOutput(BaseModel):
@@ -831,10 +830,13 @@ class UnifiedRLHFUI:
             self.root.after(0, self.on_generation_error, str(e))
 
     def on_tree_generated(self, behaviour_tree: str) -> None:
-        """Handle successful tree generation."""
+        """Handle successful tree generation.
+
+        Args:
+            behaviour_tree: The generated behavior tree string.
+        """
         if self.current_state:
             self.current_state.behaviour_tree = behaviour_tree
-            self.current_state.human_feedback = None  # Reset feedback
 
         # Display tree
         self.tree_display.config(state=tk.NORMAL)
@@ -848,7 +850,11 @@ class UnifiedRLHFUI:
         threading.Thread(target=self.validate_tree, daemon=True).start()
 
     def on_generation_error(self, error_msg: str) -> None:
-        """Handle tree generation errors."""
+        """Handle tree generation errors.
+
+        Args:
+            error_msg: The error message to display.
+        """
         self.update_status(f"Generation failed: {error_msg}", "red")
 
         # Reset workflow state
@@ -896,7 +902,12 @@ class UnifiedRLHFUI:
             self.root.after(0, self.on_validation_error, str(e))
 
     def on_validation_complete(self, passed: bool, feedback: str) -> None:
-        """Handle validation completion."""
+        """Handle validation completion.
+
+        Args:
+            passed: Whether the validation passed.
+            feedback: The validation feedback message.
+        """
         if self.current_state:
             self.current_state.passed_validator = passed
             self.current_state.validator_feedback = feedback
@@ -930,7 +941,11 @@ class UnifiedRLHFUI:
         self.prompt_button.config(state=tk.NORMAL)
 
     def on_validation_error(self, error_msg: str) -> None:
-        """Handle validation errors."""
+        """Handle validation errors.
+
+        Args:
+            error_msg: The error message to display.
+        """
         self.update_status(f"Validation failed: {error_msg}", "red")
 
         # Reset workflow state
@@ -949,7 +964,11 @@ class UnifiedRLHFUI:
         threading.Thread(target=self.run_sim_thread, daemon=True).start()
 
     def run_sim_thread(self) -> None:
-        """Run simulation in background thread."""
+        """Run simulation in background thread.
+
+        Raises:
+            ValueError: If there is an error during simulation execution.
+        """
         try:
             if not self.current_state or not self.current_state.behaviour_tree:
                 raise ValueError("No valid tree available for simulation")
@@ -966,7 +985,11 @@ class UnifiedRLHFUI:
             self.root.after(0, self.on_simulation_error, str(e))
 
     def on_simulation_complete(self, metrics_result: Dict[str, Any]) -> None:
-        """Handle simulation completion."""
+        """Handle simulation completion.
+
+        Args:
+            metrics_result: The simulation metrics and results.
+        """
         if self.current_state:
             self.current_state.task_metrics_result = metrics_result
 
@@ -990,7 +1013,11 @@ class UnifiedRLHFUI:
         self.root.update()
 
     def on_simulation_error(self, error_msg: str) -> None:
-        """Handle simulation errors."""
+        """Handle simulation errors.
+
+        Args:
+            error_msg: The error message to display.
+        """
         self.update_status(f"Simulation failed: {error_msg}", "red")
 
         # Re-enable the simulation button on error
@@ -1043,7 +1070,11 @@ class UnifiedRLHFUI:
             self.update_status(f"Failed to save datapoint: {e}", "red")
 
     def ask_continue_generation(self) -> bool:
-        """Ask user if they want to continue generating data."""
+        """Ask user if they want to continue generating data.
+
+        Returns:
+            True if the user wants to continue, False otherwise.
+        """
         if not self.current_state:
             return False
 
@@ -1089,7 +1120,6 @@ class UnifiedRLHFUI:
                 with open(self.dataset_path, "r") as f:
                     dataset = json.load(f)
                     for i, datapoint in enumerate(dataset):
-                        # Show preview of layman task
                         preview = datapoint.get("layman_task", "No task description")[
                             :50
                         ]
@@ -1102,7 +1132,11 @@ class UnifiedRLHFUI:
         self.clear_dataset_details()
 
     def on_datapoint_select(self, event: Any) -> None:
-        """Handle datapoint selection in the list."""
+        """Handle datapoint selection in the list.
+
+        Args:
+            event: The selection event from the listbox.
+        """
         try:
             selection = self.datapoint_listbox.curselection()  # type: ignore[no-untyped-call]
             if not selection:
@@ -1119,7 +1153,11 @@ class UnifiedRLHFUI:
             pass
 
     def display_datapoint_details(self, datapoint: Dict[str, Any]) -> None:
-        """Display details of selected datapoint."""
+        """Display details of selected datapoint.
+
+        Args:
+            datapoint: The datapoint dictionary containing task and tree information.
+        """
         # Display layman task
         self.layman_display.config(state=tk.NORMAL)
         self.layman_display.delete(1.0, tk.END)
@@ -1174,7 +1212,15 @@ def main(
     environment_kwargs: Optional[Dict[str, Any]] = None,
     config_kwargs: Optional[Dict[str, Any]] = None,
 ) -> None:
-    """Run the unified RLHF UI application."""
+    """Run the unified RLHF UI application.
+
+    Args:
+        agent_class: The agent class to use for behavior tree validation.
+        grammar_rules: Custom grammar rules for behavior tree validation.
+        environment_class: Custom environment class for simulation.
+        environment_kwargs: Arguments to pass to the environment constructor.
+        config_kwargs: Configuration arguments for the agent.
+    """
     ui = UnifiedRLHFUI(
         dataset_path="./data_grammar/rlhf_generation/output/dataset_path.json",
         dataset_size_goal=10,
