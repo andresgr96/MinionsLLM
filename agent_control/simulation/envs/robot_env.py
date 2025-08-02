@@ -88,32 +88,32 @@ class RobotEnvironment(SimEnvironment):
         """Draw arena boundaries in the simulation environment."""
         self.simulation.spawn_obstacle(
             "./agent_control/simulation/images/arena_new.png",
-            self.arena_pos.x,
-            self.arena_pos.y,
+            int(self.arena_pos.x),
+            int(self.arena_pos.y),
         )
 
     def draw_source(self) -> None:
         """Draw source area where good parts are located."""
         self.simulation.spawn_site(
             "./agent_control/simulation/images/source_green.png",
-            self.source_pos.x,
-            self.source_pos.y,
+            int(self.source_pos.x),
+            int(self.source_pos.y),
         )
 
     def draw_nest(self) -> None:
         """Draw base/nest area where parts should be delivered."""
         self.simulation.spawn_site(
             "./agent_control/simulation/images/blue_nest.png",
-            self.base_pos.x,
-            self.base_pos.y,
+            int(self.base_pos.x),
+            int(self.base_pos.y),
         )
 
     def draw_waste(self) -> None:
         """Draw waste area where bad parts should be disposed."""
         self.simulation.spawn_site(
             "./agent_control/simulation/images/waste_red.png",
-            self.waste_pos.x,
-            self.waste_pos.y,
+            int(self.waste_pos.x),
+            int(self.waste_pos.y),
         )
 
     def spawn_part(self, type: str, pos: Vector2) -> None:
@@ -141,7 +141,7 @@ class RobotEnvironment(SimEnvironment):
         Args:
             part: Part object to remove from simulation
         """
-        part.kill()
+        part.kill()  # type: ignore[no-untyped-call]
 
     def place_parts(self, num_parts: int) -> None:
         """

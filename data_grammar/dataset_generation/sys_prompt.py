@@ -504,7 +504,7 @@ Tree:
 </BehaviorTree>
 
 Metrics:
-{"good_parts_picked_up": 1}
+{{"good_parts_picked_up": 1}}
 
 Task: Your task is to find a good part and stop moving.
 
@@ -528,7 +528,7 @@ Tree:
 </BehaviorTree>
 
 Metrics:
-{"good_parts_picked_up": 1}
+{{"good_parts_picked_up": 1}}
 
 Task: Your task is to find a scrap part and stop moving.
 
@@ -552,7 +552,7 @@ Tree:
 </BehaviorTree>
 
 Metrics:
-{"bad_parts_picked_up": 1}
+{{"bad_parts_picked_up": 1}}
 
 -Examples for finding and bringing parts to areas:
 
@@ -584,7 +584,7 @@ Tree:
 </BehaviorTree>
 
 Metrics:
-{"good_parts_picked_up": 1, "parts_dropped_in_construction": [1, 0]}
+{{"good_parts_picked_up": 1, "parts_dropped_in_construction": [1, 0]}}
 
 Task: Your task is to find scrap parts and bring them to the source area.
 
@@ -614,7 +614,7 @@ Tree:
 </BehaviorTree>
 
 Metrics:
-{"bad_parts_picked_up": 1, "parts_dropped_in_source": [0, 1]}
+{{"bad_parts_picked_up": 1, "parts_dropped_in_source": [0, 1]}}
 
 
 - Complex example on how to handle both good and scrap parts to different areas:
@@ -666,7 +666,7 @@ Tree:
 </BehaviorTree>
 
 Metrics:
-{"good_parts_picked_up": 1, "bad_parts_picked_up": 1, "parts_dropped_in_storage": [1, 0], "parts_dropped_in_source": [0, 1]}
+{{"good_parts_picked_up": 1, "bad_parts_picked_up": 1, "parts_dropped_in_storage": [1, 0], "parts_dropped_in_source": [0, 1]}}
 
 
 You can use the examples above to help you understand how nodes come toguether to build functional units of a behaviour tree, but you can also take direct inspiration to populate a tree if the strucutre is the same or similar to an example.
@@ -722,7 +722,7 @@ Tree:
 </BehaviorTree>
 
 Metrics:
-{"bad_parts_picked_up": 1}
+{{"bad_parts_picked_up": 1}}
 
 """
 

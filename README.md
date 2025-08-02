@@ -65,6 +65,7 @@ Explore synthetic dataset generation using formal grammars:
 - **`custom_grammar_gen.py`** - Generate datasets using custom grammar configurations
 - **`filtered_dataset_generation.py`** - Advanced dataset generation with simulation-based filtering
 - **`mixed_gen.py`** - Mixed dataset generation combining multiple approaches
+- **`rlhf_dataset_gen.py`** - Interactive RLHF-inspired dataset generation with human-in-the-loop feedback using a unified GUI
 
 #### **Experimental Setup Examples** (`examples/04_experimental_setup_example/`)
 Complete experimental pipeline example for research and evaluation:

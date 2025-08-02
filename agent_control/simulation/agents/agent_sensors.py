@@ -25,7 +25,7 @@ class LightSensor:
         Returns:
             Vector2: Direction vector to the nearest light source
         """
-        light_pos = self.agent.env.light_pos
+        light_pos = self.agent.env.light_pos  # type: ignore[attr-defined]
         agent_pos = self.agent.pos
         diff_vec: Vector2 = light_pos - agent_pos
 
