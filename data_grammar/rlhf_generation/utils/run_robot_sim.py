@@ -1,4 +1,4 @@
-""" Run a simulation in the robot environment """
+"""Run robot simulation with behavior tree and return metrics."""
 
 import os
 from typing import Any, Dict, Optional, Type

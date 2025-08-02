@@ -1,4 +1,4 @@
-""" Save a datapoint in the given path after producing other prompt styles """
+"""Save a datapoint in the given path after producing other prompt styles."""
 
 import json
 import os

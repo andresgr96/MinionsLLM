@@ -1,4 +1,4 @@
-"""Class to build system prompt for the RLHF agent"""
+"""Class to build system prompt for the RLHF agent."""
 
 import os
 from typing import Dict, Type
