@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "MinionsLLM"
-version = "1.0.0"
+version = "1.0.1"
 description = "Task-adaptive Framework for the Control of Multi-Agent Systems Through Natural Language"
 authors = [
     {name = "Andres Garcia", email = "a.a.garciarincon@student.vu.nl"},
