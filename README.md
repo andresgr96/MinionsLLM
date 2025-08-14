@@ -1,12 +1,12 @@
 # MinionsLLM
 Minions LLM is a Task-adaptive Framework for the Control of Multi-Agent Systems Through Natural Language by integrating Large Language Models with Behavior Trees and
-Formal Grammars to enable natural language control of multi-agent systems within arbitrary, user-defined environments. 
+Formal Grammars to enable the training and control of multi-agent systems within arbitrary, user-defined environments. 
 
 ## Disclaimer
 This framework was built for the research for my masters thesis at VU Amsterdam, supervised by Dr. Eliseo Ferrante.
-For a full explanation of the framework and experimental results, feel free to read my thesis: 
+For a full explanation of the framework and experimental results, feel free to read the paper: 
 
-https://drive.google.com/file/d/19GDlBFKiZ7za9IqG7FQQxjw5b5SSKyLZ/view?usp=sharing
+https://doi.org/10.48550/arXiv.2508.08283
 
 ## Installation
 
